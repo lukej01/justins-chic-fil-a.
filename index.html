@@ -185,6 +185,24 @@ canvas{display:block;width:100%;height:100%}
 .tix-line{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .tix-item{display:inline-flex;align-items:center;gap:3px;background:rgba(0,0,0,.05);border-radius:10px;padding:2px 7px;font-size:.82em;font-weight:700}
 .tix-item .tix-x{color:var(--red);font-weight:900}
+/* Watch Jacob (Caitlin side-game) */
+.wj-wrap{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:stretch;gap:12px}
+.wj-cam{background:#0e1118;border:2px solid #28344f;border-radius:14px;padding:10px;position:relative;overflow:hidden}
+.wj-camlabel{font-size:.62em;font-weight:800;color:#5fd0ff;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase}
+.wj-rec{width:7px;height:7px;border-radius:50%;background:#ff3b3b;display:inline-block;animation:glow 1.2s ease-in-out infinite}
+.wj-stage{position:relative;height:96px;display:flex;align-items:flex-end;justify-content:center;background:repeating-linear-gradient(0deg,#171c28,#171c28 8px,#141925 8px,#141925 16px);border-radius:8px;cursor:pointer}
+.wj-char{height:84px;width:auto;image-rendering:pixelated}
+.wj-char.flirting{animation:wjLean .5s ease-in-out infinite alternate}
+@keyframes wjLean{from{transform:rotate(0)}to{transform:rotate(7deg)}}
+.wj-girl{position:absolute;right:18px;bottom:6px;opacity:0;transform:translateX(46px);transition:opacity .3s,transform .35s ease-out}
+.wj-girl.show{opacity:1;transform:translateX(0)}
+.wj-tap{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:.55em;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1px;pointer-events:none}
+.wj-alert{position:absolute;top:30px;left:50%;transform:translateX(-50%) scale(.85);background:var(--danger);color:#fff;font-size:.66em;font-weight:800;padding:5px 11px;border-radius:11px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;white-space:nowrap;box-shadow:0 3px 12px rgba(255,51,51,.55)}
+.wj-alert.show{opacity:1;transform:translateX(-50%) scale(1);animation:timerPulse .5s ease-in-out infinite}
+.wj-status{display:flex;justify-content:space-between;align-items:center;font-size:.74em;font-weight:800;color:#fff;padding:0 4px}
+.wj-status #wj-caught{color:#4f4}.wj-status #wj-missed{color:#ff7a7a}.wj-status #wj-prog{letter-spacing:3px;color:#FFD700;font-size:.9em}
+.wj-btn{width:100%;font-size:.8em;padding:15px}
+
 /* Car graphics (curbside + drive-thru) */
 .car-emoji{font-size:2.4em;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3))}
 .dt-car-big{font-size:3.4em;line-height:1;animation:carIn .4s ease-out;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
@@ -216,6 +234,40 @@ canvas{display:block;width:100%;height:100%}
 .scold h2{font-family:'Fredoka One',cursive;color:var(--danger);font-size:1.4em;margin-bottom:10px}
 .scold p{font-size:.9em;line-height:1.45;opacity:.85;margin-bottom:16px}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Glitch Overlay */
+.glitch-overlay{position:absolute;inset:0;z-index:350;pointer-events:none;overflow:hidden;mix-blend-mode:difference}
+.glitch-text{position:absolute;font-family:'Fredoka One',cursive;color:#0f0;opacity:.7;white-space:nowrap;animation:glitchDrift 0.4s linear infinite;text-shadow:2px 0 #f0f,-2px 0 #0ff;font-weight:900;letter-spacing:2px}
+@keyframes glitchDrift{0%{transform:translateX(0) skewX(0deg)}20%{transform:translateX(-8px) skewX(-3deg)}40%{transform:translateX(4px) skewX(2deg)}60%{transform:translateX(-2px) skewX(-1deg)}80%{transform:translateX(6px) skewX(1deg)}100%{transform:translateX(0) skewX(0deg)}}
+.glitch-scanline{position:absolute;width:100%;height:2px;background:rgba(0,255,0,.3);animation:scanDrop .8s linear infinite;pointer-events:none}
+@keyframes scanDrop{from{top:-2px}to{top:100%}}
+.glitch-corrupt{animation:corruptFlash .15s steps(2) infinite}
+@keyframes corruptFlash{0%{opacity:1;filter:hue-rotate(0deg)}50%{opacity:.6;filter:hue-rotate(90deg) saturate(3)}100%{opacity:1;filter:hue-rotate(180deg)}}
+
+/* Gentry Counter Event */
+.gentry-counter-event{position:absolute;inset:0;z-index:280;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;color:#fff;animation:fadeIn .3s}
+.gentry-on-counter{width:120px;height:160px;animation:gentryBounce 0.6s ease-in-out infinite}
+@keyframes gentryBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.gentry-poo{font-size:2em;animation:pooDrop 0.8s ease-out infinite;position:absolute}
+@keyframes pooDrop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(60px) scale(.5);opacity:0}}
+.gentry-counter-wrap{position:relative;width:200px;height:100px;background:linear-gradient(180deg,#8B7355,#6B5335);border-radius:8px 8px 0 0;display:flex;align-items:flex-end;justify-content:center;margin:12px auto;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.gentry-timer{font-family:'Fredoka One',cursive;font-size:1.8em;color:#ff3b3b;animation:timerPulse .5s ease-in-out infinite}
+.gentry-stop-btn{padding:16px 40px;background:var(--danger);color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1em;cursor:pointer;animation:timerPulse .6s ease-in-out infinite;text-transform:uppercase;letter-spacing:2px}
+
+/* Secret Room */
+.secret-room{position:absolute;inset:0;z-index:280;background:linear-gradient(180deg,#1a1020,#0a0510);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;color:#fff;animation:fadeIn .3s}
+.secret-room-bed{width:160px;height:80px;background:linear-gradient(180deg,#4a2040,#2a1025);border-radius:12px 12px 4px 4px;border:3px solid #6a3050;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.secret-room-bed::before{content:'';position:absolute;top:-20px;left:10%;right:10%;height:20px;background:#5a2545;border-radius:8px 8px 0 0}
+.secret-room-bed::after{content:'Zzz';position:absolute;top:-40px;right:-10px;font-size:1.4em;animation:zzz 1.5s ease-in-out infinite;color:#c8a8ff;font-family:'Fredoka One',cursive}
+@keyframes zzz{0%,100%{transform:translateY(0) scale(1);opacity:.5}50%{transform:translateY(-15px) scale(1.2);opacity:1}}
+
+/* CPR Event */
+.cpr-event{position:absolute;inset:0;z-index:290;background:linear-gradient(180deg,#0a0a1e,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;color:#fff;animation:fadeIn .3s}
+.cpr-justin-lying{width:160px;height:60px;transform:rotate(0deg)}
+.cpr-hudson-bro{width:80px;height:120px;animation:cprBounce 0.4s ease-in-out infinite}
+@keyframes cprBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+.cpr-stack{position:relative;width:200px;height:200px;margin:12px auto}
+.cpr-label{font-family:'Fredoka One',cursive;font-size:.8em;color:#ff6b6b;letter-spacing:2px;text-transform:uppercase;margin-top:8px}
 </style>
 </head>
 <body>
@@ -383,6 +435,12 @@ const Sprites = {
     ranel:    { hair:'short', hairColor:'#3A2A1A', skinColor:'#D4A06A', eyeColor:'#2A1A0A', shirtColor:'#9B59B6', pantsColor:'#335', isApron:false, hat:false },
     declan:   { hair:'short', hairColor:'#5A3A20', skinColor:'#FDDCB5', eyeColor:'#556B2F', shirtColor:'#2ECC71', pantsColor:'#335', isApron:false, hat:false },
     katy:     { hair:'red-long', hairColor:'#CC4422', skinColor:'#FDDCB5', eyeColor:'#4488CC', shirtColor:'#FF6B6B', pantsColor:'#446', isApron:false, hat:false },
+    nicolas:  { hair:'short', hairColor:'#1A1008', skinColor:'#E3BC92', eyeColor:'#2A1A0A', shirtColor:'#00A3E0', pantsColor:'#1c1c1c', isApron:false, hat:false },
+    caitlin:  { hair:'long', hairColor:'#6B4A2A', skinColor:'#FDE3C8', eyeColor:'#3A7A4A', shirtColor:'#C2185B', pantsColor:'#446', isApron:false, hat:false },
+    charles:  { hair:'short', hairColor:'#7A5B1A', skinColor:'#FDE3C8', eyeColor:'#5A3A1A', shirtColor:'#5C5470', pantsColor:'#2c2c2c', isApron:false, hat:false },
+    levi:     { hair:'lots',  hairColor:'#C49A3C', skinColor:'#FDDCB5', eyeColor:'#5A3A1A', shirtColor:'#B8572A', pantsColor:'#336',    isApron:false, hat:false },
+    stranger: { hair:'short', hairColor:'#333',    skinColor:'#D4AA78', eyeColor:'#444',    shirtColor:'#555',    pantsColor:'#333',    isApron:false, hat:false },
+    hudsons_brother: { hair:'short', hairColor:'#999', skinColor:'#D4A06A', eyeColor:'#556B2F', shirtColor:'#0A4A72', pantsColor:'#334', isApron:false, hat:true },
   },
 
   drawChar(canvasOrCtx, charKey, frame=0) {
@@ -988,7 +1046,9 @@ const G = {
     henry:{ name:'Henry' }, black:{ name:'Black' }, carter:{ name:'Carter' },
     reagan:{ name:'Reagan' }, navaneeth:{ name:'Navaneeth' },
     walter:{ name:'Walter' }, ranel:{ name:'Ranel' }, declan:{ name:'Declan' },
-    katy:{ name:'Katy' },
+    katy:{ name:'Katy' }, nicolas:{ name:'Nicolas' }, caitlin:{ name:'Caitlin' },
+    charles:{ name:'Charles Weiner' }, levi:{ name:'Levi Howard Weiner' },
+    stranger:{ name:'???' }, hudsons_brother:{ name:"Coach Hudson's Bro" },
   },
 
   npcOrders: {
@@ -1040,6 +1100,24 @@ const G = {
     katy: [
       { greeting:"OH MY GOD JUSTIN HI!! So okay I have SO much to tell you. First of all, did you hear about— oh right, food. Okay so milkshake, no wait lemonade, NO WAIT BOTH! And nuggets! And a cookie! And a brownie! And waffle fries! Actually get me a fruit cup too I need vitamins or whatever! And like a ranch and a Chick-fil-A sauce! ANYWAY so as I was saying—", items:['ms','lm','ng','ck','br','fr','fs','rn','sc'], katyFlavor:true },
       { greeting:"JUSTINNNN!! Okay so listen, I was telling Gentry about this thing and— oh wait I need to order. Salad because I'm being healthy but ALSO fries AND mac and cheese because like BALANCE right?? And an icedream cone! And an iced coffee! Okay ANYWAY so Gentry said—", items:['sa','fr','mc','cm','ic'], katyFlavor:true },
+    ],
+    nicolas: [
+      { greeting:"Justin! *appears out of nowhere* Spicy deluxe and a lemonade. Ran here in 4:09 by the way. Easy day.", items:['ss','lm'], nicolasFlavor:true },
+      { greeting:"Hey legend! 12-piece and a sweet tea. I'll be gone before you blink.", items:['ng','tea'], nicolasFlavor:true },
+      { greeting:"Yo Justin! CFA sandwich, waffle fries, and a Chick-fil-A sauce. You're the GOAT, man.", items:['cs','fr','sc'], nicolasFlavor:true },
+    ],
+    caitlin: [
+      { greeting:"Hi Justin! I'll take a grilled sandwich and a lemonade — *glances toward the kitchen* ...is Jacob back there? Keep an eye on him for me, would you?", items:['gs','lm'], caitlinFlavor:true, chatter:"So anyway, my sister said the funniest thing— wait. What is Jacob DOING back there?" },
+      { greeting:"Justin! A 12-piece and a sweet tea, please. *narrows eyes at the kitchen* He better not be chatting anybody up while I'm standing here.", items:['ng','tea'], caitlinFlavor:true, chatter:"Keep watching him, Justin. I notice everything, okay? Everything." },
+    ],
+    charles: [
+      { greeting:"Justin! Charles Weiner. You may know my son. CFA sandwich, waffle fries, lemonade, and a honey mustard. Pleasure doing business.", items:['cs','fr','lm','hm'] },
+      { greeting:"Weiner here. Usual please. Spicy deluxe, extra pickles, waffle fries, sweet tea. Tell Levi to call his father when you see him.", items:['ss','xp','fr','tea'] },
+      { greeting:"Justin, Charles Weiner. Family business. Strips, mac and cheese, iced coffee, and a brownie. The Weiner men keep it simple.", items:['st','mc','ic','br'] },
+    ],
+    levi: [
+      { greeting:"Justin. You know what I want. The Weiner special. Dad said you'd know. You DO know, right? RIGHT?? Come on. THE thing. Our thing.", items:['cs','xp','fr','lm','sc'], weinerflavor:true },
+      { greeting:"It's me. Levi. Howard. Weiner. The WEINER SPECIAL. Classic. Legendary. Dad's order. Family recipe. You KNOW what it is. Stop acting like you don't.", items:['ss','fr','tea','bq','hm'], weinerflavor:true },
     ],
   },
 
@@ -1565,6 +1643,73 @@ const G = {
         }))); return true;
       }
     },
+    {
+      name: 'glitch_event',
+      intro: "Every screen just GLITCHED OUT. The register shows hex code. The iPad says ERROR 404. The drive-thru speaker is playing dial-up modem sounds at full volume.",
+      lukeReaction: "SOMEONE CALL IT!! Justin STOP touching the screens, you're literally making it worse!!",
+      effect: function(cb) {
+        G.triggerGlitch(4000);
+        G.customerPatience = Math.max(0, G.customerPatience - 18);
+        G.toast("SYSTEM GLITCH! All screens corrupted!", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 700);
+      }
+    },
+    {
+      name: 'gentry_counter',
+      intro: "Gentry just CLIMBED onto the front counter. He's standing up there. He has a very specific look on his face and Justin knows exactly what's about to happen.",
+      lukeReaction: "GENTRY. YOU ABSOLUTE— GET DOWN FROM THERE THIS INSTANT!!!",
+      effect: function(evt, cb) {
+        G.mgGentryCounter(cb);
+        return true;
+      }
+    },
+    {
+      name: 'stranger_vibes',
+      intro: "A random stranger nobody recognizes walked in, scanned the room slowly, pointed finger guns at Justin, and said 'What the game up to, bro?' He's not ordering. He's just vibing in the middle of the floor.",
+      lukeReaction: "...Do you know that person, Justin? WHY is he STANDING there? We have an ORDERING LINE.",
+      choices: [
+        { text: "Sir, can I take your order?", good: true },
+        { text: "I have genuinely no idea who that is.", good: true },
+        { text: "*finger guns back* The game's up bro.", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.showDialog('stranger', "What the game up to, bro?", [], () => {
+          G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+            text: c.text,
+            action: () => {
+              if (c.good) { G.toast("He slowly backed out the door. Bizarre.", 'warn'); }
+              else { G.addStrike(0.25); G.toast("Justin is now vibing on the clock. +0.25 strike.", 'bad'); }
+              cb();
+            }
+          })));
+        });
+        return true;
+      }
+    },
+    {
+      name: 'coach_alaska',
+      intro: "A man in an Alaska state flag fleece walked in. He looks EXACTLY like Coach Hudson. He starts yelling at Justin's posture, then pivots to a detailed story about catching sockeye salmon on the Kenai River. Nobody asked.",
+      lukeReaction: "Is that... is that Coach Hudson's BROTHER?! Why is he HERE and why is he COACHING MY EMPLOYEE??",
+      choices: [
+        { text: "Sir, this is a Chick-fil-A.", good: true },
+        { text: "*straightens posture immediately*", good: true },
+        { text: "How long have you been watching my splits??", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.showDialog('hudsons_brother', "Flew in from Juneau! Your FORM, son! You'd never survive the Iditarod with posture like that! My brother told me about you. He was RIGHT. Now get me a CFA sandwich before I run laps around this parking lot — I already did 14 miles on a glacier BEFORE breakfast!", [], () => {
+          G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+            text: c.text,
+            action: () => {
+              if (c.good) { G.toast("He bought two sandwiches and literally jogged out. Okay.", 'warn'); }
+              else { G.customerPatience = Math.max(0, G.customerPatience - 20); G.addStrike(0.5); G.toast("He coached Justin for 12 minutes. Nobody moved. +0.5 strike.", 'bad'); G.updateHUD(); }
+              cb();
+            }
+          })));
+        });
+        return true;
+      }
+    },
   ],
 
   // --- INIT ---
@@ -1573,6 +1718,7 @@ const G = {
     this.ordersCorrect=0; this.ordersMessed=0; this.currentRound=0;
     this.customerPatience=100; this.isRunning=true; this.inMinigame=false;
     this.availableStation=null; this.patienceDrainRate=1.5; this.isReaganCustomer=false;
+    this.andyRepelledCount=0;
     Restaurant.justin = { x:0.5, y:0.45, tx:0.5, ty:0.45, frame:0, moving:false, targetStation:null };
     document.getElementById('title-screen').classList.remove('active');
     document.getElementById('fired-screen').classList.remove('active');
@@ -1859,6 +2005,19 @@ const G = {
     this.inMinigame = true;
     const customer = this.pickCustomer();
 
+    // Caitlin Serna — runs her own "watch Jacob" side game (no standard timer)
+    if (customer.key === 'caitlin') { this.mgWatchJacob(customer); return; }
+
+    // Levi Howard Weiner — "The Weiner Special" assembly game (handles its own timer)
+    if (customer.key === 'levi') { this.mgWeinerSpecial(customer); return; }
+
+    // Nicolas Bittner — super-speed legend: chill & patient, so the timer
+    // crawls (which also means a fat patience bonus when you finish)
+    if (customer.key === 'nicolas') {
+      this.patienceDrainRate = 0.7;
+      this.toast("Nicolas Bittner sprints in — the GOAT is here! Total legend.", 'good');
+    }
+
     // Patience drain
     clearInterval(this.patienceTimer);
     this.patienceTimer = setInterval(() => {
@@ -2003,6 +2162,15 @@ const G = {
       this.showDialog('gentry', R([
         "Yeah I know it's a lot. I'm a complex person, Justin. Don't judge me.",
         "Before you give me that look — yes I need all of it. Practice was FOUR hours today.",
+      ]), [], cb);
+      return true;
+    }
+    // Nicolas Bittner — the super-speed legend, hyping Justin up
+    if (order.nicolasFlavor && Math.random() < 0.6) {
+      this.showDialog('nicolas', R([
+        "No rush at all, man. I run sub-4:10, I'm used to waiting for nobody. *grins*",
+        "Already know exactly what I want. You're crushing this shift, Justin. Genuinely.",
+        "Take your time, legend. I could lap this whole restaurant before you even feel pressure.",
       ]), [], cb);
       return true;
     }
@@ -2516,14 +2684,146 @@ const G = {
     };
   },
 
+  // ============================
+  //  CAITLIN SERNA — WATCH JACOB (side game)
+  //  Caitlin orders while you keep Jacob from flirting with other girls.
+  // ============================
+  mgWatchJacob(cust) {
+    this.inMinigame = true;
+    clearInterval(this.patienceTimer);
+    this.customerPatience = 100;
+    this.updateHUD();
+
+    const order = cust.order;
+    const TOTAL = 5;          // temptation events
+    const WINDOW = 1500;      // ms to react
+    const flirtPool = ['katy', 'reagan'];
+    let caught = 0, missed = 0, done = 0;
+    let active = false, winT = null, nextT = null;
+
+    const cleanup = () => { clearTimeout(winT); clearTimeout(nextT); winT = nextT = null; };
+
+    this.showDialog('caitlin', order.greeting, [
+      { text: "Of course! (better watch Jacob...)", action: () => start() },
+    ]);
+
+    const start = () => {
+      const area = this.openMG('WATCH JACOB', "Caitlin's ordering — don't let Jacob flirt with other girls!");
+      const w = document.createElement('div');
+      w.className = 'wj-wrap';
+      w.innerHTML = `
+        <div class="pos-bubble" style="max-width:340px;margin:0"><canvas class="pb-ava" id="wj-cait" width="26" height="34"></canvas><div class="pb-txt">${order.chatter || order.greeting}</div></div>
+        <div class="wj-cam">
+          <div class="wj-camlabel"><span class="wj-rec"></span>KITCHEN CAM · JACOB</div>
+          <div class="wj-stage" id="wj-stage">
+            <canvas class="wj-char" id="wj-jacob" width="48" height="72"></canvas>
+            <canvas class="wj-char wj-girl" id="wj-girl" width="48" height="72"></canvas>
+            <div class="wj-tap">TAP TO STOP HIM</div>
+          </div>
+          <div class="wj-alert" id="wj-alert">!</div>
+        </div>
+        <div class="wj-status"><span id="wj-caught">Caught: 0</span><span id="wj-prog"></span><span id="wj-missed">Missed: 0</span></div>
+        <button class="btn btn-r wj-btn" id="wj-stop">GET BACK TO WORK, JACOB!</button>`;
+      area.appendChild(w);
+      Sprites.drawChar(document.getElementById('wj-cait'), 'caitlin');
+      Sprites.drawChar(document.getElementById('wj-jacob'), 'jacob');
+      updProg();
+      document.getElementById('wj-stop').onclick = () => tap();
+      document.getElementById('wj-stage').onclick = () => tap();
+      nextT = setTimeout(scheduleNext, 800);
+    };
+
+    const updProg = () => {
+      const cE = document.getElementById('wj-caught'); if (cE) cE.textContent = 'Caught: ' + caught;
+      const mE = document.getElementById('wj-missed'); if (mE) mE.textContent = 'Missed: ' + missed;
+      const pE = document.getElementById('wj-prog');
+      if (pE) { let s = ''; for (let i = 0; i < TOTAL; i++) s += i < done ? '●' : '○'; pE.textContent = s; }
+    };
+
+    const scheduleNext = () => {
+      if (!this.isRunning) return;
+      if (done >= TOTAL) return finish();
+      nextT = setTimeout(activate, 600 + Math.random() * 1300);
+    };
+
+    const activate = () => {
+      if (!this.isRunning) return;
+      active = true;
+      const girl = R(flirtPool);
+      const gc = document.getElementById('wj-girl');
+      if (gc) { Sprites.drawChar(gc, girl); gc.classList.add('show'); }
+      const jc = document.getElementById('wj-jacob'); if (jc) jc.classList.add('flirting');
+      const al = document.getElementById('wj-alert');
+      if (al) { al.textContent = (this.chars[girl]?.name || 'Someone') + ' is chatting up Jacob!'; al.classList.add('show'); }
+      SFX.andy();
+      winT = setTimeout(() => resolve(false), WINDOW);
+    };
+
+    const tap = () => { if (active) resolve(true); };
+
+    const resolve = (success) => {
+      if (!active) return;
+      active = false;
+      clearTimeout(winT); winT = null;
+      done++;
+      const gc = document.getElementById('wj-girl'); if (gc) gc.classList.remove('show');
+      const jc = document.getElementById('wj-jacob'); if (jc) jc.classList.remove('flirting');
+      const al = document.getElementById('wj-alert'); if (al) al.classList.remove('show');
+      if (success) {
+        caught++; this.score += 40; SFX.tap();
+        this.toast('Got him! Jacob, focus. +40', 'good');
+      } else {
+        missed++; this.customerPatience = Math.max(0, this.customerPatience - 18); this.updateHUD();
+        SFX.fail();
+        this.toast(R(["Jacob slipped away!", "Caitlin SAW that!", "Jacob is FLIRTING!"]), 'bad');
+      }
+      updProg();
+      if (missed >= 3) return finish();
+      nextT = setTimeout(scheduleNext, 650);
+    };
+
+    const finish = () => {
+      cleanup();
+      this.closeMG();
+      this.customersServed++;
+      const passed = missed < 3 && caught >= 3;
+      if (passed) {
+        this.ordersCorrect++;
+        const bonus = 80 + caught * 15;
+        this.score += bonus;
+        SFX.success();
+        this.toast('Caitlin happy & Jacob behaved! +' + bonus, 'good');
+        this.checkSpeedBonus();
+        this.myPleasure(0.5);
+        this.showDialog('caitlin', R([
+          "Thanks Justin! And thanks for keeping Jacob in line, haha.",
+          "Perfect order AND Jacob didn't embarrass himself. You're the best!",
+          "See? This is why I come to YOUR register. Bye Justin!",
+        ]), [], () => this.nextRound());
+      } else {
+        this.ordersMessed++;
+        this.showDialog('caitlin', R([
+          "Justin you weren't even listening to me! And Jacob?? UGH.",
+          "I'm leaving. You let Jacob run absolutely wild back there.",
+          "Worst service ever. Jacob was flirting the ENTIRE time!",
+        ]), [], () => {
+          this.showDialog('luke', R(this.lukeRoasts), [], () => { this.addStrike(0.75); this.nextRound(); });
+        });
+      }
+    };
+  },
+
   // --- ANDY ---
   andyEvent(cb) {
     SFX.andy();
     this.toast('ANDY ALERT! Andy has entered the building!','andy');
+
+    // 20% chance Andy asks about the secret room instead of making an allegation
+    if (Math.random() < 0.20) { setTimeout(() => this.andySecretRoom(cb), 800); return; }
+
     const a = R(this.andyAllegations);
     setTimeout(()=>{
       this.showDialog('andy', `Hey! Manager! ${a.claim}`, [], ()=>{
-        // Special follow-up for napkin allegation
         const followup = a.lukeFollowup
           ? `Justin... Andy is saying stuff. Care to explain? Also... ${a.lukeFollowup}`
           : "Justin... Andy is saying stuff. Care to explain?";
@@ -2533,15 +2833,21 @@ const G = {
             action:()=>{
               if(d.e>0){
                 this.score+=Math.round(d.e*40);
+                this.andyRepelledCount = (this.andyRepelledCount||0) + 1;
                 this.toast('Defended yourself! Andy leaves.','good');
-                this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], () => {
-                  // Post-Andy Luke roast
-                  if (Math.random() < 0.5) {
-                    this.toast(R(this.lukePostAndyRoasts), 'luke');
-                  }
-                  cb();
-                });
+                if (this.andyRepelledCount >= 3) {
+                  this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], () => {
+                    this.toast("Andy: 'That is IT. Get on the floor, Justin. Right now.'", 'andy');
+                    setTimeout(() => this.andyCPR(cb), 1400);
+                  });
+                } else {
+                  this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], () => {
+                    if (Math.random() < 0.5) this.toast(R(this.lukePostAndyRoasts), 'luke');
+                    cb();
+                  });
+                }
               } else {
+                this.andyRepelledCount = 0;
                 this.addStrike(0.75);
                 this.toast("That defense didn't help... +0.75 strike",'bad');
                 this.showDialog('luke', R(this.lukePostAndyRoasts), [], cb);
@@ -2551,6 +2857,187 @@ const G = {
         );
       });
     }, 800);
+  },
+
+  // Andy — secret room variant
+  andySecretRoom(cb) {
+    this.showDialog('andy', "Hey. Manager. I need to use the secret room. You know which one. The one with the... bed.", [], () => {
+      this.showDialog('luke', "Justin... Andy claims there's a 'secret room.' Is there something back there I don't know about??", [
+        { text:"There IS no secret room. Andy, please leave.", action:()=>{
+          this.score += 40;
+          this.toast("Andy leaves, genuinely confused. +40 score.", 'good');
+          this.showDialog('andy',"I know it exists. I'll be back.",[],()=>cb());
+        }},
+        { text:"The break room is literally right there, Andy.", action:()=>{
+          this.toast("Luke: 'Justin. Why do you know the layout so well.'", 'warn');
+          cb();
+        }},
+        { text:"...Right this way.", action:()=>{
+          this.addStrike(0.75);
+          const o = document.createElement('div');
+          o.className = 'secret-room';
+          o.innerHTML = `<div style="font-family:'Fredoka One',cursive;font-size:1.4em;color:#E51636;margin-bottom:16px">THE SECRET ROOM</div>
+            <div class="secret-room-bed"></div>
+            <p style="margin-top:16px;font-size:.82em;opacity:.7;line-height:1.5">Andy is in the secret room.<br>With the bed.<br>Luke has not blinked in 45 seconds.</p>
+            <button class="btn btn-r" style="margin-top:18px;padding:12px 32px" id="sr-escape">Get Andy Out of There</button>`;
+          document.getElementById('game').appendChild(o);
+          SFX.fail();
+          document.getElementById('sr-escape').onclick = () => {
+            o.remove();
+            this.showDialog('luke',"I don't want to know what he was doing in there. +0.75 strike, Justin.",[],()=>cb());
+          };
+        }},
+      ]);
+    });
+  },
+
+  // Andy — CPR event (triggered after 3 successful defenses)
+  andyCPR(cb) {
+    clearInterval(this.patienceTimer);
+    const o = document.createElement('div');
+    o.className = 'cpr-event';
+    let taps = 0, done = false;
+    const NEED = 12, TIMEOUT = 6000;
+
+    const cJ = document.createElement('canvas'); cJ.width=60; cJ.height=80;
+    cJ.style.cssText='transform:rotate(90deg);position:absolute;bottom:14px;left:14px';
+    const cA = document.createElement('canvas'); cA.width=56; cA.height=84;
+    cA.className='cpr-hudson-bro'; cA.style.cssText='position:absolute;bottom:50px;left:28px';
+
+    o.innerHTML=`<div style="font-family:'Fredoka One',cursive;font-size:1.1em;color:#E51636;margin-bottom:6px">EMERGENCY ANDY CPR</div>
+      <p style="font-size:.78em;opacity:.7;margin-bottom:10px">You repelled Andy 3 times. He's retaliating.<br>TAP frantically to fight back!</p>
+      <div class="cpr-stack" id="cpr-stage"></div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.5em;color:#fff;margin:8px 0" id="cpr-count">0 / ${NEED}</div>
+      <button class="btn btn-w" style="width:100%;padding:16px;font-size:1em" id="cpr-tap">FIGHT BACK!</button>`;
+    document.getElementById('game').appendChild(o);
+
+    const stage=document.getElementById('cpr-stage');
+    stage.appendChild(cJ); stage.appendChild(cA);
+    Sprites.drawChar(cJ,'justin'); Sprites.drawChar(cA,'andy');
+
+    const countEl=document.getElementById('cpr-count');
+    const finish=(survived)=>{
+      if(done) return; done=true;
+      clearTimeout(t);
+      o.remove();
+      this.andyRepelledCount=0;
+      if(survived){
+        this.score+=50; SFX.success();
+        this.toast("You fought off the CPR! Andy retreats in shame! +50", 'good');
+      } else {
+        this.addStrike(0.5); SFX.fail();
+        this.toast("Andy CPR'd you into the ground. +0.5 strike.", 'bad');
+      }
+      cb();
+    };
+    const onTap=()=>{ if(done) return; taps++; SFX.tap(); countEl.textContent=`${taps} / ${NEED}`; if(taps>=NEED) finish(true); };
+    document.getElementById('cpr-tap').onclick=onTap;
+    o.onclick=onTap;
+    const t=setTimeout(()=>finish(false), TIMEOUT);
+  },
+
+  // Gentry counter chaos minigame
+  mgGentryCounter(cb) {
+    const o=document.createElement('div');
+    o.className='gentry-counter-event';
+    const SECS=5; let elapsed=0, stopped=false;
+
+    const cv=document.createElement('canvas'); cv.width=64; cv.height=96;
+    cv.className='gentry-on-counter';
+
+    o.innerHTML=`<div style="font-family:'Fredoka One',cursive;font-size:1.1em;color:#ff6600;margin-bottom:6px">GENTRY IS ON THE COUNTER</div>
+      <p style="font-size:.78em;opacity:.7;margin-bottom:8px">He climbed up. He's about to go. Tap STOP before it happens.</p>
+      <div class="gentry-counter-wrap" id="gc-wrap"></div>
+      <div class="gentry-timer" id="gc-timer">${SECS}</div>
+      <button class="gentry-stop-btn" id="gc-stop">GENTRY, STOP!!</button>`;
+    document.getElementById('game').appendChild(o);
+
+    document.getElementById('gc-wrap').appendChild(cv);
+    Sprites.drawChar(cv,'gentry');
+
+    const timerEl=document.getElementById('gc-timer');
+    const finish=(inTime)=>{
+      clearInterval(ticker);
+      if(stopped) return; stopped=true;
+      o.remove();
+      if(inTime){
+        SFX.success(); this.score+=60;
+        this.toast("You stopped Gentry! +60", 'good');
+        this.showDialog('luke',"Justin I don't know what just happened and I don't want to know. +60 points for handling that.",[],()=>cb());
+      } else {
+        SFX.fail(); this.addStrike(0.75);
+        this.customerPatience=Math.max(0,this.customerPatience-30); this.updateHUD();
+        this.toast("Gentry did it. On the counter. For everyone to see. +0.75 strike.", 'bad');
+        this.showDialog('luke',"I have NEVER in my ENTIRE CAREER written an incident report this specific. This is unprecedented. +0.75 strike. Deal with your FRIENDS, Justin.",[],()=>cb());
+      }
+    };
+    document.getElementById('gc-stop').onclick=o.onclick=()=>{ if(!stopped){ stopped=true; finish(true); }};
+    const ticker=setInterval(()=>{ elapsed++; const r=SECS-elapsed; if(timerEl) timerEl.textContent=r>0?r:'0'; if(elapsed>=SECS&&!stopped) finish(false); },1000);
+  },
+
+  // CSS glitch overlay trigger
+  triggerGlitch(duration=3000) {
+    const g=document.getElementById('game');
+    const ov=document.createElement('div'); ov.className='glitch-overlay';
+    const texts=['ERR_REGISTER_NULL','0x4F4F4F','VOID_ORDER','NULL_ITEM','[CORRUPTED]','UNDEFINED','SYS::FAIL','0xDEADBEEF'];
+    for(let i=0;i<6;i++){
+      const t=document.createElement('div'); t.className='glitch-text';
+      t.style.cssText=`top:${8+i*14}%;left:${Math.random()*55}%;font-size:${0.45+Math.random()*0.45}em`;
+      t.textContent=texts[Math.floor(Math.random()*texts.length)]; ov.appendChild(t);
+    }
+    const sl=document.createElement('div'); sl.className='glitch-scanline'; ov.appendChild(sl);
+    g.appendChild(ov); g.classList.add('glitch-corrupt');
+    setTimeout(()=>{ ov.remove(); g.classList.remove('glitch-corrupt'); }, duration);
+  },
+
+  // Levi Howard Weiner — Weiner Special assembly
+  mgWeinerSpecial(cust) {
+    this.inMinigame=true;
+    const order=cust.order, items=order.items;
+
+    clearInterval(this.patienceTimer);
+    this.patienceDrainRate=1.8;
+    this.patienceTimer=setInterval(()=>{
+      this.customerPatience=Math.max(0,this.customerPatience-this.patienceDrainRate);
+      this.updateHUD(); this.updateTimerDisplay();
+      if(this.customerPatience<=0){ clearInterval(this.patienceTimer); this.failMG("Levi left! Nobody knows the Weiner special!"); }
+    },500);
+
+    this.showDialog('levi', order.greeting, [
+      { text:"The Weiner special. I'm on it.", action:()=>render() },
+      { text:"Can you just... tell me what's in it?", action:()=>{
+        this.showDialog('levi',"WHAT?! You DON'T KNOW?! Dad SWORE you knew. Okay FINE. Just... look at the menu. You'll figure it out. Hurry UP.",[],()=>render());
+      }},
+    ]);
+
+    const render=()=>{
+      const area=this.openMG('WEINER SPECIAL HQ',`Assemble the Weiner Special for Levi Howard Weiner`);
+      this._pickPad(area,{
+        items,
+        decoyCount:4,
+        sendLabel:'Serve the Weiner Special',
+        onSend:(picked)=>{
+          clearInterval(this.patienceTimer);
+          this.closeMG();
+          const ok=[...items].sort().join()===[...picked].sort().join();
+          this.customersServed++;
+          if(ok){
+            this.ordersCorrect++; this.score+=150+Math.round(this.customerPatience);
+            SFX.success();
+            this.toast('WEINER SPECIAL NAILED! +'+(150+Math.round(this.customerPatience)),'good');
+            this.checkSpeedBonus(); this.myPleasure(0.6);
+            this.showDialog('levi',"THAT'S IT!! THE WEINER SPECIAL!! I knew you knew! Dad is going to be SO proud! This is legendary!",[],()=>this.nextRound());
+          } else {
+            this.ordersMessed++; SFX.fail();
+            this.showDialog('levi',"That's... that's not it. That's not the Weiner special. I'm calling Dad right now. He's not going to believe this.",[],()=>{
+              this.addStrike(0.5);
+              this.showDialog('luke',R(this.lukeSimpleFailRoasts),[],()=>this.nextRound());
+            });
+          }
+          this.updateHUD();
+        }
+      });
+    };
   },
 
   // --- FAIL ---
@@ -2613,6 +3100,12 @@ const SFX = {
     hudson:   ['square',   300, 30,  0.10],
     jacob:    ['sawtooth', 360, 50,  0.09],
     katy:     ['sine',     740, 100, 0.08],
+    nicolas:  ['square',   560, 90,  0.09],
+    caitlin:  ['sine',     700, 95,  0.08],
+    charles:  ['triangle', 330, 25,  0.08],
+    levi:     ['square',   490, 70,  0.09],
+    stranger: ['sine',     420, 50,  0.07],
+    hudsons_brother: ['square', 290, 25, 0.10],
     gentry:   ['triangle', 460, 60,  0.08],
     henry:    ['square',   500, 80,  0.08],
     black:    ['triangle', 420, 50,  0.08],
