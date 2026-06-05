@@ -1002,7 +1002,7 @@ const G = {
   isRunning: false, inMinigame: false,
   andyChance: 0.46, patienceTimer: null,
   availableStation: null,
-  patienceDrainRate: 1.5,
+  patienceDrainRate: 0.85,
   isReaganCustomer: false,
   honkEl: null,
 
@@ -1292,28 +1292,6 @@ const G = {
       }
     },
     {
-      name: 'lemonade_machine',
-      intro: "The lemonade machine just DIED. It's making a terrible grinding noise and leaking everywhere.",
-      lukeReaction: "Great. Now you have to tell every customer who orders lemonade that we're out. This is going to go GREAT.",
-      effect: function(cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 15);
-        G.toast("Lemonade machine broke! Customers furious!", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
-      }
-    },
-    {
-      name: 'rush_hour',
-      intro: "RUSH HOUR just hit! The line is out the door and TWO customers are trying to order at the same time!",
-      lukeReaction: "Move FASTER, Justin! There are 30 people in line! I can't believe this is happening on YOUR shift!",
-      effect: function(cb) {
-        G.patienceDrainRate = 2.4;
-        G.toast("RUSH HOUR! Patience drains faster!", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
-      }
-    },
-    {
       name: 'youre_welcome',
       intro: "Justin just said 'you're welcome' to a customer instead of 'my pleasure'. Luke heard it. Everyone heard it.",
       lukeReaction: "Did you just... did you just say 'YOU'RE WELCOME'?! At a CHICK-FIL-A?! That is a FIREABLE OFFENSE, Justin! Say it right! SAY IT!",
@@ -1356,28 +1334,6 @@ const G = {
       }
     },
     {
-      name: 'ipad_drop',
-      intro: "Justin drops the iPad outside! It's sliding across the asphalt while cars HONK and customers stare!",
-      lukeReaction: "That iPad costs $800, Justin. EIGHT HUNDRED DOLLARS. If there's a single crack I'm taking it out of your paycheck for the next YEAR.",
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 25);
-        G.toast("Dropped the iPad! Cars honking! -25 patience", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
-      }
-    },
-    {
-      name: 'fire_alarm',
-      intro: "The fryer just set off the FIRE ALARM! The entire restaurant is PANICKING! Customers are running for the exits!",
-      lukeReaction: "FALSE ALARM! EVERYONE CALM DOWN! Justin, go reset the alarm panel and then get back to work. We're losing customers by the SECOND!",
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 30);
-        G.toast("FIRE ALARM! Total chaos! -30 patience", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
-      }
-    },
-    {
       name: 'mom_calls',
       intro: "Justin's phone starts RINGING in the middle of service. Loudly. It's his mom. Customers are staring.",
       lukeReaction: "Is that... is that your PHONE?! During SERVICE?! Your MOM is calling you?! Tell her you're WORKING, Justin!",
@@ -1417,18 +1373,6 @@ const G = {
             cb();
           }
         }))); return true;
-      }
-    },
-    {
-      name: 'wrong_bag',
-      intro: "Justin confidently hands a curbside bag to the wrong car. The actual customer is honking. The wrong customer drove away. With the food.",
-      lukeReaction: "Justin. That was NOT their order. You just gave a stranger $40 of free food. We are remaking that ENTIRE ORDER.",
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 22);
-        G.score = Math.max(0, G.score - 80);
-        G.toast("Wrong car got the food! -80 score, -22 patience", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
       }
     },
     {
@@ -1476,39 +1420,6 @@ const G = {
       }
     },
     {
-      name: 'headset_dies',
-      intro: "Justin's drive-through headset just cut out mid-order. He's been nodding for 2 minutes at static. He has no idea what the customer wants. The customer is furious.",
-      lukeReaction: "Justin... have you just been nodding at a dead headset this whole time?! SWAP IT OUT! We have BACKUPS FOR A REASON!",
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 20);
-        G.toast("Headset died! No idea what they ordered! -20 patience", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
-      }
-    },
-    {
-      name: 'complained_sighing',
-      intro: "A customer is demanding to speak to a manager. Reason: Justin was 'sighing too loudly and it was off-putting.' Luke is walking over.",
-      lukeReaction: "A customer complained... that you were SIGHING too much. Justin. Are you sighing at customers?",
-      choices: [
-        { text: "I didn't even know I was doing it, I'm so sorry!", good: true },
-        { text: "It's been a long shift and I'm tired—", good: false },
-        { text: "She was rude first and you know it.", good: false },
-      ],
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 10);
-        G.updateHUD();
-        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
-          text: c.text,
-          action: () => {
-            if (c.good) { G.toast("Smoothed over. Barely.", 'warn'); }
-            else { G.addStrike(0.5); G.toast("Luke is questioning all his life decisions. +0.5 strike.", 'bad'); }
-            cb();
-          }
-        }))); return true;
-      }
-    },
-    {
       name: 'cow_in_freezer',
       intro: "A kid is crying because Justin told him the cow mascot lives in the walk-in freezer. The mom is LIVID. Luke is sprinting over.",
       lukeReaction: "Justin did you tell a child that our MASCOT LIVES IN THE FREEZER?! Why would you SAY THAT?! He's CRYING, Justin!",
@@ -1525,41 +1436,6 @@ const G = {
           action: () => {
             if (c.good) { G.toast("Mom gave you a death stare but accepted the apology.", 'warn'); }
             else { G.addStrike(0.75); G.toast("You made a child cry about a frozen cow. +0.75 strike.", 'bad'); }
-            cb();
-          }
-        }))); return true;
-      }
-    },
-    {
-      name: 'milkshake_machine',
-      intro: "The milkshake machine is broken and making an unholy noise. Justin tried to fix it himself. There is vanilla shake on the ceiling.",
-      lukeReaction: "WHAT IS ON THE CEILING?! Justin... WHO told you to touch the machine?! Are you a TECHNICIAN?! Are you??",
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 25);
-        G.addStrike(0.25);
-        G.toast("Milkshake machine EXPLODED. +0.25 strike, -25 patience", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 600);
-      }
-    },
-    {
-      name: 'wrong_order_return',
-      intro: "An angry customer just came BACK with the wrong order Justin gave them 20 minutes ago. They're holding the bag like evidence. Luke is watching.",
-      lukeReaction: "This man drove back here, Justin. He drove BACK. Look at his face. LOOK AT IT.",
-      choices: [
-        { text: "Sir I am SO sorry, let me fix that right now! My pleasure!", good: true },
-        { text: "I'm like 90% sure that's the right order though...", good: false },
-        { text: "*studies receipt* ...I made this correctly. He changed his mind.", good: false },
-      ],
-      effect: function(evt, cb) {
-        G.customerPatience = Math.max(0, G.customerPatience - 15);
-        G.score = Math.max(0, G.score - 50);
-        G.updateHUD();
-        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
-          text: c.text,
-          action: () => {
-            if (c.good) { G.toast("Fixed. Still embarrassing. -50 score.", 'warn'); }
-            else { G.addStrike(0.75); G.toast("You argued with a returning customer. +0.75 strike.", 'bad'); }
             cb();
           }
         }))); return true;
@@ -1644,18 +1520,6 @@ const G = {
       }
     },
     {
-      name: 'glitch_event',
-      intro: "Every screen just GLITCHED OUT. The register shows hex code. The iPad says ERROR 404. The drive-thru speaker is playing dial-up modem sounds at full volume.",
-      lukeReaction: "SOMEONE CALL IT!! Justin STOP touching the screens, you're literally making it worse!!",
-      effect: function(cb) {
-        G.triggerGlitch(4000);
-        G.customerPatience = Math.max(0, G.customerPatience - 18);
-        G.toast("SYSTEM GLITCH! All screens corrupted!", 'chaos');
-        G.updateHUD();
-        setTimeout(cb, 700);
-      }
-    },
-    {
       name: 'gentry_counter',
       intro: "Gentry just CLIMBED onto the front counter. He's standing up there. He has a very specific look on his face and Justin knows exactly what's about to happen.",
       lukeReaction: "GENTRY. YOU ABSOLUTE— GET DOWN FROM THERE THIS INSTANT!!!",
@@ -1717,7 +1581,7 @@ const G = {
     this.score=0; this.strikes=0; this.customersServed=0;
     this.ordersCorrect=0; this.ordersMessed=0; this.currentRound=0;
     this.customerPatience=100; this.isRunning=true; this.inMinigame=false;
-    this.availableStation=null; this.patienceDrainRate=1.5; this.isReaganCustomer=false;
+    this.availableStation=null; this.patienceDrainRate=0.85; this.isReaganCustomer=false;
     this.andyRepelledCount=0;
     Restaurant.justin = { x:0.5, y:0.45, tx:0.5, ty:0.45, frame:0, moving:false, targetStation:null };
     document.getElementById('title-screen').classList.remove('active');
@@ -1927,7 +1791,7 @@ const G = {
     this.customerPatience = 100;
     this.inMinigame = false;
     this.isReaganCustomer = false;
-    this.patienceDrainRate = 1.5;
+    this.patienceDrainRate = 0.85;
     this.updateHUD();
 
     // === SPECIAL ROUND EVENTS ===
@@ -1935,15 +1799,15 @@ const G = {
       this.toast('Luke: "Corporate is watching today. Don\'t embarrass me."', 'luke');
     }
     if (this.currentRound === 6) {
-      this.patienceDrainRate = 2.1;
-      this.toast('LUNCH RUSH! Patience drains a bit faster!', 'chaos');
+      this.patienceDrainRate = 1.3;
+      this.toast('LUNCH RUSH! Getting busier!', 'chaos');
     }
     if (this.currentRound === 12 && this.isRunning) {
       this.toast('Luke: "I can\'t believe you made it. Genuinely shocked."', 'luke');
     }
 
     // === CHAOS EVENTS (random between rounds) ===
-    if (this.currentRound > 1 && Math.random() < 0.34) {
+    if (this.currentRound > 1 && Math.random() < 0.58) {
       this.triggerChaos(() => this.afterChaos());
       return;
     }
@@ -2996,7 +2860,7 @@ const G = {
     const order=cust.order, items=order.items;
 
     clearInterval(this.patienceTimer);
-    this.patienceDrainRate=1.8;
+    this.patienceDrainRate=1.1;
     this.patienceTimer=setInterval(()=>{
       this.customerPatience=Math.max(0,this.customerPatience-this.patienceDrainRate);
       this.updateHUD(); this.updateTimerDisplay();
