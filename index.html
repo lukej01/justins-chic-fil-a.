@@ -51,7 +51,7 @@ canvas{display:block;width:100%;height:100%}
 
 /* Toast */
 .toast{position:absolute;top:54px;left:12px;right:12px;padding:12px;border-radius:12px;color:#fff;font-weight:700;font-size:.8em;z-index:300;animation:tIn .3s ease-out,tOut .3s ease-in 2s forwards;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.toast-good{background:var(--success)}.toast-bad{background:var(--danger)}.toast-warn{background:var(--warn);color:#333}.toast-andy{background:#6f42c1}.toast-luke{background:var(--blue)}.toast-chaos{background:#FF6F00}
+.toast-good{background:var(--success)}.toast-bad{background:var(--danger)}.toast-warn{background:var(--warn);color:#333}.toast-andy{background:#6f42c1}.toast-luke{background:var(--blue)}.toast-chaos{background:#FF6F00}.toast-justin{background:#0a7d52}
 @keyframes tIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
 
@@ -150,6 +150,45 @@ canvas{display:block;width:100%;height:100%}
 .dt-handed{display:flex;gap:4px;flex-wrap:wrap;min-height:22px;margin-bottom:8px;justify-content:center}
 .dt-hchip{background:rgba(255,255,255,.15);padding:2px 8px;border-radius:8px;font-size:.72em;color:#fff;font-weight:700}
 
+/* ===== INLINE SVG ICONS (no emoji) ===== */
+.fi{width:1em;height:1em;display:inline-block;vertical-align:-.15em;flex-shrink:0}
+.car-svg{height:1em;width:auto;display:inline-block;vertical-align:middle}
+
+/* ===== UNIFIED MINIGAME COMPONENTS ===== */
+/* Customer greeting bubble (shown inside the POS for every serving game) */
+.pos-bubble{display:flex;gap:8px;align-items:flex-start;background:#f0f4f8;border-radius:12px 12px 12px 2px;padding:8px 10px;margin:8px;font-size:.72em;color:#333;line-height:1.35}
+.pos-bubble .pb-ava{width:26px;height:34px;border-radius:5px;overflow:hidden;flex-shrink:0;background:#ddd}
+.pos-bubble .pb-txt{flex:1}
+/* Menu item icon (replaces the little dot) */
+.menu-btn .mi-ic{font-size:1.25em;line-height:1;flex-shrink:0;width:1.4em;text-align:center}
+.menu-btn .mb-name{flex:1;min-width:0}
+/* Entered-order chips, grouped with quantity */
+.pos-chips{display:flex;flex-wrap:wrap;gap:5px}
+.qchip{display:inline-flex;align-items:center;gap:4px;background:var(--red);color:#fff;padding:3px 6px 3px 7px;border-radius:14px;font-size:.78em;font-weight:800;cursor:pointer;transition:transform .12s}
+.qchip:active{transform:scale(.92)}
+.qchip .qi{font-size:1.05em}
+.qchip .qx{background:rgba(255,255,255,.28);border-radius:9px;padding:0 5px;font-size:.85em}
+.qchip .qrm{opacity:.7;font-weight:900;margin-left:1px}
+/* Fulfillment pick-cards (bagging / drive-thru) with quantity stepper */
+.pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;margin-bottom:12px}
+.pick-card{position:relative;background:rgba(255,255,255,.94);border:2px solid transparent;border-radius:14px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.12);color:#333}
+.pick-card:active{transform:scale(.94)}
+.pick-card.has-qty{border-color:var(--success);background:#e9f7ee;box-shadow:0 0 14px rgba(40,167,69,.25)}
+.pick-card .pc-ic{font-size:1.9em;line-height:1}
+.pick-card .pc-name{font-size:.62em;font-weight:800;text-align:center;line-height:1.1}
+.pick-card .pc-badge{position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;border-radius:12px;background:var(--success);color:#fff;font-size:.8em;font-weight:900;display:none;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25);padding:0 5px}
+.pick-card.has-qty .pc-badge{display:inline-flex}
+.pick-card .pc-minus{position:absolute;top:-8px;left:-8px;width:24px;height:24px;border-radius:12px;background:#fff;color:var(--danger);border:2px solid var(--danger);font-size:.9em;font-weight:900;display:none;align-items:center;justify-content:center;line-height:1}
+.pick-card.has-qty .pc-minus{display:inline-flex}
+.pick-card.wrong-pick{border-color:var(--danger);background:#ffe3e3;animation:wrongItem .4s ease-out}
+/* Ticket line with food icons */
+.tix-line{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tix-item{display:inline-flex;align-items:center;gap:3px;background:rgba(0,0,0,.05);border-radius:10px;padding:2px 7px;font-size:.82em;font-weight:700}
+.tix-item .tix-x{color:var(--red);font-weight:900}
+/* Car graphics (curbside + drive-thru) */
+.car-emoji{font-size:2.4em;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3))}
+.dt-car-big{font-size:3.4em;line-height:1;animation:carIn .4s ease-out;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
+
 /* App */
 #app-screen{background:#fff;z-index:250}
 .app-hdr{background:var(--red);color:#fff;padding:18px 14px;text-align:center}
@@ -199,7 +238,7 @@ canvas{display:block;width:100%;height:100%}
     <div class="hud-g"><span>Patience</span><div id="patience-wrap"><div id="patience-fill"></div></div></div>
     <div class="hud-g"><span>Strikes:</span><span id="h-strikes">0/3</span></div>
     <button id="app-btn" onclick="G.toggleApp()">APP</button>
-    <button id="mute-btn" onclick="document.getElementById('mute-btn').textContent=SFX.toggle()?'🔇':'🔊'" style="background:none;border:none;font-size:1.1em;cursor:pointer;padding:2px 4px;line-height:1">🔊</button>
+    <button id="mute-btn" onclick="this.innerHTML=SFX.toggle()?IconLib.speakerOff:IconLib.speakerOn" style="background:none;border:none;color:#fff;font-size:1.1em;cursor:pointer;padding:2px 4px;line-height:1;display:flex;align-items:center"></button>
   </div>
 
   <!-- DIALOG -->
@@ -816,6 +855,67 @@ const Restaurant = {
 };
 
 // =============================================
+// ICON LIBRARY (hand-drawn inline SVG — no emoji)
+// =============================================
+const IconLib = {
+  _svg(inner, vb, cls) { return `<svg class="${cls||'fi'}" viewBox="${vb||'0 0 32 32'}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`; },
+  foodDefs: {
+    // Chicken sandwich
+    cs: '<path d="M4 13c0-5 5.5-8 12-8s12 3 12 8z" fill="#E8B26A"/><ellipse cx="16" cy="13" rx="12" ry="1.6" fill="#F3D9A8"/><rect x="4" y="14" width="24" height="4" rx="1.5" fill="#9C6B3B"/><path d="M4 18c2 1.6 4 1.6 6 .3 2 1.6 4 1.6 6 0 2 1.6 4 1.6 6 0 2 1.3 4 1.3 6-.3z" fill="#7FB04B"/><path d="M4 19c0 4 5.5 6.5 12 6.5s12-2.5 12-6.5z" fill="#E8B26A"/>',
+    // Spicy deluxe (sandwich + spice flecks)
+    ss: '<path d="M4 13c0-5 5.5-8 12-8s12 3 12 8z" fill="#E8B26A"/><ellipse cx="16" cy="13" rx="12" ry="1.6" fill="#F3D9A8"/><rect x="4" y="14" width="24" height="4" rx="1.5" fill="#A85A39"/><circle cx="10" cy="16" r="1" fill="#E51636"/><circle cx="16" cy="16.4" r="1" fill="#E51636"/><circle cx="22" cy="16" r="1" fill="#E51636"/><path d="M4 18c2 1.6 4 1.6 6 .3 2 1.6 4 1.6 6 0 2 1.6 4 1.6 6 0 2 1.3 4 1.3 6-.3z" fill="#7FB04B"/><path d="M4 19c0 4 5.5 6.5 12 6.5s12-2.5 12-6.5z" fill="#E8B26A"/>',
+    // Grilled sandwich (lighter bun + grill marks)
+    gs: '<path d="M4 13c0-5 5.5-8 12-8s12 3 12 8z" fill="#EBC98F"/><rect x="4" y="14" width="24" height="4" rx="1.5" fill="#7A5A3A"/><path d="M8 15.4l3 2M14 15.4l3 2M20 15.4l3 2" stroke="#5e4128" stroke-width="1" fill="none"/><path d="M4 19c0 4 5.5 6.5 12 6.5s12-2.5 12-6.5z" fill="#EBC98F"/>',
+    // Nuggets
+    ng: '<g fill="#C88A4A" stroke="#9C6B3B" stroke-width=".8"><rect x="5" y="11" width="9" height="8" rx="3.5"/><rect x="17" y="9" width="9" height="8" rx="3.5"/><rect x="9" y="17" width="9" height="8" rx="3.5"/><rect x="19" y="18" width="8" height="7" rx="3.5"/></g>',
+    // Strips
+    st: '<g fill="#C88A4A" stroke="#9C6B3B" stroke-width=".8"><rect x="5" y="8" width="6" height="18" rx="3" transform="rotate(9 8 17)"/><rect x="13" y="7" width="6" height="19" rx="3"/><rect x="21" y="8" width="6" height="18" rx="3" transform="rotate(-9 24 17)"/></g>',
+    // Waffle fries in red carton
+    fr: '<rect x="11" y="6" width="3" height="11" rx="1" fill="#F2C14E"/><rect x="15.5" y="4" width="3" height="13" rx="1" fill="#F2C14E"/><rect x="20" y="7" width="3" height="10" rx="1" fill="#F2C14E"/><path d="M7 14h18l-2.5 13H9.5z" fill="#E51636"/><rect x="7" y="14" width="18" height="3" fill="#C41230"/>',
+    // Mac & cheese
+    mc: '<path d="M9 12h14l-1.4 14H10.4z" fill="#fff" stroke="#ddd" stroke-width="1"/><ellipse cx="16" cy="12" rx="7" ry="2.6" fill="#F2C14E"/><circle cx="13" cy="11.6" r="1" fill="#E0A82E"/><circle cx="18.5" cy="12.2" r="1" fill="#E0A82E"/><circle cx="16" cy="10.8" r="1" fill="#E0A82E"/>',
+    // Side salad
+    sa: '<path d="M6 15a10 6 0 0 0 20 0z" fill="#fff" stroke="#ddd" stroke-width="1"/><path d="M7 15c1-4 5-6.5 9-6.5s8 2.5 9 6.5z" fill="#5FA83C"/><circle cx="12" cy="13" r="1.6" fill="#E0552B"/><circle cx="20" cy="12.4" r="1.6" fill="#E0552B"/>',
+    // Fruit cup
+    fs: '<path d="M9 9h14l-1 17H10z" fill="#EAF4FB" stroke="#cfe2ee" stroke-width="1"/><circle cx="13" cy="14" r="2" fill="#E0552B"/><circle cx="18.5" cy="13" r="2" fill="#7FB04B"/><circle cx="15" cy="18" r="2" fill="#E04B7A"/><circle cx="20" cy="19" r="2" fill="#F2C14E"/>',
+    // Soft drink
+    dk: '<path d="M10 11h12l-1.5 15h-9z" fill="#E51636"/><rect x="9" y="8.5" width="14" height="2.8" rx="1" fill="#C41230"/><rect x="17" y="2" width="2" height="9" rx="1" fill="#fff"/><rect x="12.5" y="15" width="7" height="2" rx="1" fill="#fff" opacity=".55"/>',
+    // Lemonade
+    lm: '<path d="M10 10h12l-1.5 16h-9z" fill="#FFF3B0" stroke="#F2C14E" stroke-width="1"/><rect x="16" y="2" width="2" height="9" rx="1" fill="#E0A82E"/><circle cx="21" cy="9" r="3.2" fill="#F2C14E"/><path d="M21 5.9v6.2M17.9 9h6.2" stroke="#fff" stroke-width=".8"/>',
+    // Milkshake
+    ms: '<path d="M10 13h12l-1.5 13h-9z" fill="#F6E7D8"/><path d="M9 13c0-4.2 3.4-6.5 7-6.5s7 2.3 7 6.5z" fill="#fff" stroke="#eee" stroke-width="1"/><rect x="15" y="1" width="2.4" height="9" rx="1" fill="#E51636"/><circle cx="16.2" cy="6" r="2.4" fill="#E51636"/>',
+    // Iced coffee
+    ic: '<path d="M10 9h12l-1.5 17h-9z" fill="#fff" stroke="#ddd" stroke-width="1"/><path d="M10.7 14h10.6l-1 12h-8.6z" fill="#8B5E3C"/><rect x="12" y="11" width="4" height="4" rx="1" fill="#cfe7f2" opacity=".9" transform="rotate(12 14 13)"/><rect x="17" y="16" width="4" height="4" rx="1" fill="#cfe7f2" opacity=".9" transform="rotate(-10 19 18)"/><rect x="17" y="2" width="2" height="9" rx="1" fill="#E51636"/>',
+    // Cookie
+    ck: '<circle cx="16" cy="16" r="11" fill="#D6A461"/><circle cx="12" cy="13" r="1.6" fill="#5a3a1e"/><circle cx="20" cy="12" r="1.6" fill="#5a3a1e"/><circle cx="17" cy="18" r="1.6" fill="#5a3a1e"/><circle cx="11" cy="19.5" r="1.4" fill="#5a3a1e"/><circle cx="22" cy="19.5" r="1.4" fill="#5a3a1e"/>',
+    // Brownie
+    br: '<rect x="7" y="9" width="18" height="14" rx="2" fill="#5C3A22"/><rect x="7" y="9" width="18" height="5" rx="2" fill="#6E4A2E"/><path d="M11 12l2 2M18 11l2 2" stroke="#3e2616" stroke-width="1" fill="none"/>',
+    // Icedream cone
+    cm: '<path d="M16 27l-5-11h10z" fill="#D6A461"/><path d="M11.5 16h9M12.8 18.5h6.4M14 21h4" stroke="#b9863f" stroke-width=".8" fill="none"/><path d="M16 4c4 0 6 3 5 6 1.6 1 1 4.2-1.6 4.6.6 2.2-2 3.2-3.6 2-1.6 1.2-4.2.2-3.6-2C8 18.2 8.6 15 10 14c-1.2-3 1-6 6-10z" fill="#fff" stroke="#eee" stroke-width=".8"/>',
+    _default: '<circle cx="16" cy="16" r="10" fill="#E8B26A"/>',
+  },
+  food(id) { return this._svg(this.foodDefs[id] || this.foodDefs._default); },
+  carColors: ['#C0392B', '#2E5D8A', '#3A7A4A', '#E67E22', '#6C5CE7', '#444', '#1ABC9C'],
+  car(c) {
+    c = c || this.carColors[0];
+    return this._svg(
+      `<path d="M3 20c0-1 1-2 2-2h38c1 0 2 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="${c}"/>` +
+      `<path d="M10 18l5-7c.6-.8 1.5-1.2 2.5-1.2h12c1 0 2 .5 2.6 1.4L38 18z" fill="${c}"/>` +
+      `<path d="M12.5 17.5l3.6-5c.4-.6 1-.9 1.7-.9H23v5.9z" fill="#bfe0f0"/>` +
+      `<path d="M25 11.6h5.2c.7 0 1.3.3 1.7.9l3.3 5H25z" fill="#bfe0f0"/>` +
+      `<circle cx="14" cy="25" r="4" fill="#222"/><circle cx="14" cy="25" r="1.7" fill="#999"/>` +
+      `<circle cx="34" cy="25" r="4" fill="#222"/><circle cx="34" cy="25" r="1.7" fill="#999"/>` +
+      `<rect x="42" y="20" width="3" height="2.4" rx="1" fill="#F2C14E"/>`,
+      '0 0 48 28', 'car-svg');
+  },
+  randomCar() { return this.car(this.carColors[Math.floor(Math.random() * this.carColors.length)]); },
+  parking() { return this._svg('<rect x="5" y="3" width="22" height="26" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 25V9h6a5 5 0 0 1 0 10h-6" fill="none" stroke="currentColor" stroke-width="3"/>'); },
+  speakerOn: '<svg class="fi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.6 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  speakerOff: '<svg class="fi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  x: '<svg class="fi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+};
+
+// =============================================
 // GAME ENGINE
 // =============================================
 const G = {
@@ -824,12 +924,13 @@ const G = {
   ordersCorrect: 0, ordersMessed: 0,
   currentRound: 0, totalRounds: 12,
   isRunning: false, inMinigame: false,
-  andyChance: 0.55, patienceTimer: null,
+  andyChance: 0.32, patienceTimer: null,
   availableStation: null,
-  patienceDrainRate: 2.2,
+  patienceDrainRate: 1.5,
   isReaganCustomer: false,
   honkEl: null,
 
+  // icons are assigned from IconLib (inline SVG) at boot — see window load
   menu: [
     { id:'cs', name:'Chick-fil-A Sandwich', short:'CFA Sand', cat:'entree' },
     { id:'ss', name:'Spicy Deluxe', short:'Spicy Dlx', cat:'entree' },
@@ -1086,7 +1187,7 @@ const G = {
       intro: "RUSH HOUR just hit! The line is out the door and TWO customers are trying to order at the same time!",
       lukeReaction: "Move FASTER, Justin! There are 30 people in line! I can't believe this is happening on YOUR shift!",
       effect: function(cb) {
-        G.patienceDrainRate = 3.5;
+        G.patienceDrainRate = 2.4;
         G.toast("RUSH HOUR! Patience drains faster!", 'chaos');
         G.updateHUD();
         setTimeout(cb, 600);
@@ -1429,7 +1530,7 @@ const G = {
     this.score=0; this.strikes=0; this.customersServed=0;
     this.ordersCorrect=0; this.ordersMessed=0; this.currentRound=0;
     this.customerPatience=100; this.isRunning=true; this.inMinigame=false;
-    this.availableStation=null; this.patienceDrainRate=2.2; this.isReaganCustomer=false;
+    this.availableStation=null; this.patienceDrainRate=1.5; this.isReaganCustomer=false;
     Restaurant.justin = { x:0.5, y:0.45, tx:0.5, ty:0.45, frame:0, moving:false, targetStation:null };
     document.getElementById('title-screen').classList.remove('active');
     document.getElementById('fired-screen').classList.remove('active');
@@ -1638,7 +1739,7 @@ const G = {
     this.customerPatience = 100;
     this.inMinigame = false;
     this.isReaganCustomer = false;
-    this.patienceDrainRate = 2.2;
+    this.patienceDrainRate = 1.5;
     this.updateHUD();
 
     // === SPECIAL ROUND EVENTS ===
@@ -1646,15 +1747,15 @@ const G = {
       this.toast('Luke: "Corporate is watching today. Don\'t embarrass me."', 'luke');
     }
     if (this.currentRound === 6) {
-      this.patienceDrainRate = 3.3;
-      this.toast('LUNCH RUSH! Patience drains 50% faster!', 'chaos');
+      this.patienceDrainRate = 2.1;
+      this.toast('LUNCH RUSH! Patience drains a bit faster!', 'chaos');
     }
     if (this.currentRound === 12 && this.isRunning) {
       this.toast('Luke: "I can\'t believe you made it. Genuinely shocked."', 'luke');
     }
 
     // === CHAOS EVENTS (random between rounds) ===
-    if (this.currentRound > 1 && Math.random() < 0.38) {
+    if (this.currentRound > 1 && Math.random() < 0.20) {
       this.triggerChaos(() => this.afterChaos());
       return;
     }
@@ -1663,8 +1764,8 @@ const G = {
   },
 
   afterChaos() {
-    // Andy event check - round 9 gets double Andy
-    const andyRolls = this.currentRound === 9 ? 2 : 1;
+    // Andy event check (one roll per round now — he used to gang up on you)
+    const andyRolls = 1;
     let andyCount = 0;
     for (let i = 0; i < andyRolls; i++) {
       if (this.currentRound > 2 && Math.random() < this.andyChance) {
@@ -1866,6 +1967,184 @@ const G = {
     return false;
   },
 
+  // ============================
+  //  SHARED MINIGAME HELPERS
+  // ============================
+  mItem(id) { return this.menu.find(m => m.id === id); },
+
+  // group an array of ids -> [{id,count}] in menu order
+  groupItems(ids) {
+    const counts = {};
+    ids.forEach(id => counts[id] = (counts[id] || 0) + 1);
+    return this.menu.filter(m => counts[m.id]).map(m => ({ id: m.id, count: counts[m.id] }));
+  },
+
+  // ticket / order line rendered with food icons + quantities
+  tixHtml(ids) {
+    return `<span class="tix-line">` + this.groupItems(ids).map(g => {
+      const m = this.mItem(g.id);
+      return `<span class="tix-item">${m.icon} ${m.short}${g.count > 1 ? ` <span class="tix-x">×${g.count}</span>` : ''}</span>`;
+    }).join('') + `</span>`;
+  },
+
+  // --- "MY PLEASURE" (Justin's catchphrase, sprinkled in) ---
+  myPleasureLines: [
+    'My pleasure!',
+    'My pleasure! Enjoy!',
+    'Anytime — my pleasure!',
+    'My pleasure! Come back soon!',
+    'My pleasure! Always a joy.',
+    'My pleasure, have a blessed day!',
+  ],
+  myPleasure(chance = 1) {
+    if (Math.random() > chance) return false;
+    SFX.voice('justin');
+    this.toast('Justin: "' + R(this.myPleasureLines) + '"', 'justin');
+    return true;
+  },
+
+  // ---- Unified ORDER PAD (register + outside iPad) ----
+  // opts: { items, subLine, bubble:{charKey,text}, sendLabel, onSend(entered) }
+  _orderPad(area, opts) {
+    let entered = [];
+    let activeCat = 'entree';
+    const cats = { entree:'Entrees', side:'Sides', bev:'Beverages', dessert:'Desserts' };
+    const items = opts.items;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'reg-screen';
+    wrap.innerHTML = `
+      <div class="reg-header"><h3>Chick-fil-A POS</h3><span class="order-num">${opts.subLine || ''}</span></div>
+      ${opts.bubble ? `<div class="pos-bubble"><canvas class="pb-ava" width="26" height="34" id="pad-ava"></canvas><div class="pb-txt">${opts.bubble.text}</div></div>` : ''}
+      <div class="reg-display" id="pad-disp"><span class="reg-empty">No items entered...</span></div>
+      <div class="reg-total" id="pad-total"><span>Items: 0</span><span>Needed: ${items.length}</span></div>
+      <div class="reg-cats" id="pad-cats"></div>
+      <div class="menu-grid" id="pad-menu"></div>
+      <div class="reg-acts">
+        <button class="btn btn-r" id="pad-void">VOID</button>
+        <button class="btn" style="background:var(--success);color:#fff" id="pad-send">${opts.sendLabel || 'SEND ORDER'}</button>
+      </div>`;
+    area.appendChild(wrap);
+
+    if (opts.bubble) { const av = document.getElementById('pad-ava'); if (av) Sprites.drawChar(av, opts.bubble.charKey); }
+
+    const catsEl = document.getElementById('pad-cats');
+    Object.entries(cats).forEach(([k, v]) => {
+      const tab = document.createElement('div');
+      tab.className = `reg-cat ${k === activeCat ? 'active' : ''}`;
+      tab.textContent = v;
+      tab.onclick = () => { activeCat = k; renderMenu(); document.querySelectorAll('#pad-cats .reg-cat').forEach(t => t.classList.remove('active')); tab.classList.add('active'); };
+      catsEl.appendChild(tab);
+    });
+
+    const renderMenu = () => {
+      const grid = document.getElementById('pad-menu');
+      grid.innerHTML = '';
+      this.menu.filter(m => m.cat === activeCat).forEach(m => {
+        const b = document.createElement('div');
+        b.className = 'menu-btn';
+        b.innerHTML = `<span class="mi-ic">${m.icon}</span><span class="mb-name">${m.name}</span>`;
+        b.onclick = () => { SFX.tap(); entered.push(m.id); updDisp(); };
+        grid.appendChild(b);
+      });
+    };
+    renderMenu();
+
+    const updDisp = () => {
+      const d = document.getElementById('pad-disp');
+      const t = document.getElementById('pad-total');
+      if (!entered.length) {
+        d.innerHTML = '<span class="reg-empty">No items entered...</span>';
+      } else {
+        d.innerHTML = `<div class="pos-chips">` + this.groupItems(entered).map(g => {
+          const m = this.mItem(g.id);
+          return `<span class="qchip" data-id="${g.id}">${m.icon}<span>${m.short}</span>${g.count > 1 ? `<span class="qx">×${g.count}</span>` : ''}<span class="qrm">${IconLib.x}</span></span>`;
+        }).join('') + `</div>`;
+        d.querySelectorAll('.qchip').forEach(ch => {
+          ch.onclick = () => { const id = ch.getAttribute('data-id'); const i = entered.lastIndexOf(id); if (i > -1) entered.splice(i, 1); SFX.tap(); updDisp(); };
+        });
+      }
+      const over = entered.length > items.length;
+      t.innerHTML = `<span>Items: ${entered.length}</span><span style="color:${entered.length === items.length ? 'var(--success)' : over ? 'var(--danger)' : '#333'}">Needed: ${items.length}</span>`;
+    };
+
+    document.getElementById('pad-void').onclick = () => { entered = []; updDisp(); };
+    document.getElementById('pad-send').onclick = () => opts.onSend(entered);
+  },
+
+  // ---- Unified PICK PAD (bagging + drive-thru fulfillment) ----
+  // Tap a card to add one; the − removes one. Quantities are first-class,
+  // so "two lemonades" just means tapping lemonade twice. Decoys can't be added.
+  // opts: { items, decoyCount, sendLabel, onSend(selected) }
+  _pickPad(area, opts) {
+    const items = opts.items;
+    const selected = {}; // id -> count
+    const need = {};
+    items.forEach(id => need[id] = (need[id] || 0) + 1);
+    const correctIds = Object.keys(need);
+    const decoys = this.menu.filter(m => !items.includes(m.id)).sort(() => Math.random() - .5).slice(0, opts.decoyCount || 4).map(m => m.id);
+    const cardIds = [...correctIds, ...decoys].sort(() => Math.random() - .5);
+
+    const wrap = document.createElement('div');
+    wrap.style.width = '100%';
+    wrap.style.maxWidth = '360px';
+    wrap.innerHTML = `
+      <div class="bag-ticket"><strong>Order:</strong> ${this.tixHtml(items)}</div>
+      <div class="reg-total" style="border-radius:10px;margin-bottom:10px"><span>Selected: <span id="pp-cnt">0</span></span><span>Needed: ${items.length}</span></div>
+      <div class="pick-grid" id="pp-grid"></div>
+      <div class="reg-acts"><button class="btn btn-r" style="font-size:.78em" id="pp-rst">Reset</button><button class="btn" style="background:var(--success);color:#fff;font-size:.78em" id="pp-send">${opts.sendLabel || 'Deliver'}</button></div>`;
+    area.appendChild(wrap);
+
+    const grid = document.getElementById('pp-grid');
+    cardIds.forEach(id => {
+      const m = this.mItem(id);
+      const isCorrect = !!need[id];
+      const card = document.createElement('div');
+      card.className = 'pick-card';
+      card.innerHTML = `<span class="pc-minus">−</span><span class="pc-badge">0</span><span class="pc-ic">${m.icon}</span><span class="pc-name">${m.short}</span>`;
+      const refresh = () => {
+        const c = selected[id] || 0;
+        card.classList.toggle('has-qty', c > 0);
+        card.querySelector('.pc-badge').textContent = c;
+        updCnt();
+      };
+      card.onclick = (e) => {
+        if (e.target.classList.contains('pc-minus')) {
+          if (selected[id] > 0) { selected[id]--; if (selected[id] === 0) delete selected[id]; SFX.tap(); refresh(); }
+          return;
+        }
+        if (!isCorrect) {
+          card.classList.add('wrong-pick');
+          this.wrongFlash();
+          this.toast('Not on this order!', 'bad');
+          setTimeout(() => card.classList.remove('wrong-pick'), 450);
+          return;
+        }
+        selected[id] = (selected[id] || 0) + 1;
+        SFX.tap();
+        refresh();
+      };
+      grid.appendChild(card);
+    });
+
+    const updCnt = () => {
+      const n = Object.values(selected).reduce((a, b) => a + b, 0);
+      const el = document.getElementById('pp-cnt');
+      if (el) el.textContent = n;
+    };
+
+    document.getElementById('pp-rst').onclick = () => {
+      for (const k in selected) delete selected[k];
+      grid.querySelectorAll('.pick-card').forEach(c => { c.classList.remove('has-qty'); c.querySelector('.pc-badge').textContent = '0'; });
+      updCnt();
+    };
+    document.getElementById('pp-send').onclick = () => {
+      const arr = [];
+      for (const id in selected) { for (let i = 0; i < selected[id]; i++) arr.push(id); }
+      opts.onSend(arr);
+    };
+  },
+
   openMG(title, inst) {
     const o = document.getElementById('minigame-overlay');
     document.getElementById('mg-title').textContent = title;
@@ -1886,35 +2165,19 @@ const G = {
   //  REGISTER MINIGAME (CFA POS)
   // ============================
   mgRegister(cust) {
-    let entered = [];
     const items = cust.order.items;
-    let activeCat = 'entree';
-    const cats = {entree:'Entrees',side:'Sides',bev:'Beverages',dessert:'Desserts'};
     const orderNum = Math.floor(Math.random()*900)+100;
     const isReagan = cust.key === 'reagan';
-
     const greetingText = isReagan ? this.getReaganFlustered() : cust.order.greeting;
 
+    const proceed = () => {
+      if (isReagan) { this.reaganPostOrderDialog(() => render()); }
+      else if (!this.npcFlavorDialog(cust, () => render())) { render(); }
+    };
+
     this.showDialog(cust.key, greetingText, [
-      { text: isReagan ? "Uh... welcome to... yeah. Go ahead." : "Welcome to Chick-fil-A! Go ahead.", action: () => {
-        if (isReagan) {
-          this.reaganPostOrderDialog(() => render());
-        } else {
-          // NPC flavor check
-          if (!this.npcFlavorDialog(cust, () => render())) {
-            render();
-          }
-        }
-      }},
-      { text: isReagan ? "*stammering* My... my pleasure... what can I..." : "My pleasure, what can I get you?", action: () => {
-        if (isReagan) {
-          this.reaganPostOrderDialog(() => render());
-        } else {
-          if (!this.npcFlavorDialog(cust, () => render())) {
-            render();
-          }
-        }
-      }},
+      { text: isReagan ? "Uh... welcome to... yeah. Go ahead." : "Welcome to Chick-fil-A! Go ahead.", action: proceed },
+      { text: isReagan ? "*stammering* My... my pleasure... what can I..." : "My pleasure, what can I get you?", action: proceed },
     ]);
 
     const render = () => {
@@ -1922,83 +2185,44 @@ const G = {
       if (cust.key === 'navaneeth' && items.length > 7) {
         this.toast(R(this.lukeNavRoasts), 'luke');
       }
-
       const area = this.openMG('REGISTER', `Order #${orderNum} for ${cust.name}`);
-      const wrap = document.createElement('div');
-      wrap.className = 'reg-screen';
-      wrap.innerHTML = `
-        <div class="reg-header"><h3>Chick-fil-A POS</h3><span class="order-num">Order #${orderNum}</span></div>
-        <div class="reg-display" id="rd"><span class="reg-empty">No items entered...</span></div>
-        <div class="reg-total" id="rtotal"><span>Items: 0</span><span>Needed: ${items.length}</span></div>
-        <div class="reg-cats" id="rcats"></div>
-        <div class="menu-grid" id="rm"></div>
-        <div class="reg-acts">
-          <button class="btn btn-r" id="rc">VOID</button>
-          <button class="btn" style="background:var(--success);color:#fff" id="rs">SEND ORDER</button>
-        </div>`;
-      area.appendChild(wrap);
-
-      // Build category tabs
-      const catsEl = document.getElementById('rcats');
-      Object.entries(cats).forEach(([k,v]) => {
-        const tab = document.createElement('div');
-        tab.className = `reg-cat ${k===activeCat?'active':''}`;
-        tab.textContent = v;
-        tab.onclick = () => { activeCat = k; renderMenu(); document.querySelectorAll('.reg-cat').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); };
-        catsEl.appendChild(tab);
-      });
-
-      const renderMenu = () => {
-        const grid = document.getElementById('rm');
-        grid.innerHTML = '';
-        this.menu.filter(m=>m.cat===activeCat).forEach(m => {
-          const b = document.createElement('div');
-          b.className = 'menu-btn';
-          b.innerHTML = `<span class="mi"></span>${m.name}`;
-          b.onclick = () => { SFX.tap(); entered.push(m.id); updDisp(); };
-          grid.appendChild(b);
-        });
-      };
-      renderMenu();
-
-      const updDisp = () => {
-        const d = document.getElementById('rd');
-        const t = document.getElementById('rtotal');
-        if (!entered.length) { d.innerHTML = '<span class="reg-empty">No items entered...</span>'; }
-        else { d.innerHTML = entered.map(id=>{const m=this.menu.find(x=>x.id===id);return `<div class="reg-item"><span>${m?.name||id}</span><span>1</span></div>`;}).join(''); }
-        t.innerHTML = `<span>Items: ${entered.length}</span><span style="color:${entered.length===items.length?'var(--success)':entered.length>items.length?'var(--danger)':'#333'}">Needed: ${items.length}</span>`;
-      };
-      document.getElementById('rc').onclick = () => { entered=[]; updDisp(); };
-      document.getElementById('rs').onclick = () => {
-        clearInterval(this.patienceTimer);
-        this.closeMG();
-        const ok = [...items].sort().join() === [...entered].sort().join();
-        this.customersServed++;
-        if (ok) {
-          this.ordersCorrect++; this.score += 100+Math.round(this.customerPatience);
-          SFX.success();
-          this.toast('Order correct! +'+(100+Math.round(this.customerPatience)),'good');
-          this.checkSpeedBonus();
-          if (isReagan) {
-            this.showDialog('justin', "She ordered. I got it right. I'm basically a hero.", [], ()=>this.nextRound());
+      this._orderPad(area, {
+        items,
+        subLine: `Order #${orderNum}`,
+        bubble: { charKey: cust.key, text: greetingText },
+        sendLabel: 'SEND ORDER',
+        onSend: (entered) => {
+          clearInterval(this.patienceTimer);
+          this.closeMG();
+          const ok = [...items].sort().join() === [...entered].sort().join();
+          this.customersServed++;
+          if (ok) {
+            this.ordersCorrect++; this.score += 100+Math.round(this.customerPatience);
+            SFX.success();
+            this.toast('Order correct! +'+(100+Math.round(this.customerPatience)),'good');
+            this.checkSpeedBonus();
+            this.myPleasure(0.6);
+            if (isReagan) {
+              this.showDialog('justin', "She ordered. I got it right. I'm basically a hero.", [], ()=>this.nextRound());
+            } else {
+              this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+            }
           } else {
-            this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+            this.ordersMessed++;
+            if (isReagan) {
+              this.reaganFailDialog(() => { this.addStrike(0.5); this.nextRound(); });
+            } else {
+              this.toast('Wrong order sent!','bad');
+              const roasts = items.length <= 3 ? this.lukeSimpleFailRoasts : this.lukeRoasts;
+              this.showDialog(cust.key, R(this.angryLines), this.angryChoices.map(c=>({text:c.text,action:()=>{
+                if(c.e>0){this.score+=Math.round(c.e*30);}else{this.addStrike(0.25);}
+                this.showDialog('luke',R(roasts),[],()=>{this.addStrike(0.5);this.nextRound();});
+              }})));
+            }
           }
-        } else {
-          this.ordersMessed++;
-          if (isReagan) {
-            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
-          } else {
-            this.toast('Wrong order sent!','bad');
-            const roasts = items.length <= 3 ? this.lukeSimpleFailRoasts : this.lukeRoasts;
-            this.showDialog(cust.key, R(this.angryLines), this.angryChoices.map(c=>({text:c.text,action:()=>{
-              if(c.e>0){this.score+=Math.round(c.e*30);}else{this.addStrike(0.25);}
-              this.showDialog('luke',R(roasts),[],()=>{this.addStrike(0.75);this.nextRound();});
-            }})));
-          }
+          this.updateHUD();
         }
-        this.updateHUD();
-      };
+      });
     };
   },
 
@@ -2006,11 +2230,7 @@ const G = {
   //  BAGGING MINIGAME
   // ============================
   mgBagging(cust) {
-    let picked = [];
     const items = cust.order.items;
-    const correct = items.map(id=>this.menu.find(m=>m.id===id));
-    const wrong = this.menu.filter(m=>!items.includes(m.id)).sort(()=>Math.random()-.5).slice(0,4);
-    const all = [...correct,...wrong].sort(()=>Math.random()-.5);
     const isReagan = cust.key === 'reagan';
 
     const introText = isReagan
@@ -2022,70 +2242,40 @@ const G = {
     ]);
 
     const render = () => {
-      const area = this.openMG('BAGGING', `Bag order for ${cust.name}`);
-      const w = document.createElement('div');
-      w.className = 'bag-wrap';
-      w.innerHTML = `<div class="bag-ticket"><strong>Order:</strong> ${items.map(id=>this.menu.find(m=>m.id===id)?.short||id).join(', ')}</div><div class="conveyor" id="conv"></div><div class="bag-drop" id="bdrop"></div><div class="reg-acts" style="margin-top:12px"><button class="btn btn-r" style="font-size:.78em" id="brst">Reset</button><button class="btn" style="background:var(--success);color:#fff;font-size:.78em" id="bsub">Deliver Bag</button></div>`;
-      area.appendChild(w);
-
-      const conv = document.getElementById('conv');
-      all.forEach((item,idx) => {
-        const d = document.createElement('div');
-        d.className = 'food-box';
-        d.textContent = item.short;
-        d.onclick = () => {
-          if(d.classList.contains('picked')){
-            d.classList.remove('picked');
-            picked=picked.filter(p=>p.idx!==idx);
-          } else {
-            // WRONG ITEM flash check
-            if (!items.includes(item.id)) {
-              d.classList.add('wrong-pick');
-              this.wrongFlash();
-              this.toast('WRONG ITEM!', 'bad');
-              setTimeout(() => d.classList.remove('wrong-pick'), 500);
-              return; // don't add it, just warn
+      const area = this.openMG('BAGGING', `Bag order for ${cust.name} — tap items into the bag`);
+      this._pickPad(area, {
+        items,
+        decoyCount: 4,
+        sendLabel: 'Deliver Bag',
+        onSend: (picked) => {
+          clearInterval(this.patienceTimer);
+          this.closeMG();
+          const ok = [...items].sort().join() === [...picked].sort().join();
+          this.customersServed++;
+          if(ok){
+            this.ordersCorrect++; this.score+=120+Math.round(this.customerPatience);
+            SFX.success();
+            this.toast('Bagged perfectly! +'+(120+Math.round(this.customerPatience)),'good');
+            this.checkSpeedBonus();
+            this.myPleasure(0.5);
+            if (isReagan) {
+              this.showDialog('reagan', R(["Thanks Justin! *smiles*","Perfect, thank you! See you later!","You're the best, Justin!"]), [], () => {
+                this.showDialog('justin', "She said I'm the best. SHE SAID I'M THE BEST.", [], ()=>this.nextRound());
+              });
+            } else {
+              this.showDialog(cust.key, R(["Thanks! Perfect order!","That's everything, thanks!","Awesome, appreciate it!"]), [], ()=>this.nextRound());
             }
-            d.classList.add('picked');
-            picked.push({id:item.id,idx});
-          }
-          updBag();
-        };
-        conv.appendChild(d);
-      });
-
-      const updBag = () => {
-        document.getElementById('bdrop').innerHTML = picked.map(p=>`<span class="bag-mini">${this.menu.find(m=>m.id===p.id)?.short||''}</span>`).join('');
-      };
-
-      document.getElementById('brst').onclick = () => { picked=[]; document.querySelectorAll('.food-box').forEach(f=>f.classList.remove('picked')); updBag(); };
-      document.getElementById('bsub').onclick = () => {
-        clearInterval(this.patienceTimer);
-        this.closeMG();
-        const ok = [...items].sort().join() === picked.map(p=>p.id).sort().join();
-        this.customersServed++;
-        if(ok){
-          this.ordersCorrect++; this.score+=120+Math.round(this.customerPatience);
-          SFX.success();
-          this.toast('Bagged perfectly! +'+(120+Math.round(this.customerPatience)),'good');
-          this.checkSpeedBonus();
-          if (isReagan) {
-            this.showDialog('reagan', R(["Thanks Justin! *smiles*","Perfect, thank you! See you later!","You're the best, Justin!"]), [], () => {
-              this.showDialog('justin', "She said I'm the best. SHE SAID I'M THE BEST.", [], ()=>this.nextRound());
-            });
           } else {
-            this.showDialog(cust.key, R(["Thanks! Perfect order!","That's everything, thanks!","Awesome, appreciate it!"]), [], ()=>this.nextRound());
+            this.ordersMessed++; this.toast('Wrong items in the bag!','bad');
+            if (isReagan) {
+              this.reaganFailDialog(() => { this.addStrike(0.5); this.nextRound(); });
+            } else {
+              this.showDialog('luke', R(this.lukeRoasts), [], ()=>{ this.addStrike(0.5); this.nextRound(); });
+            }
           }
-        } else {
-          this.ordersMessed++; this.toast('Wrong items in the bag!','bad');
-          if (isReagan) {
-            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
-          } else {
-            this.showDialog('luke', R(this.lukeRoasts), [], ()=>{ this.addStrike(0.75); this.nextRound(); });
-          }
+          this.updateHUD();
         }
-        this.updateHUD();
-      };
+      });
     };
   },
 
@@ -2097,9 +2287,10 @@ const G = {
     const nk = Object.keys(this.npcOrders);
     const correct = Math.floor(Math.random()*6);
     const isReagan = cust.key === 'reagan';
+    const carPick = () => ({ car: R(['Sedan','SUV','Truck','Van','Coupe']), icon: IconLib.randomCar() });
     for(let i=0;i<6;i++){
-      if(i===correct) spots.push({occ:true,name:cust.name,right:true,car:R(['Sedan','SUV','Truck','Van','Coupe'])});
-      else if(Math.random()>.4){const k=nk[Math.floor(Math.random()*nk.length)];spots.push({occ:true,name:this.chars[k]?.name||'Customer',right:false,car:R(['Sedan','SUV','Truck','Hatch'])});}
+      if(i===correct) spots.push({occ:true,name:cust.name,right:true,...carPick()});
+      else if(Math.random()>.4){const k=nk[Math.floor(Math.random()*nk.length)];spots.push({occ:true,name:this.chars[k]?.name||'Customer',right:false,...carPick()});}
       else spots.push({occ:false});
     }
 
@@ -2119,7 +2310,7 @@ const G = {
         const d = document.createElement('div');
         d.className = `park-spot ${sp.occ?'has-car':''}`;
         if(sp.occ){
-          d.innerHTML = `<span class="car">${R(['[CAR]','[SUV]','[VAN]'])}</span><span class="pname">${sp.name}</span><span class="pnum">Spot ${idx+1} - ${sp.car}</span>`;
+          d.innerHTML = `<span class="car-emoji">${sp.icon}</span><span class="pname">${sp.name}</span><span class="pnum">Spot ${idx+1} · ${sp.car}</span>`;
           d.onclick = () => {
             clearInterval(this.patienceTimer);
             this.closeMG();
@@ -2129,6 +2320,7 @@ const G = {
               SFX.success();
               this.toast('Delivered! +'+(80+Math.round(this.customerPatience)),'good');
               this.checkSpeedBonus();
+              this.myPleasure(0.5);
               if (isReagan) {
                 this.showDialog('reagan', R(["Hey Justin! Thanks for bringing it out! *waves*","You found me! Thank you!","Justin! You're so sweet, thanks!"]), [], () => {
                   this.showDialog('justin', "She waved at me. I'm going to pass out.", [], ()=>this.nextRound());
@@ -2139,15 +2331,15 @@ const G = {
             } else {
               this.ordersMessed++; this.toast('Wrong car!','bad');
               if (isReagan) {
-                this.reaganFailDialog(() => { this.addStrike(1.5); this.nextRound(); });
+                this.reaganFailDialog(() => { this.addStrike(1); this.nextRound(); });
               } else {
-                this.showDialog('luke', `You gave ${cust.name}'s food to ${sp.name}. HOW.`, [], ()=>{ this.addStrike(1.5); this.nextRound(); });
+                this.showDialog('luke', `You gave ${cust.name}'s food to ${sp.name}. HOW.`, [], ()=>{ this.addStrike(1); this.nextRound(); });
               }
             }
             this.updateHUD();
           };
         } else {
-          d.innerHTML = `<span class="pnum">Empty</span><span style="font-size:1.2em;opacity:.3">P</span>`;
+          d.innerHTML = `<span class="car-emoji" style="opacity:.25">${IconLib.parking()}</span><span class="pnum">Empty</span>`;
         }
         g.appendChild(d);
       });
@@ -2159,9 +2351,8 @@ const G = {
   //  OUTSIDE iPAD MINIGAME
   // ============================
   mgIPad(cust) {
-    let entered = [];
     const items = cust.order.items;
-    const weather = R(['94F - Hot out here','62F - Rainy','78F - Cloudy','101F - Scorching','55F - Windy']);
+    const weather = R(['94°F · Hot out here','62°F · Rainy','78°F · Cloudy','101°F · Scorching','55°F · Windy']);
     const carNum = Math.floor(Math.random()*30)+1;
     const isReagan = cust.key === 'reagan';
 
@@ -2176,55 +2367,42 @@ const G = {
 
     const render = () => {
       const greetText = isReagan ? this.getReaganFlustered() + " ...through the car window. While holding an iPad. In the sun." : cust.order.greeting;
-      const area = this.openMG('OUTSIDE iPAD ORDER', `Car #${carNum} - ${weather}`);
-      const f = document.createElement('div');
-      f.className = 'ipad-frame';
-      f.innerHTML = `<div class="ipad-inner"><div class="ipad-top"><h3>CFA Order System</h3><span class="car-tag">Car #${carNum}</span></div><div class="ipad-bubble">${greetText}</div><div class="ipad-entered" id="ie">Tap items to add...</div><div class="ipad-grid" id="ig"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="ic">Clear</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="is">Send to Kitchen</button></div></div>`;
-      area.appendChild(f);
-
-      const grid = document.getElementById('ig');
-      this.menu.forEach(m => {
-        const b = document.createElement('div');
-        b.className = 'ipad-item';
-        b.textContent = m.short;
-        b.onclick = () => { SFX.tap(); entered.push(m.id); updIpad(); };
-        grid.appendChild(b);
-      });
-
-      const updIpad = () => {
-        const el = document.getElementById('ie');
-        el.innerHTML = entered.length ? entered.map(id=>`<span class="ipad-chip">${this.menu.find(m=>m.id===id)?.short||id}</span>`).join('') : 'Tap items to add...';
-      };
-
-      document.getElementById('ic').onclick = () => { entered=[]; updIpad(); };
-      document.getElementById('is').onclick = () => {
-        clearInterval(this.patienceTimer);
-        this.closeMG();
-        const ok = [...items].sort().join() === [...entered].sort().join();
-        this.customersServed++;
-        if(ok){
-          this.ordersCorrect++; this.score+=110+Math.round(this.customerPatience);
-          SFX.success();
-          this.toast('Order sent to Jacob! +'+(110+Math.round(this.customerPatience)),'good');
-          this.checkSpeedBonus();
-          if (isReagan) {
-            this.showDialog('reagan', "Thanks Justin! Stay cool out here!", [], () => {
-              this.showDialog('justin', "She told me to stay cool. I am NOT cool. I am the opposite of cool right now.", [], ()=>this.nextRound());
-            });
+      const area = this.openMG('OUTSIDE iPAD ORDER', `Car #${carNum} · ${weather}`);
+      this._orderPad(area, {
+        items,
+        subLine: `Car #${carNum} · ${weather}`,
+        bubble: { charKey: cust.key, text: greetText },
+        sendLabel: 'Send to Kitchen',
+        onSend: (entered) => {
+          clearInterval(this.patienceTimer);
+          this.closeMG();
+          const ok = [...items].sort().join() === [...entered].sort().join();
+          this.customersServed++;
+          if(ok){
+            this.ordersCorrect++; this.score+=110+Math.round(this.customerPatience);
+            SFX.success();
+            this.toast('Order sent to Jacob! +'+(110+Math.round(this.customerPatience)),'good');
+            this.checkSpeedBonus();
+            this.myPleasure(0.5);
+            if (isReagan) {
+              this.showDialog('reagan', "Thanks Justin! Stay cool out here!", [], () => {
+                this.showDialog('justin', "She told me to stay cool. I am NOT cool. I am the opposite of cool right now.", [], ()=>this.nextRound());
+              });
+            } else {
+              this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+            }
           } else {
-            this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+            this.ordersMessed++;
+            if (isReagan) {
+              this.reaganFailDialog(() => { this.addStrike(0.5); this.nextRound(); });
+            } else {
+              this.toast('Wrong order sent to kitchen!','bad');
+              this.showDialog('luke', R(["Jacob yelled at me because that order makes no sense.","The iPad order is all wrong!","Did the heat get to your brain?"]), [], ()=>{ this.addStrike(0.5); this.nextRound(); });
+            }
           }
-        } else {
-          this.ordersMessed++;
-          if (isReagan) {
-            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
-          } else {
-            this.toast('Wrong order sent to kitchen!','bad');
-            this.showDialog('luke', R(["Jacob yelled at me because that order makes no sense.","The iPad order is all wrong!","Did the heat get to your brain?"]), [], ()=>{ this.addStrike(0.75); this.nextRound(); });
-          }
+          this.updateHUD();
         }
-        this.updateHUD();
-      };
+      });
     };
   },
 
@@ -2232,11 +2410,7 @@ const G = {
   //  DRIVE-THROUGH WINDOW
   // ============================
   mgDriveThrough(cust) {
-    let handed = [];
     const items = cust.order.items;
-    const correct = items.map(id=>this.menu.find(m=>m.id===id));
-    const wrong = this.menu.filter(m=>!items.includes(m.id)).sort(()=>Math.random()-.5).slice(0,3);
-    const tray = [...correct,...wrong].sort(()=>Math.random()-.5);
     const isReagan = cust.key === 'reagan';
 
     const introText = isReagan
@@ -2250,60 +2424,53 @@ const G = {
     const render = () => {
       this.startHonking();
       const area = this.openMG('DRIVE-THROUGH WINDOW', `Hand ${cust.name} their order`);
-      const w = document.createElement('div');
-      w.className = 'dt-wrap';
       const sayText = isReagan
         ? R(["Hi Justin! *waves from car*", "Hey! It's me!", "Justin! Fancy seeing you here *laughs*"])
         : R(["Mobile order for "+cust.name,"Picking up!","Hey, order ready?","What's up Justin!"]);
-      w.innerHTML = `<div class="dt-window"><div class="dt-car">${R(['[CAR]','[SUV]','[TRUCK]','[VAN]'])}</div><div class="dt-who">${cust.name}</div><div class="dt-says">"${sayText}"</div></div><div class="dt-counter"><div class="dt-ticket"><strong>Ticket:</strong> ${items.map(id=>this.menu.find(m=>m.id===id)?.short||id).join(', ')}</div><div class="dt-handed" id="dh"></div><div class="dt-tray" id="dtray"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="drst">Take Back</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="ddn">Close Window</button></div></div>`;
-      area.appendChild(w);
-
-      const dtray = document.getElementById('dtray');
-      tray.forEach((item,idx) => {
-        const d = document.createElement('div');
-        d.className = 'dt-item';
-        d.textContent = item.short;
-        d.onclick = () => { if(d.classList.contains('gone'))return; SFX.tap(); d.classList.add('gone'); handed.push({id:item.id,idx}); updH(); };
-        dtray.appendChild(d);
-      });
-
-      const updH = () => {
-        document.getElementById('dh').innerHTML = handed.map(h=>`<span class="dt-hchip">${this.menu.find(m=>m.id===h.id)?.short||''}</span>`).join('');
-      };
-
-      document.getElementById('drst').onclick = () => { handed=[]; document.querySelectorAll('.dt-item').forEach(d=>d.classList.remove('gone')); updH(); };
-      document.getElementById('ddn').onclick = () => {
-        clearInterval(this.patienceTimer);
-        this.closeMG();
-        this.stopHonking();
-        const ok = [...items].sort().join() === handed.map(h=>h.id).sort().join();
-        this.customersServed++;
-        if(ok){
-          this.ordersCorrect++; this.score+=90+Math.round(this.customerPatience);
-          SFX.success();
-          this.toast('Perfect handoff! +'+(90+Math.round(this.customerPatience)),'good');
-          this.checkSpeedBonus();
-          if (isReagan) {
-            this.showDialog('reagan', R(["Thanks Justin! *smiles and drives away*","You're a lifesaver! See you around!","Perfect! Bye Justin! *waves*"]), [], () => {
-              this.showDialog('justin', "I handed Reagan food through a window and our hands almost touched. I need to sit down.", [], ()=>this.nextRound());
-            });
+      const carIcon = IconLib.randomCar();
+      const win = document.createElement('div');
+      win.style.width = '100%';
+      win.style.maxWidth = '360px';
+      win.innerHTML = `<div class="dt-window" style="border-radius:16px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px"><div class="dt-car-big">${carIcon}</div><div class="dt-who">${cust.name}</div><div class="dt-says">"${sayText}"</div></div>`;
+      area.appendChild(win);
+      this._pickPad(area, {
+        items,
+        decoyCount: 3,
+        sendLabel: 'Close Window',
+        onSend: (handed) => {
+          clearInterval(this.patienceTimer);
+          this.closeMG();
+          this.stopHonking();
+          const ok = [...items].sort().join() === [...handed].sort().join();
+          this.customersServed++;
+          if(ok){
+            this.ordersCorrect++; this.score+=90+Math.round(this.customerPatience);
+            SFX.success();
+            this.toast('Perfect handoff! +'+(90+Math.round(this.customerPatience)),'good');
+            this.checkSpeedBonus();
+            this.myPleasure(0.5);
+            if (isReagan) {
+              this.showDialog('reagan', R(["Thanks Justin! *smiles and drives away*","You're a lifesaver! See you around!","Perfect! Bye Justin! *waves*"]), [], () => {
+                this.showDialog('justin', "I handed Reagan food through a window and our hands almost touched. I need to sit down.", [], ()=>this.nextRound());
+              });
+            } else {
+              this.showDialog(cust.key, R(["Thanks! Have a great day!","Perfect, everything's here!","Fast service, thanks!"]), [], ()=>this.nextRound());
+            }
           } else {
-            this.showDialog(cust.key, R(["Thanks! Have a great day!","Perfect, everything's here!","Fast service, thanks!"]), [], ()=>this.nextRound());
+            this.ordersMessed++; this.toast('Wrong items!','bad');
+            if (isReagan) {
+              this.reaganFailDialog(() => { this.addStrike(0.5); this.nextRound(); });
+            } else {
+              this.showDialog(cust.key, R(["This isn't what I ordered??","I'm missing stuff!","Bro I can see my items right there on the counter."]),
+                this.angryChoices.map(c=>({text:c.text,action:()=>{
+                  if(c.e>0){this.score+=Math.round(c.e*50);}else{this.addStrike(0.25);}
+                  this.showDialog('luke',R(this.lukeRoasts),[],()=>{this.addStrike(0.5);this.nextRound();});
+                }})));
+            }
           }
-        } else {
-          this.ordersMessed++; this.toast('Wrong items!','bad');
-          if (isReagan) {
-            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
-          } else {
-            this.showDialog(cust.key, R(["This isn't what I ordered??","I'm missing stuff!","Bro I can see my items right there on the counter."]),
-              this.angryChoices.map(c=>({text:c.text,action:()=>{
-                if(c.e>0){this.score+=Math.round(c.e*50);}else{this.addStrike(0.25);}
-                this.showDialog('luke',R(this.lukeRoasts),[],()=>{this.addStrike(0.75);this.nextRound();});
-              }})));
-          }
+          this.updateHUD();
         }
-        this.updateHUD();
-      };
+      });
     };
   },
 
@@ -2349,7 +2516,7 @@ const G = {
     this.closeMG();
     this.customersServed++; this.ordersMessed++;
     this.toast(reason,'bad');
-    this.addStrike(1.5);
+    this.addStrike(1);
     if(this.isRunning) this.showDialog('luke', R(this.lukeRoasts), [], ()=>this.nextRound());
     this.updateHUD();
   },
@@ -2377,6 +2544,9 @@ const G = {
     </div><button class="btn btn-w" style="margin-top:20px" onclick="G.closeMG();G.restart()">Play Again</button>`;
   },
 };
+
+// Attach hand-drawn SVG icons to every menu item (no emoji)
+G.menu.forEach(m => m.icon = IconLib.food(m.id));
 
 function R(a){return a[Math.floor(Math.random()*a.length)];}
 
@@ -2490,6 +2660,9 @@ window.addEventListener('load', () => {
   document.addEventListener('click', () => { try { SFX.ctx(); } catch(e){} }, { once: true });
   Restaurant.init();
   Restaurant.loop();
+  // Mute button icon (SVG, no emoji)
+  const mb = document.getElementById('mute-btn');
+  if (mb) mb.innerHTML = IconLib.speakerOn;
   // Draw title screen Justin
   const tc = document.getElementById('title-justin');
   if (tc) Sprites.drawChar(tc, 'justin');
