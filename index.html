@@ -1002,7 +1002,7 @@ const G = {
   ordersCorrect: 0, ordersMessed: 0,
   currentRound: 0, totalRounds: 12,
   isRunning: false, inMinigame: false,
-  andyChance: 0.46, patienceTimer: null,
+  andyChance: 0.55, patienceTimer: null,
   availableStation: null,
   patienceDrainRate: 0.85,
   isReaganCustomer: false,
@@ -1806,9 +1806,18 @@ const G = {
     if (this.currentRound === 3) {
       this.toast('Luke: "Corporate is watching today. Don\'t embarrass me."', 'luke');
     }
+    if (this.currentRound === 4) {
+      this.toast('Luke: "Heads up — Caitlin just walked in. Keep an eye on Jacob back there."', 'warn');
+    }
     if (this.currentRound === 6) {
       this.patienceDrainRate = 1.3;
-      this.toast('LUNCH RUSH! Getting busier!', 'chaos');
+      this.toast('LUNCH RUSH! Getting busier! Also Ethan is here with his girlfriend again.', 'chaos');
+    }
+    if (this.currentRound === 8) {
+      this.toast('Nicolas Bittner is on his way. He literally ran here.', 'good');
+    }
+    if (this.currentRound === 9) {
+      this.toast('Luke: "Levi Weiner is here. You know what he wants. ...Do you know what he wants?"', 'warn');
     }
     if (this.currentRound === 12 && this.isRunning) {
       this.toast('Luke: "I can\'t believe you made it. Genuinely shocked."', 'luke');
@@ -1919,11 +1928,20 @@ const G = {
   },
 
   pickCustomer() {
-    // Round 11 guarantees Reagan
-    if (this.currentRound === 11) {
-      const orders = this.npcOrders['reagan'];
-      const order = orders[Math.floor(Math.random()*orders.length)];
-      return { key:'reagan', name:'Reagan', order };
+    // Guaranteed special character rounds — every game sees all the unique content
+    const guaranteed = {
+      4:  'caitlin',  // Watch Jacob side game
+      6:  'ethan',    // Ethan + freshman GF double order (during lunch rush)
+      8:  'nicolas',  // The GOAT (chill patience drain)
+      9:  'levi',     // Weiner Special (+ double Andy from round 9 rule)
+      11: 'reagan',   // The crush
+    };
+    const forcedKey = guaranteed[this.currentRound];
+    if (forcedKey) {
+      const orders = this.npcOrders[forcedKey];
+      const order = R(orders);
+      this.lastCustomerKey = forcedKey;
+      return { key:forcedKey, name:this.chars[forcedKey]?.name||forcedKey, order };
     }
 
     const keys = Object.keys(this.npcOrders);
@@ -2715,7 +2733,7 @@ const G = {
                 this.score+=Math.round(d.e*40);
                 this.andyRepelledCount = (this.andyRepelledCount||0) + 1;
                 this.toast('Defended yourself! Andy leaves.','good');
-                if (this.andyRepelledCount >= 3) {
+                if (this.andyRepelledCount >= 2) {
                   this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], () => {
                     this.toast("Andy: 'That is IT. Get on the floor, Justin. Right now.'", 'andy');
                     setTimeout(() => this.andyCPR(cb), 1400);
