@@ -9,1653 +9,1250 @@
 <title>Justin's Chick-fil-A Shift</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+:root{--red:#E51636;--dkred:#C41230;--blue:#004F71;--cream:#FFF5E1;--brown:#8B4513;--danger:#FF3333;--success:#28A745;--warn:#FFC107}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:#1a1a2e;touch-action:manipulation}
+#game{width:100%;height:100%;position:relative;overflow:hidden;max-width:500px;margin:0 auto;background:#888}
+canvas{display:block;width:100%;height:100%}
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+/* Screens */
+.screen{display:none;width:100%;height:100%;position:absolute;top:0;left:0;flex-direction:column;z-index:10}
+.screen.active{display:flex}
+#title-screen{background:linear-gradient(180deg,var(--red) 0%,#B01030 60%,#8B0A20 100%);align-items:center;justify-content:center;text-align:center;color:#fff}
+#title-screen .logo{font-family:'Fredoka One',cursive;font-size:2.2em;line-height:1.1;text-shadow:3px 3px 0 rgba(0,0,0,.3);margin-bottom:6px}
+#title-screen .sub{font-size:.85em;opacity:.85;font-weight:700;letter-spacing:1px}
+.title-char{width:120px;height:160px;margin:20px auto;position:relative}
+.btn{padding:14px 44px;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1em;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:transform .15s}
+.btn:active{transform:scale(.95)}
+.btn-w{background:#fff;color:var(--red);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.btn-r{background:var(--danger);color:#fff}
+#start-btn{margin-top:24px}
 
-:root {
-  --cfa-red: #E51636;
-  --cfa-dark-red: #C41230;
-  --cfa-blue: #004F71;
-  --cfa-white: #FFFFFF;
-  --cfa-cream: #FFF5E1;
-  --cfa-gold: #FFD700;
-  --cfa-brown: #8B4513;
-  --danger: #FF3333;
-  --success: #28A745;
-  --warning: #FFC107;
-}
+/* HUD */
+#hud{position:absolute;top:0;left:0;right:0;height:48px;z-index:100;background:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.4));display:none;align-items:center;justify-content:space-between;padding:0 12px;color:#fff;font-weight:700;font-size:.75em}
+#hud.visible{display:flex}
+.hud-g{display:flex;align-items:center;gap:6px}
+#patience-wrap{width:50px;height:6px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden}
+#patience-fill{height:100%;background:var(--success);border-radius:3px;transition:width .3s,background .3s;width:100%}
+#app-btn{background:#fff;color:var(--red);border:none;padding:3px 8px;border-radius:8px;font-weight:800;font-size:.7em;font-family:'Nunito',sans-serif;cursor:pointer}
 
-html, body {
-  width: 100%; height: 100%;
-  overflow: hidden;
-  font-family: 'Nunito', sans-serif;
-  background: #1a1a2e;
-  touch-action: manipulation;
-}
+/* Dialog */
+#dialog{display:none;position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.2);padding:16px;z-index:200;max-height:55vh;overflow-y:auto;animation:slideU .25s ease-out}
+#dialog.visible{display:block}
+@keyframes slideU{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.dlg-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dlg-portrait{width:40px;height:52px;border-radius:6px;overflow:hidden;flex-shrink:0;position:relative}
+.dlg-name{font-weight:800;font-size:.9em;color:var(--red)}
+.dlg-text{font-size:.85em;line-height:1.45;color:#333;margin-bottom:12px}
+.dlg-choices{display:flex;flex-direction:column;gap:6px}
+.ch-btn{width:100%;padding:12px;border:2px solid #eee;border-radius:12px;background:#fff;text-align:left;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82em;color:#333;cursor:pointer;transition:all .15s}
+.ch-btn:active{background:var(--red);color:#fff;border-color:var(--red)}
 
-#game {
-  width: 100%; height: 100%;
-  position: relative;
-  overflow: hidden;
-  max-width: 500px;
-  margin: 0 auto;
-  background: var(--cfa-cream);
-}
+/* Toast */
+.toast{position:absolute;top:54px;left:12px;right:12px;padding:12px;border-radius:12px;color:#fff;font-weight:700;font-size:.8em;z-index:300;animation:tIn .3s ease-out,tOut .3s ease-in 2s forwards;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast-good{background:var(--success)}.toast-bad{background:var(--danger)}.toast-warn{background:var(--warn);color:#333}.toast-andy{background:#6f42c1}.toast-luke{background:var(--blue)}
+@keyframes tIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes tOut{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
 
-/* ========== SCREENS ========== */
-.screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; flex-direction: column; }
-.screen.active { display: flex; }
+/* Station Labels */
+.station-label{position:absolute;background:rgba(0,0,0,.65);color:#fff;padding:3px 8px;border-radius:6px;font-size:.6em;font-weight:800;white-space:nowrap;pointer-events:none;z-index:50;text-align:center;letter-spacing:.5px}
+.station-glow{position:absolute;border-radius:8px;border:2px solid rgba(255,255,255,.5);pointer-events:none;z-index:5;animation:glow 1.5s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(255,255,255,.3)}50%{box-shadow:0 0 18px rgba(255,255,255,.7)}}
 
-/* ========== TITLE SCREEN ========== */
-#title-screen {
-  background: linear-gradient(180deg, var(--cfa-red) 0%, #B01030 60%, #8B0A20 100%);
-  align-items: center; justify-content: center; text-align: center; color: white;
-}
-#title-screen .logo-container {
-  animation: floatY 3s ease-in-out infinite;
-}
-#title-screen .logo {
-  font-family: 'Fredoka One', cursive;
-  font-size: 2.4em; line-height: 1.1;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-  margin-bottom: 8px;
-}
-#title-screen .subtitle {
-  font-size: 1em; opacity: 0.9;
-  font-weight: 700; letter-spacing: 1px;
-}
-#title-screen .character-preview {
-  width: 150px; height: 150px; margin: 24px auto;
-  background: white; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  font-size: 80px;
-  animation: pulse 2s ease-in-out infinite;
-}
-.btn {
-  padding: 16px 48px; border: none; border-radius: 50px;
-  font-family: 'Nunito', sans-serif; font-weight: 800;
-  font-size: 1.1em; cursor: pointer; transition: all 0.2s;
-  text-transform: uppercase; letter-spacing: 1px;
-}
-.btn:active { transform: scale(0.95); }
-.btn-primary {
-  background: white; color: var(--cfa-red);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
-.btn-danger { background: var(--danger); color: white; }
-.btn-success { background: var(--success); color: white; }
-.btn-small { padding: 10px 24px; font-size: 0.85em; }
+/* Minigame Overlay */
+#minigame-overlay{display:none;position:absolute;inset:0;z-index:150;background:rgba(0,0,0,.85);flex-direction:column;padding:52px 12px 12px}
+#minigame-overlay.visible{display:flex}
+.mg-title{font-family:'Fredoka One',cursive;font-size:1.2em;color:#fff;text-align:center;margin-bottom:6px}
+.mg-inst{font-size:.78em;color:#ccc;text-align:center;margin-bottom:12px;font-weight:600}
+.mg-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center}
 
-#start-btn { margin-top: 32px; }
+/* Register MG */
+.reg-screen{width:100%;max-width:340px;background:#1e1e2e;border-radius:14px;padding:12px}
+.reg-display{background:#0a0a1a;color:#0f0;border-radius:6px;padding:10px;font-family:monospace;font-size:.78em;min-height:60px;margin-bottom:10px;white-space:pre-line}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.menu-btn{background:#2a2a3e;border:2px solid #444;border-radius:10px;padding:8px 2px;text-align:center;font-size:.65em;font-weight:700;color:#fff;cursor:pointer;transition:all .12s}
+.menu-btn:active{background:var(--red);border-color:var(--red);transform:scale(.95)}
+.menu-btn .mi{font-size:1.6em;display:block;margin-bottom:1px}
+.reg-acts{display:flex;gap:6px;margin-top:10px}
+.reg-acts .btn{flex:1;padding:10px;font-size:.8em}
 
-/* ========== HUD ========== */
-#hud {
-  position: absolute; top: 0; left: 0; right: 0;
-  padding: 12px 16px; z-index: 50;
-  background: linear-gradient(180deg, rgba(229,22,54,0.95) 0%, rgba(229,22,54,0.85) 100%);
-  display: none; align-items: center; justify-content: space-between;
-  color: white; font-weight: 700; font-size: 0.85em;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-}
-#hud.visible { display: flex; }
-.hud-item { display: flex; align-items: center; gap: 4px; }
-.hud-icon { font-size: 1.1em; }
-#patience-bar-container {
-  width: 60px; height: 8px; background: rgba(255,255,255,0.3);
-  border-radius: 4px; overflow: hidden;
-}
-#patience-bar {
-  height: 100%; background: var(--success); border-radius: 4px;
-  transition: width 0.3s, background 0.3s;
-}
-#app-btn {
-  background: white; color: var(--cfa-red); border: none;
-  padding: 4px 10px; border-radius: 12px; font-weight: 800;
-  font-size: 0.75em; font-family: 'Nunito', sans-serif; cursor: pointer;
-}
+/* Bagging MG */
+.bag-wrap{width:100%;max-width:340px}
+.bag-ticket{background:#fff;border-radius:10px;padding:10px;margin-bottom:8px;font-size:.8em;color:#333}
+.bag-ticket strong{color:var(--red)}
+.conveyor{display:flex;gap:8px;overflow-x:auto;padding:10px;background:#333;border-radius:10px;margin-bottom:12px;min-height:70px;align-items:center}
+.food-box{width:56px;height:56px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1em;flex-shrink:0;cursor:pointer;border:2px solid transparent;transition:all .15s;font-weight:800;color:#333}
+.food-box.picked{border-color:#0f0;background:#e8ffe8}
+.food-box:active{transform:scale(.9)}
+.bag-drop{width:100px;height:120px;margin:0 auto;background:linear-gradient(180deg,#c9a36a,#8B4513);border-radius:4px 4px 10px 10px;position:relative;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px;gap:2px}
+.bag-drop::before{content:'';position:absolute;top:-6px;left:-3px;right:-3px;height:12px;background:#c9a36a;border-radius:6px 6px 0 0}
+.bag-mini{font-size:.7em;font-weight:800;background:rgba(255,255,255,.3);padding:1px 4px;border-radius:4px;color:#fff}
 
-/* ========== MAIN GAME SCREEN ========== */
-#game-screen {
-  background: var(--cfa-cream);
-}
-.restaurant-bg {
-  flex: 1; display: flex; flex-direction: column;
-  padding-top: 56px;
-}
+/* Curbside */
+.park-grid{width:100%;max-width:340px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.park-spot{background:#444;border-radius:10px;padding:14px;text-align:center;color:#fff;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border:2px dashed #666;transition:all .15s}
+.park-spot.has-car{background:#2c3e50;border:2px solid #4a90d9;border-style:solid}
+.park-spot:active{transform:scale(.96)}
+.park-spot .car{font-size:1.8em}.park-spot .pname{font-size:.75em;font-weight:700}.park-spot .pnum{font-size:.65em;opacity:.6}
 
-/* ========== DIALOG BOX ========== */
-#dialog-box {
-  display: none; position: absolute; bottom: 0; left: 0; right: 0;
-  background: white; border-radius: 20px 20px 0 0;
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
-  padding: 20px; z-index: 100;
-  max-height: 70vh; overflow-y: auto;
-  animation: slideUp 0.3s ease-out;
-}
-#dialog-box.visible { display: block; }
+/* iPad MG */
+.ipad-frame{width:100%;max-width:320px;background:#111;border-radius:18px;padding:10px}
+.ipad-inner{background:#fff;border-radius:10px;padding:12px}
+.ipad-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--red)}
+.ipad-top h3{font-size:.8em;color:var(--red)}.ipad-top .car-tag{background:var(--blue);color:#fff;padding:1px 8px;border-radius:8px;font-size:.65em;font-weight:800}
+.ipad-bubble{background:#f0f0f0;border-radius:12px 12px 12px 2px;padding:10px;margin-bottom:8px;font-size:.78em;color:#333;line-height:1.35}
+.ipad-entered{background:var(--cream);border-radius:8px;padding:6px;min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:3px;font-size:.75em}
+.ipad-chip{background:var(--red);color:#fff;padding:2px 8px;border-radius:14px;font-size:.8em;font-weight:700}
+.ipad-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;max-height:150px;overflow-y:auto;margin-bottom:8px}
+.ipad-item{display:flex;align-items:center;gap:4px;background:#f8f8f8;border:2px solid #eee;border-radius:8px;padding:6px;font-size:.68em;font-weight:700;cursor:pointer;transition:all .12s}
+.ipad-item:active{background:var(--red);color:#fff;border-color:var(--red)}
+.weather-tag{color:#ccc;font-size:.7em;text-align:center;margin-bottom:6px}
 
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+/* DT Window */
+.dt-wrap{width:100%;max-width:340px}
+.dt-window{background:linear-gradient(180deg,#555,#444);border-radius:14px 14px 0 0;padding:14px;border:3px solid #333;border-bottom:none;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.dt-car{font-size:3em;animation:carIn .4s ease-out}
+@keyframes carIn{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+.dt-who{color:#fff;font-weight:800;font-size:.9em;margin-top:4px}.dt-says{color:#aaa;font-size:.72em;font-style:italic;margin-top:2px}
+.dt-counter{background:#6B3410;padding:12px;border-radius:0 0 14px 14px;border:3px solid #5a2a0a;border-top:2px solid #8B4513}
+.dt-ticket{background:#fff;border-radius:6px;padding:6px 10px;font-size:.72em;margin-bottom:8px;color:#333}
+.dt-ticket strong{color:var(--red)}
+.dt-tray{display:flex;gap:6px;overflow-x:auto;padding:6px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:8px;min-height:54px;align-items:center}
+.dt-item{width:48px;height:48px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75em;font-weight:800;flex-shrink:0;cursor:pointer;transition:all .15s;color:#333}
+.dt-item.gone{opacity:.25;transform:scale(.8);pointer-events:none}
+.dt-item:active{transform:scale(.9)}
+.dt-handed{display:flex;gap:3px;flex-wrap:wrap;min-height:20px;margin-bottom:6px;justify-content:center}
+.dt-hchip{background:rgba(255,255,255,.2);padding:1px 6px;border-radius:6px;font-size:.7em;color:#fff;font-weight:700}
 
-.dialog-header {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
-}
-.dialog-avatar {
-  width: 48px; height: 48px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px; flex-shrink: 0;
-}
-.dialog-name {
-  font-weight: 800; font-size: 1em; color: var(--cfa-red);
-}
-.dialog-text {
-  font-size: 0.95em; line-height: 1.5; color: #333;
-  margin-bottom: 16px; min-height: 40px;
-}
-.dialog-choices {
-  display: flex; flex-direction: column; gap: 8px;
-}
-.choice-btn {
-  width: 100%; padding: 14px 16px; border: 2px solid #eee;
-  border-radius: 14px; background: white; text-align: left;
-  font-family: 'Nunito', sans-serif; font-weight: 700;
-  font-size: 0.9em; color: #333; cursor: pointer;
-  transition: all 0.2s;
-}
-.choice-btn:active { background: var(--cfa-red); color: white; border-color: var(--cfa-red); }
-.choice-btn.good { border-left: 4px solid var(--success); }
-.choice-btn.bad { border-left: 4px solid var(--danger); }
-.choice-btn.neutral { border-left: 4px solid var(--warning); }
+/* App */
+#app-screen{background:#fff;z-index:250}
+.app-hdr{background:var(--red);color:#fff;padding:18px 14px;text-align:center}
+.app-hdr h2{font-family:'Fredoka One',cursive;font-size:1.2em}.app-hdr .emp{font-size:.8em;opacity:.85;margin-top:3px}
+.app-body{flex:1;overflow-y:auto;padding:14px}
+.stat-card{background:#f8f8f8;border-radius:14px;padding:14px;margin-bottom:10px}
+.stat-card h3{font-size:.75em;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-val{font-size:1.8em;font-weight:900;color:var(--red)}
+.stat-bar{width:100%;height:10px;background:#eee;border-radius:5px;overflow:hidden;margin-top:6px}
+.stat-bar-f{height:100%;border-radius:5px;transition:width .5s}
+.stat-badge{display:inline-block;padding:4px 14px;border-radius:16px;font-weight:800;font-size:.8em;margin-top:6px}
+.sb-ok{background:#e8f5e9;color:var(--success)}.sb-warn{background:#fff3e0;color:#F57C00}.sb-bad{background:#ffebee;color:var(--danger)}.sb-dead{background:#000;color:var(--danger);font-size:1.1em;letter-spacing:2px}
+.app-close{width:calc(100% - 28px);margin:14px;padding:12px;border:none;border-radius:12px;background:var(--red);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95em;cursor:pointer}
 
-/* ========== MINIGAME AREA ========== */
-.minigame-area {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 16px; position: relative;
-}
+/* Fired */
+#fired-screen{background:linear-gradient(180deg,#1a1a2e,#0f0f1a);align-items:center;justify-content:center;text-align:center;color:#fff;padding:28px}
+#fired-screen h1{font-family:'Fredoka One',cursive;font-size:2em;color:var(--danger);margin:12px 0 6px}
+#fired-screen .reason{font-size:.88em;opacity:.65;margin-bottom:20px;line-height:1.4}
+.final-stats{background:rgba(255,255,255,.05);border-radius:14px;padding:16px;margin-bottom:20px;width:100%}
+.final-stats p{display:flex;justify-content:space-between;padding:5px 0;font-size:.85em;opacity:.75}
+.final-stats span{font-weight:800}
 
-.minigame-title {
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.3em; color: var(--cfa-red);
-  text-align: center; margin-bottom: 12px;
-}
-
-.minigame-instruction {
-  font-size: 0.85em; color: #666; text-align: center;
-  margin-bottom: 16px; font-weight: 600;
-}
-
-/* ========== REGISTER MINIGAME ========== */
-.register-screen {
-  width: 100%; max-width: 360px; background: white;
-  border-radius: 16px; padding: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-.order-display {
-  background: #1a1a2e; color: #0f0; border-radius: 8px;
-  padding: 12px; font-family: monospace; font-size: 0.85em;
-  min-height: 80px; margin-bottom: 12px;
-}
-.menu-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-}
-.menu-item {
-  background: var(--cfa-cream); border: 2px solid #ddd;
-  border-radius: 12px; padding: 10px 4px; text-align: center;
-  font-size: 0.7em; font-weight: 700; cursor: pointer;
-  transition: all 0.15s;
-}
-.menu-item:active { background: var(--cfa-red); color: white; transform: scale(0.95); }
-.menu-item .item-emoji { font-size: 1.8em; display: block; margin-bottom: 2px; }
-.register-actions {
-  display: flex; gap: 8px; margin-top: 12px;
-}
-.register-actions .btn { flex: 1; padding: 12px; font-size: 0.85em; }
-
-/* ========== BAGGING MINIGAME ========== */
-.bag-area {
-  width: 100%; max-width: 360px; position: relative;
-}
-.conveyor {
-  display: flex; gap: 10px; overflow-x: auto; padding: 12px;
-  background: #ddd; border-radius: 12px; margin-bottom: 16px;
-  min-height: 80px; align-items: center;
-}
-.food-item {
-  width: 64px; height: 64px; background: white;
-  border-radius: 12px; display: flex; align-items: center;
-  justify-content: center; font-size: 2em; flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;
-  transition: all 0.2s; border: 2px solid transparent;
-}
-.food-item.selected { border-color: var(--cfa-red); transform: scale(1.1); }
-.food-item:active { transform: scale(0.9); }
-.bag-target {
-  width: 120px; height: 140px; margin: 0 auto;
-  background: linear-gradient(180deg, #D2691E 0%, #8B4513 100%);
-  border-radius: 4px 4px 12px 12px; position: relative;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.5em; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
-.bag-target::before {
-  content: ''; position: absolute; top: -8px; left: -4px; right: -4px;
-  height: 16px; background: #D2691E; border-radius: 8px 8px 0 0;
-}
-.bag-contents {
-  display: flex; flex-wrap: wrap; gap: 2px; padding: 8px;
-  justify-content: center;
-}
-.bag-contents .mini-item { font-size: 1.2em; }
-.bag-order-list {
-  background: white; border-radius: 12px; padding: 12px;
-  margin-bottom: 12px; font-size: 0.85em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-.bag-order-list h3 { color: var(--cfa-red); font-size: 0.9em; margin-bottom: 6px; }
-
-/* ========== CURBSIDE MINIGAME ========== */
-.parking-lot {
-  width: 100%; max-width: 360px;
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.parking-spot {
-  background: #555; border-radius: 12px; padding: 16px;
-  text-align: center; color: white; min-height: 100px;
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 6px; cursor: pointer;
-  border: 3px dashed #777; transition: all 0.2s;
-}
-.parking-spot.has-car {
-  background: linear-gradient(135deg, #2c3e50, #34495e);
-  border-style: solid; border-color: #4a90d9;
-}
-.parking-spot.has-car:active { transform: scale(0.95); }
-.parking-spot .car-emoji { font-size: 2.2em; }
-.parking-spot .spot-label { font-size: 0.75em; font-weight: 700; opacity: 0.8; }
-.parking-spot .car-name { font-size: 0.8em; font-weight: 700; }
-.parking-spot .car-order { font-size: 0.7em; opacity: 0.8; }
-
-/* ========== CFA APP SCREEN ========== */
-#app-screen {
-  background: white; z-index: 200;
-}
-.app-header {
-  background: var(--cfa-red); color: white; padding: 20px 16px;
-  text-align: center;
-}
-.app-header h2 { font-family: 'Fredoka One', cursive; font-size: 1.3em; }
-.app-header .employee-name { font-size: 0.9em; opacity: 0.9; margin-top: 4px; }
-.app-body { flex: 1; overflow-y: auto; padding: 16px; }
-.stat-card {
-  background: #f8f8f8; border-radius: 16px; padding: 16px;
-  margin-bottom: 12px;
-}
-.stat-card h3 { font-size: 0.85em; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.stat-value { font-size: 2em; font-weight: 900; color: var(--cfa-red); }
-.stat-bar-bg {
-  width: 100%; height: 12px; background: #eee; border-radius: 6px;
-  overflow: hidden; margin-top: 8px;
-}
-.stat-bar-fill {
-  height: 100%; border-radius: 6px; transition: width 0.5s;
-}
-.status-badge {
-  display: inline-block; padding: 6px 16px; border-radius: 20px;
-  font-weight: 800; font-size: 0.85em; margin-top: 8px;
-}
-.status-active { background: #e8f5e9; color: var(--success); }
-.status-warning { background: #fff3e0; color: #F57C00; }
-.status-danger { background: #ffebee; color: var(--danger); }
-.status-terminated { background: #000; color: var(--danger); font-size: 1.2em; letter-spacing: 2px; }
-.app-close-btn {
-  width: calc(100% - 32px); margin: 16px;
-  padding: 14px; border: none; border-radius: 14px;
-  background: var(--cfa-red); color: white;
-  font-family: 'Nunito', sans-serif; font-weight: 800;
-  font-size: 1em; cursor: pointer;
-}
-
-/* ========== FIRED SCREEN ========== */
-#fired-screen {
-  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-  align-items: center; justify-content: center; text-align: center;
-  color: white; padding: 32px;
-}
-#fired-screen .fired-icon { font-size: 80px; margin-bottom: 16px; }
-#fired-screen h1 {
-  font-family: 'Fredoka One', cursive; font-size: 2.2em;
-  color: var(--danger); margin-bottom: 8px;
-}
-#fired-screen .fired-reason {
-  font-size: 0.95em; opacity: 0.7; margin-bottom: 24px; line-height: 1.5;
-}
-#fired-screen .final-stats {
-  background: rgba(255,255,255,0.05); border-radius: 16px;
-  padding: 20px; margin-bottom: 24px; width: 100%;
-}
-#fired-screen .final-stats p {
-  display: flex; justify-content: space-between;
-  padding: 6px 0; font-size: 0.9em; opacity: 0.8;
-}
-#fired-screen .final-stats span { font-weight: 800; }
-
-/* ========== OUTSIDE iPAD MINIGAME ========== */
-.ipad-frame {
-  width: 100%; max-width: 340px; background: #1a1a2e;
-  border-radius: 20px; padding: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-.ipad-screen {
-  background: white; border-radius: 12px; padding: 16px;
-  min-height: 300px;
-}
-.ipad-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--cfa-red);
-}
-.ipad-header h3 { font-size: 0.9em; color: var(--cfa-red); }
-.ipad-header .car-num { background: var(--cfa-blue); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75em; font-weight: 800; }
-.ipad-customer-bubble {
-  background: #f0f0f0; border-radius: 14px 14px 14px 4px;
-  padding: 12px; margin-bottom: 10px; font-size: 0.85em; color: #333;
-  line-height: 1.4;
-}
-.ipad-menu-scroll {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
-  max-height: 180px; overflow-y: auto; margin-bottom: 12px;
-}
-.ipad-menu-item {
-  display: flex; align-items: center; gap: 6px;
-  background: #f8f8f8; border: 2px solid #eee; border-radius: 10px;
-  padding: 8px; font-size: 0.75em; font-weight: 700; cursor: pointer;
-  transition: all 0.15s;
-}
-.ipad-menu-item:active { background: var(--cfa-red); color: white; border-color: var(--cfa-red); }
-.ipad-menu-item .ipad-item-emoji { font-size: 1.4em; }
-.ipad-entered {
-  background: var(--cfa-cream); border-radius: 10px; padding: 8px;
-  min-height: 36px; margin-bottom: 10px; font-size: 0.8em; color: #666;
-  display: flex; flex-wrap: wrap; gap: 4px;
-}
-.ipad-chip {
-  background: var(--cfa-red); color: white; padding: 3px 10px;
-  border-radius: 20px; font-size: 0.85em; font-weight: 700;
-}
-.weather-badge {
-  position: absolute; top: 70px; right: 16px;
-  background: rgba(0,0,0,0.5); color: white;
-  padding: 4px 10px; border-radius: 10px;
-  font-size: 0.75em; font-weight: 700; z-index: 10;
-}
-
-/* ========== DRIVE-THROUGH WINDOW MINIGAME ========== */
-.dt-window {
-  width: 100%; max-width: 360px; position: relative;
-}
-.dt-window-frame {
-  background: linear-gradient(180deg, #555 0%, #444 100%);
-  border-radius: 16px 16px 0 0; padding: 16px;
-  border: 4px solid #333; border-bottom: none;
-  min-height: 160px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; text-align: center;
-}
-.dt-car-view {
-  font-size: 3.5em; margin-bottom: 8px;
-  animation: carPull 0.5s ease-out;
-}
-@keyframes carPull {
-  from { transform: translateX(100px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-.dt-customer-name {
-  color: white; font-weight: 800; font-size: 1em; margin-bottom: 4px;
-}
-.dt-customer-says {
-  color: #ccc; font-size: 0.8em; font-style: italic;
-}
-.dt-counter {
-  background: #8B4513; padding: 16px; border-radius: 0 0 16px 16px;
-  border: 4px solid #6B3410; border-top: 2px solid #A0522D;
-}
-.dt-items-tray {
-  display: flex; gap: 8px; overflow-x: auto;
-  padding: 8px; background: rgba(255,255,255,0.1);
-  border-radius: 10px; margin-bottom: 12px; min-height: 70px;
-  align-items: center;
-}
-.dt-tray-item {
-  width: 56px; height: 56px; background: white;
-  border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; font-size: 1.8em; flex-shrink: 0;
-  cursor: pointer; transition: all 0.15s;
-  border: 2px solid transparent;
-}
-.dt-tray-item.handed { opacity: 0.3; transform: scale(0.8); pointer-events: none; }
-.dt-tray-item:active { transform: scale(0.9); }
-.dt-handed-list {
-  display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
-  min-height: 24px; margin-bottom: 8px;
-}
-.dt-handed-chip {
-  background: rgba(255,255,255,0.2); padding: 2px 8px;
-  border-radius: 8px; font-size: 0.8em; color: white;
-}
-.dt-order-ticket {
-  background: white; border-radius: 8px; padding: 8px 12px;
-  font-size: 0.8em; margin-bottom: 10px; color: #333;
-}
-.dt-order-ticket strong { color: var(--cfa-red); }
-
-/* ========== NOTIFICATION TOAST ========== */
-.toast {
-  position: absolute; top: 60px; left: 16px; right: 16px;
-  padding: 14px 16px; border-radius: 14px; color: white;
-  font-weight: 700; font-size: 0.85em; z-index: 300;
-  animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.2s forwards;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  display: flex; align-items: center; gap: 8px;
-}
-.toast-good { background: var(--success); }
-.toast-bad { background: var(--danger); }
-.toast-warning { background: var(--warning); color: #333; }
-.toast-andy { background: #6f42c1; }
-.toast-luke { background: var(--cfa-blue); }
-
-/* ========== SCOLDING OVERLAY ========== */
-.scold-overlay {
-  position: absolute; inset: 0; z-index: 250;
-  background: rgba(0,0,0,0.85); display: flex;
-  flex-direction: column; align-items: center; justify-content: center;
-  padding: 32px; text-align: center; color: white;
-  animation: fadeIn 0.3s;
-}
-.scold-overlay .scold-emoji { font-size: 64px; margin-bottom: 16px; }
-.scold-overlay h2 { font-family: 'Fredoka One', cursive; color: var(--danger); font-size: 1.5em; margin-bottom: 12px; }
-.scold-overlay p { font-size: 0.95em; line-height: 1.5; opacity: 0.9; margin-bottom: 20px; }
-
-/* ========== ANIMATIONS ========== */
-@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-20px); } }
-@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-
-.shake { animation: shake 0.4s ease-in-out; }
-
-/* ========== TRANSITION ========== */
-.scene-transition {
-  position: absolute; inset: 0; background: var(--cfa-red);
-  z-index: 500; display: flex; align-items: center; justify-content: center;
-  color: white; font-family: 'Fredoka One', cursive; font-size: 1.5em;
-  text-align: center; padding: 32px;
-}
+/* Scold */
+.scold{position:absolute;inset:0;z-index:280;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;color:#fff;animation:fadeIn .3s}
+.scold h2{font-family:'Fredoka One',cursive;color:var(--danger);font-size:1.4em;margin-bottom:10px}
+.scold p{font-size:.9em;line-height:1.45;opacity:.85;margin-bottom:16px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
 <div id="game">
+  <canvas id="c"></canvas>
 
-  <!-- ===== TITLE SCREEN ===== -->
+  <!-- TITLE -->
   <div id="title-screen" class="screen active">
-    <div class="logo-container">
-      <div class="logo">Justin's<br>Chick-fil-A<br>Shift</div>
-      <div class="subtitle">Can you survive the shift?</div>
-    </div>
-    <div class="character-preview">🧑‍🍳</div>
-    <p style="font-size:0.85em;opacity:0.8;margin-top:8px;font-weight:600;">Starring Justin Cook</p>
-    <p style="font-size:0.7em;opacity:0.5;margin-top:4px;">Distance Runner • Terrible Employee</p>
-    <button class="btn btn-primary" id="start-btn" onclick="Game.start()">Start Shift</button>
+    <div class="logo" style="font-family:'Fredoka One',cursive;font-size:2.2em;line-height:1.1;text-shadow:3px 3px 0 rgba(0,0,0,.3)">Justin's<br>Chick-fil-A<br>Shift</div>
+    <div class="sub">Can you survive the shift?</div>
+    <div class="title-char"><canvas id="title-justin" width="120" height="160"></canvas></div>
+    <p style="font-size:.8em;opacity:.75;font-weight:600">Starring Justin Cook</p>
+    <p style="font-size:.65em;opacity:.45;margin-top:3px">Distance Runner &bull; Terrible Employee</p>
+    <button class="btn btn-w" id="start-btn" onclick="G.start()">Start Shift</button>
   </div>
 
-  <!-- ===== MAIN GAME SCREEN ===== -->
-  <div id="game-screen" class="screen">
-    <div class="restaurant-bg">
-      <div class="minigame-area" id="minigame-area"></div>
-    </div>
-  </div>
-
-  <!-- ===== HUD ===== -->
+  <!-- HUD -->
   <div id="hud">
-    <div class="hud-item"><span class="hud-icon">⭐</span><span id="hud-score">0</span></div>
-    <div class="hud-item"><span class="hud-icon">😊</span>
-      <div id="patience-bar-container"><div id="patience-bar" style="width:100%"></div></div>
-    </div>
-    <div class="hud-item"><span class="hud-icon">⚠️</span><span id="hud-strikes">0/3</span></div>
-    <button id="app-btn" onclick="Game.toggleApp()">📱 App</button>
+    <div class="hud-g"><span>Score:</span><span id="h-score">0</span></div>
+    <div class="hud-g"><span>Patience</span><div id="patience-wrap"><div id="patience-fill"></div></div></div>
+    <div class="hud-g"><span>Strikes:</span><span id="h-strikes">0/3</span></div>
+    <button id="app-btn" onclick="G.toggleApp()">APP</button>
   </div>
 
-  <!-- ===== DIALOG BOX ===== -->
-  <div id="dialog-box">
-    <div class="dialog-header">
-      <div class="dialog-avatar" id="dialog-avatar">😀</div>
-      <div class="dialog-name" id="dialog-name">Luke</div>
+  <!-- DIALOG -->
+  <div id="dialog">
+    <div class="dlg-head">
+      <canvas class="dlg-portrait" id="dlg-portrait" width="40" height="52"></canvas>
+      <div class="dlg-name" id="dlg-name">Luke</div>
     </div>
-    <div class="dialog-text" id="dialog-text"></div>
-    <div class="dialog-choices" id="dialog-choices"></div>
+    <div class="dlg-text" id="dlg-text"></div>
+    <div class="dlg-choices" id="dlg-choices"></div>
   </div>
 
-  <!-- ===== CFA APP SCREEN ===== -->
+  <!-- MINIGAME OVERLAY -->
+  <div id="minigame-overlay">
+    <div class="mg-title" id="mg-title"></div>
+    <div class="mg-inst" id="mg-inst"></div>
+    <div class="mg-area" id="mg-area"></div>
+  </div>
+
+  <!-- APP -->
   <div id="app-screen" class="screen">
-    <div class="app-header">
-      <h2>🐔 CFA Team Member</h2>
-      <div class="employee-name">Justin Cook • Team Member</div>
-    </div>
+    <div class="app-hdr"><h2>CFA Team Member</h2><div class="emp">Justin Cook - Team Member</div></div>
     <div class="app-body" id="app-body"></div>
-    <button class="app-close-btn" onclick="Game.toggleApp()">Close App</button>
+    <button class="app-close" onclick="G.toggleApp()">Close App</button>
   </div>
 
-  <!-- ===== FIRED SCREEN ===== -->
+  <!-- FIRED -->
   <div id="fired-screen" class="screen">
-    <div class="fired-icon">🚫</div>
+    <h1 style="font-size:3em;margin-bottom:0">X</h1>
     <h1>TERMINATED</h1>
-    <div class="fired-reason" id="fired-reason">Your employment has been terminated.</div>
+    <div class="reason" id="fired-reason"></div>
     <div class="final-stats" id="final-stats"></div>
-    <button class="btn btn-danger" onclick="Game.restart()">Try Another Shift</button>
+    <button class="btn btn-r" onclick="G.restart()">Try Another Shift</button>
   </div>
-
 </div>
 
 <script>
-// ============================================================
-//  JUSTIN'S CHICK-FIL-A SHIFT — FULL GAME ENGINE
-// ============================================================
+// =============================================
+// SPRITE DRAWING ENGINE
+// =============================================
+const Sprites = {
+  // Draw a character on a canvas context
+  // config: { hair, hairColor, skinColor, eyeColor, shirtColor, pantsColor, isApron, w, h }
+  draw(ctx, cfg, w, h, frame=0) {
+    ctx.clearRect(0, 0, w, h);
+    const s = Math.min(w / 32, h / 48);
+    const ox = (w - 32 * s) / 2, oy = (h - 48 * s) / 2;
+    const r = (x, y, rw, rh, c) => { ctx.fillStyle = c; ctx.fillRect(ox + x*s, oy + y*s, rw*s, rh*s); };
 
-const Game = {
-  // --- STATE ---
-  score: 0,
-  strikes: 0,
-  maxStrikes: 3,
-  customerPatience: 100,
-  customersServed: 0,
-  ordersCorrect: 0,
-  ordersMessed: 0,
-  currentRound: 0,
-  totalRounds: 12,
-  isRunning: false,
-  andyChance: 0.2,
-  patienceTimer: null,
-  currentMinigame: null,
-  scoldQueue: [],
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,.15)';
+    ctx.beginPath();
+    ctx.ellipse(ox+16*s, oy+47*s, 8*s, 2*s, 0, 0, Math.PI*2);
+    ctx.fill();
 
-  // --- CHARACTERS ---
-  characters: {
-    justin: { name: 'Justin', emoji: '👱', color: '#4a90d9', desc: 'Blonde hair, blue eyes, distance runner, terrible at this job' },
-    luke: { name: 'Luke', emoji: '👨‍💼', color: '#004F71', desc: 'Shift leader, brunette, blue eyes, attractive, makes fun of Justin' },
-    jacob: { name: 'Jacob', emoji: '👨‍🍳', color: '#8B4513', desc: 'Kitchen staff, makes the food' },
-    andy: { name: 'Andy', emoji: '👨‍🦱', color: '#6f42c1', desc: 'Brunette, curly hair, brown eyes, trying to get Justin fired' },
-    hudson: { name: 'Coach Hudson', emoji: '🧔', color: '#2c3e50', desc: 'Cross country coach, 50s' },
-    gentry: { name: 'Gentry', emoji: '🧑', color: '#e67e22', desc: 'Mixed boy' },
-    henry: { name: 'Henry', emoji: '👦', color: '#27ae60', desc: 'White, curly brown hair, brown eyes' },
-    black: { name: 'Black', emoji: '👦', color: '#3498db', desc: 'Twin, blonde hair' },
-    carter: { name: 'Carter', emoji: '👦', color: '#e74c3c', desc: 'Twin, reddish brunette' },
-    reagan: { name: 'Reagan', emoji: '👩', color: '#e91e63', desc: 'Brunette, Justin\'s love interest' },
-    navaneeth: { name: 'Navaneeth', emoji: '🧑', color: '#f39c12', desc: 'Indian, lots of hair, loud and crazy' },
-    walter: { name: 'Walter', emoji: '🧑', color: '#1abc9c', desc: 'Regular customer' },
-    ranel: { name: 'Ranel', emoji: '🧑', color: '#9b59b6', desc: 'Regular customer' },
-    declan: { name: 'Declan', emoji: '🧑', color: '#2ecc71', desc: 'Regular customer' },
-    katy: { name: 'Katy', emoji: '👩‍🦰', color: '#ff6b6b', desc: 'Loud annoying red head girl' },
+    // Legs (slight walk animation)
+    const legOff = Math.sin(frame * 0.15) * 2;
+    r(10, 34+legOff, 5, 12, cfg.pantsColor);
+    r(17, 34-legOff, 5, 12, cfg.pantsColor);
+    // Shoes
+    r(9, 44+legOff, 7, 3, '#222');
+    r(16, 44-legOff, 7, 3, '#222');
+
+    // Body / Shirt
+    r(8, 20, 16, 16, cfg.shirtColor);
+    // Apron
+    if (cfg.isApron) {
+      r(9, 22, 14, 12, '#fff');
+      r(12, 22, 8, 2, '#ddd');
+    }
+
+    // Arms
+    const armOff = Math.sin(frame * 0.15) * 1.5;
+    r(4, 22+armOff, 5, 10, cfg.skinColor);
+    r(23, 22-armOff, 5, 10, cfg.skinColor);
+    // Hands
+    r(4, 31+armOff, 5, 3, cfg.skinColor);
+    r(23, 31-armOff, 5, 3, cfg.skinColor);
+
+    // Head
+    r(8, 4, 16, 16, cfg.skinColor);
+    // Eyes
+    r(11, 11, 3, 3, '#fff');
+    r(18, 11, 3, 3, '#fff');
+    r(12, 12, 2, 2, cfg.eyeColor);
+    r(19, 12, 2, 2, cfg.eyeColor);
+    // Mouth
+    r(13, 16, 6, 1, '#c47');
+
+    // Hair
+    if (cfg.hair === 'short') {
+      r(7, 2, 18, 6, cfg.hairColor);
+      r(7, 4, 3, 6, cfg.hairColor);
+      r(22, 4, 3, 6, cfg.hairColor);
+    } else if (cfg.hair === 'curly') {
+      r(6, 1, 20, 7, cfg.hairColor);
+      r(6, 3, 4, 8, cfg.hairColor);
+      r(22, 3, 4, 8, cfg.hairColor);
+      // Curls
+      r(5, 2, 2, 3, cfg.hairColor);
+      r(25, 2, 2, 3, cfg.hairColor);
+      r(8, 0, 3, 2, cfg.hairColor);
+      r(20, 0, 3, 2, cfg.hairColor);
+    } else if (cfg.hair === 'long') {
+      r(6, 1, 20, 8, cfg.hairColor);
+      r(6, 4, 4, 14, cfg.hairColor);
+      r(22, 4, 4, 14, cfg.hairColor);
+    } else if (cfg.hair === 'lots') {
+      r(5, 0, 22, 8, cfg.hairColor);
+      r(5, 3, 5, 10, cfg.hairColor);
+      r(22, 3, 5, 10, cfg.hairColor);
+      r(7, -1, 4, 3, cfg.hairColor);
+      r(21, -1, 4, 3, cfg.hairColor);
+    } else if (cfg.hair === 'red-long') {
+      r(6, 1, 20, 7, '#CC4422');
+      r(6, 4, 4, 16, '#CC4422');
+      r(22, 4, 4, 16, '#CC4422');
+    }
+
+    // CFA hat (employees)
+    if (cfg.hat) {
+      r(6, 0, 20, 4, var_red);
+      r(4, 3, 24, 2, var_dkred);
+    }
   },
 
-  // --- MENU ITEMS ---
-  menu: [
-    { id: 'chicken_sandwich', name: 'Chicken Sandwich', emoji: '🍔', short: 'Ch. Sand.' },
-    { id: 'spicy_sandwich', name: 'Spicy Sandwich', emoji: '🌶️', short: 'Spicy Sand.' },
-    { id: 'grilled_sandwich', name: 'Grilled Sandwich', emoji: '🥪', short: 'Grill Sand.' },
-    { id: 'nuggets', name: 'Nuggets', emoji: '🍗', short: 'Nuggets' },
-    { id: 'strips', name: 'Strips', emoji: '🍖', short: 'Strips' },
-    { id: 'fries', name: 'Waffle Fries', emoji: '🍟', short: 'Fries' },
-    { id: 'drink', name: 'Drink', emoji: '🥤', short: 'Drink' },
-    { id: 'lemonade', name: 'Lemonade', emoji: '🍋', short: 'Lemonade' },
-    { id: 'milkshake', name: 'Milkshake', emoji: '🥛', short: 'Milkshake' },
-    { id: 'mac_cheese', name: 'Mac & Cheese', emoji: '🧀', short: 'Mac&Cheese' },
-    { id: 'salad', name: 'Salad', emoji: '🥗', short: 'Salad' },
-    { id: 'cookie', name: 'Cookie', emoji: '🍪', short: 'Cookie' },
-  ],
-
-  // --- LUKE ROASTS ---
-  lukeRoasts: [
-    "Bro, you run a 4:20 mile but you can't run a register? 💀",
-    "Justin... my guy... that's not even close to what they ordered.",
-    "I've seen faster service at the DMV, and you're a distance runner.",
-    "Do you bag groceries like you run? Because this is ALL over the place.",
-    "Even Jacob in the back is questioning your life choices right now.",
-    "How are you this bad? Like genuinely, I'm impressed by how bad you are.",
-    "If being bad at Chick-fil-A was an Olympic sport, you'd finally medal.",
-    "Justin, I like you man, but you're making me look bad to corporate.",
-    "Did you just put fries in a milkshake bag? That's... creative, I guess.",
-    "The customers are starting to ask if you're new. You've been here 3 months.",
-    "Reagan is watching... and you just did THAT. Tough scene buddy.",
-    "Your cross country coach would be disappointed in this performance.",
-  ],
-
-  lukeCompliments: [
-    "Okay okay, not bad Justin! Maybe there's hope for you yet.",
-    "See? When you actually focus, you're almost competent!",
-    "Hey that was actually solid! Don't let it go to your head though.",
-    "Wow, you didn't mess that up! I'm genuinely shocked. Good job.",
-    "Look at you! Employee of the minute right there!",
-  ],
-
-  // --- ANDY'S FALSE ALLEGATIONS ---
-  andyAllegations: [
-    { claim: "Justin was spitting in the lemonade!", defenses: [
-      { text: "That's insane Andy, I was TASTING it for quality control!", quality: 'good', effect: 0.7 },
-      { text: "Why would I do that?? I've been at the register the whole time!", quality: 'good', effect: 0.8 },
-      { text: "No I wasn't! ...okay maybe a LITTLE but it was an accident!", quality: 'bad', effect: -0.5 },
-    ]},
-    { claim: "I saw Justin eating nuggets from the warmer!", defenses: [
-      { text: "Andy literally wasn't even in the kitchen area. He's lying.", quality: 'good', effect: 0.8 },
-      { text: "Luke, you were with me the whole time. Back me up here!", quality: 'good', effect: 0.7 },
-      { text: "Those were quality samples! It's called quality assurance!", quality: 'bad', effect: -0.3 },
-    ]},
-    { claim: "Justin told a customer 'you're welcome' instead of 'my pleasure'!", defenses: [
-      { text: "I have NEVER said anything other than 'my pleasure'. Ever.", quality: 'good', effect: 0.7 },
-      { text: "Check the security cameras Andy. I dare you.", quality: 'good', effect: 0.8 },
-      { text: "Is... is that really a fireable offense though?", quality: 'bad', effect: -0.4 },
-    ]},
-    { claim: "Justin was doing stretches in the walk-in cooler for 20 minutes!", defenses: [
-      { text: "I was in there for 2 minutes grabbing sauce, Andy. Chill.", quality: 'good', effect: 0.7 },
-      { text: "Andy, you literally don't even work here. Why are you back there?", quality: 'good', effect: 0.9 },
-      { text: "My hamstrings were tight! I have a meet this weekend!", quality: 'bad', effect: -0.3 },
-    ]},
-    { claim: "Justin drew a picture of a cow on a customer's bag and wrote 'eat more chicken' badly!", defenses: [
-      { text: "That's literally the Chick-fil-A brand, Andy. The COWS say that.", quality: 'good', effect: 0.8 },
-      { text: "I would never deface company property! That's ridiculous!", quality: 'good', effect: 0.7 },
-      { text: "Okay but the customer actually loved it though...", quality: 'bad', effect: -0.2 },
-    ]},
-    { claim: "Justin was timing his register speed with a stopwatch like it was a race!", defenses: [
-      { text: "Andy is making things up. Again. As usual.", quality: 'good', effect: 0.7 },
-      { text: "I was using the TIMER on the ORDER SCREEN, Andy. It's part of the system!", quality: 'good', effect: 0.9 },
-      { text: "I mean... faster service is a GOOD thing right?", quality: 'bad', effect: -0.2 },
-    ]},
-    { claim: "Justin told a customer the ice cream machine was broken as a prank!", defenses: [
-      { text: "We don't even HAVE an ice cream machine, Andy. This isn't McDonald's.", quality: 'good', effect: 1.0 },
-      { text: "That literally never happened and everyone here knows it.", quality: 'good', effect: 0.7 },
-      { text: "I thought it WAS broken! The milkshake thing was making weird noises!", quality: 'bad', effect: -0.3 },
-    ]},
-    { claim: "Justin was doing a TikTok dance in the drive-through window!", defenses: [
-      { text: "I don't even have TikTok, Andy. I'm a serious athlete.", quality: 'good', effect: 0.7 },
-      { text: "Luke, has anyone complained about the drive-through? No? Case closed.", quality: 'good', effect: 0.8 },
-      { text: "It was ONE time and the customer loved it!", quality: 'bad', effect: -0.4 },
-    ]},
-  ],
-
-  // --- CUSTOMER DIALOGUES ---
-  customerReactions: {
-    happy: [
-      "Thank you so much! My pleasure— I mean, YOUR pleasure... you know what I mean!",
-      "Perfect order! Finally someone who knows what they're doing!",
-      "Wow, that was fast! Great job!",
-      "This is why I come to Chick-fil-A. Thanks!",
-    ],
-    angry: [
-      "Excuse me?? This is NOT what I ordered!",
-      "I've been waiting for 15 minutes! What is going on back there?!",
-      "I asked for NO pickles. There are EXTRA pickles. How?!",
-      "Can I speak to a manager? This is ridiculous.",
-      "This is the worst service I've ever had and I'm leaving a review!",
-      "Are you even paying attention or just standing there?",
-    ],
-    angryChoices: [
-      { text: '"I\'m so sorry, let me fix that for you right away!"', quality: 'good', effect: 0.3 },
-      { text: '"My pleasure! I\'ll get you a corrected order immediately."', quality: 'good', effect: 0.4 },
-      { text: '"Sir/Ma\'am this is a Chick-fil-A, please calm down..."', quality: 'bad', effect: -0.3 },
-      { text: '"That\'s actually what you ordered but okay..."', quality: 'bad', effect: -0.5 },
-      { text: '*nervous laugh* "Haha yeah my bad..."', quality: 'neutral', effect: 0.0 },
-    ],
+  // Character configs
+  chars: {
+    justin:   { hair:'short', hairColor:'#F0D060', skinColor:'#FDDCB5', eyeColor:'#4488CC', shirtColor:'#E51636', pantsColor:'#2c2c2c', isApron:true, hat:true },
+    luke:     { hair:'short', hairColor:'#6B3A2A', skinColor:'#FDDCB5', eyeColor:'#4488CC', shirtColor:'#004F71', pantsColor:'#2c2c2c', isApron:false, hat:true },
+    jacob:    { hair:'short', hairColor:'#4A3020', skinColor:'#FDDCB5', eyeColor:'#654321', shirtColor:'#E51636', pantsColor:'#2c2c2c', isApron:true, hat:true },
+    andy:     { hair:'curly', hairColor:'#4A3020', skinColor:'#FDDCB5', eyeColor:'#654321', shirtColor:'#444', pantsColor:'#335', isApron:false, hat:false },
+    hudson:   { hair:'short', hairColor:'#888', skinColor:'#E8C5A0', eyeColor:'#556B2F', shirtColor:'#2E5D3A', pantsColor:'#444', isApron:false, hat:false },
+    gentry:   { hair:'short', hairColor:'#2A1A0A', skinColor:'#C89A6E', eyeColor:'#3A2510', shirtColor:'#E67E22', pantsColor:'#335', isApron:false, hat:false },
+    henry:    { hair:'curly', hairColor:'#5A3A20', skinColor:'#FDDCB5', eyeColor:'#654321', shirtColor:'#27AE60', pantsColor:'#335', isApron:false, hat:false },
+    black:    { hair:'short', hairColor:'#F0D060', skinColor:'#FDDCB5', eyeColor:'#556B2F', shirtColor:'#3498DB', pantsColor:'#335', isApron:false, hat:false },
+    carter:   { hair:'short', hairColor:'#9A4A2A', skinColor:'#FDDCB5', eyeColor:'#556B2F', shirtColor:'#E74C3C', pantsColor:'#335', isApron:false, hat:false },
+    reagan:   { hair:'long', hairColor:'#5A3020', skinColor:'#FDDCB5', eyeColor:'#3A7A4A', shirtColor:'#E91E63', pantsColor:'#446', isApron:false, hat:false },
+    navaneeth:{ hair:'lots', hairColor:'#1A0A00', skinColor:'#B8864E', eyeColor:'#2A1A0A', shirtColor:'#F39C12', pantsColor:'#335', isApron:false, hat:false },
+    walter:   { hair:'short', hairColor:'#5A4030', skinColor:'#FDDCB5', eyeColor:'#556B2F', shirtColor:'#1ABC9C', pantsColor:'#335', isApron:false, hat:false },
+    ranel:    { hair:'short', hairColor:'#3A2A1A', skinColor:'#D4A06A', eyeColor:'#2A1A0A', shirtColor:'#9B59B6', pantsColor:'#335', isApron:false, hat:false },
+    declan:   { hair:'short', hairColor:'#5A3A20', skinColor:'#FDDCB5', eyeColor:'#556B2F', shirtColor:'#2ECC71', pantsColor:'#335', isApron:false, hat:false },
+    katy:     { hair:'red-long', hairColor:'#CC4422', skinColor:'#FDDCB5', eyeColor:'#4488CC', shirtColor:'#FF6B6B', pantsColor:'#446', isApron:false, hat:false },
   },
 
-  // --- NPC SPECIFIC LINES ---
-  npcOrders: {
-    hudson: [
-      { greeting: "Justin! Shouldn't you be training right now? Anyway, I need fuel for the coaching staff meeting.", items: ['chicken_sandwich', 'fries', 'drink'] },
-      { greeting: "Cook! Your split times better be improving. Now get me a grilled sandwich, I'm watching my figure.", items: ['grilled_sandwich', 'salad', 'lemonade'] },
-    ],
-    gentry: [
-      { greeting: "Yo Justin! Lemme get uhhhh...", items: ['spicy_sandwich', 'fries', 'lemonade'] },
-      { greeting: "Bro hook me up with some nuggets, I'm starving from practice!", items: ['nuggets', 'fries', 'drink'] },
-    ],
-    henry: [
-      { greeting: "Hey Justin! What's good? Can I get my usual?", items: ['chicken_sandwich', 'mac_cheese', 'milkshake'] },
-      { greeting: "Justin! Dude! Get me some strips and a cookie, I'm in a rush!", items: ['strips', 'cookie', 'drink'] },
-    ],
-    black: [
-      { greeting: "Justin, me and Carter are splitting. Ring us up.", items: ['nuggets', 'nuggets', 'fries', 'fries', 'drink', 'drink'] },
-    ],
-    carter: [
-      { greeting: "What's up Justin! Can I just get something quick?", items: ['chicken_sandwich', 'drink'] },
-    ],
-    reagan: [
-      { greeting: "Hey Justin... *smiles* Can I get a salad and lemonade please?", items: ['salad', 'lemonade'] },
-      { greeting: "Hi Justin! You look... busy. I'll just have a sandwich and fries.", items: ['chicken_sandwich', 'fries', 'lemonade'] },
-    ],
-    navaneeth: [
-      { greeting: "JUSTIN! BRO! WHAT'S UP! I NEED FOOD RIGHT NOW I'M SO HUNGRY I MIGHT PASS OUT!!", items: ['spicy_sandwich', 'nuggets', 'fries', 'fries', 'drink', 'milkshake', 'cookie'] },
-      { greeting: "YO JUSTIN! GET ME EVERYTHING! I just ran 8 miles and I need CALORIES!", items: ['chicken_sandwich', 'strips', 'fries', 'mac_cheese', 'drink', 'lemonade'] },
-    ],
-    walter: [
-      { greeting: "Hey man, can I just get a sandwich combo?", items: ['chicken_sandwich', 'fries', 'drink'] },
-    ],
-    ranel: [
-      { greeting: "What's good Justin, let me get some nuggets.", items: ['nuggets', 'fries', 'lemonade'] },
-    ],
-    declan: [
-      { greeting: "Justin! Bro! Spicy sandwich, extra pickles!", items: ['spicy_sandwich', 'fries', 'drink'] },
-    ],
-    katy: [
-      { greeting: "OH MY GOD JUSTIN HI!! Can I get like a milkshake?? Actually no wait, a lemonade. No WAIT, a milkshake AND a lemonade! And nuggets! And a cookie!", items: ['milkshake', 'lemonade', 'nuggets', 'cookie'] },
-      { greeting: "JUSTINNNN! Okay so I want a salad because I'm being healthy but ALSO fries because like, balance, right?? RIGHT??", items: ['salad', 'fries', 'lemonade'] },
-    ],
+  drawChar(canvasOrCtx, charKey, frame=0) {
+    let ctx, w, h;
+    if (canvasOrCtx instanceof HTMLCanvasElement) {
+      ctx = canvasOrCtx.getContext('2d');
+      w = canvasOrCtx.width; h = canvasOrCtx.height;
+    } else {
+      ctx = canvasOrCtx; w = ctx.canvas.width; h = ctx.canvas.height;
+    }
+    const cfg = this.chars[charKey];
+    if (cfg) this.draw(ctx, cfg, w, h, frame);
+  }
+};
+
+const var_red = '#E51636', var_dkred = '#C41230';
+
+// =============================================
+// RESTAURANT RENDERER (Canvas top-down view)
+// =============================================
+const Restaurant = {
+  canvas: null, ctx: null, W: 0, H: 0,
+
+  // Station zones (relative 0-1)
+  stations: {
+    register:    { x: 0.15, y: 0.25, w: 0.22, h: 0.15, label: 'REGISTER', color: '#C41230' },
+    bagging:     { x: 0.63, y: 0.25, w: 0.22, h: 0.15, label: 'BAGGING', color: '#8B4513' },
+    drivethrough:{ x: 0.63, y: 0.55, w: 0.22, h: 0.15, label: 'DRIVE-THRU', color: '#004F71' },
+    ipad:        { x: 0.15, y: 0.55, w: 0.22, h: 0.15, label: 'OUTSIDE iPAD', color: '#2E7D32' },
+    curbside:    { x: 0.38, y: 0.78, w: 0.24, h: 0.14, label: 'CURBSIDE', color: '#E65100' },
+    kitchen:     { x: 0.35, y: 0.05, w: 0.30, h: 0.12, label: 'KITCHEN (Jacob)', color: '#555' },
   },
 
-  // --- INIT ---
-  start() {
-    this.score = 0;
-    this.strikes = 0;
-    this.customersServed = 0;
-    this.ordersCorrect = 0;
-    this.ordersMessed = 0;
-    this.currentRound = 0;
-    this.customerPatience = 100;
-    this.isRunning = true;
-    this.switchScreen('game-screen');
-    document.getElementById('hud').classList.add('visible');
-    this.updateHUD();
-    this.showTransition("Starting Shift... 🐔", () => {
-      this.showDialog('luke', this.randFrom([
-        "Alright Justin, welcome to another shift. Try not to embarrass us today, okay?",
-        "Justin! You're late. Again. Like always. Let's just... try to survive today.",
-        "Okay Justin, here's the deal — customers come in, you take their order, bag their food, and bring it to their car. Simple, right? ...RIGHT?",
-      ]), [
-        { text: "I got this! Let's do it! 💪", action: () => this.nextRound() },
-        { text: "I make no promises, Luke.", action: () => { this.showToast("Luke sighs deeply...", 'luke'); setTimeout(() => this.nextRound(), 1500); } },
-      ]);
+  justin: { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, frame: 0, moving: false },
+
+  init() {
+    this.canvas = document.getElementById('c');
+    this.ctx = this.canvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+
+    this.canvas.addEventListener('click', (e) => {
+      if (!G.isRunning || G.inMinigame) return;
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+      const cx = (e.clientX - rect.left) * scaleX;
+      const cy = (e.clientY - rect.top) * scaleY;
+      const rx = cx / this.W, ry = cy / this.H;
+
+      // Check if tapped a station
+      let tappedStation = null;
+      for (const [key, st] of Object.entries(this.stations)) {
+        if (key === 'kitchen') continue; // Can't go to kitchen
+        if (rx >= st.x && rx <= st.x + st.w && ry >= st.y && ry <= st.y + st.h) {
+          tappedStation = key;
+          break;
+        }
+      }
+
+      if (tappedStation) {
+        const st = this.stations[tappedStation];
+        this.justin.tx = st.x + st.w / 2;
+        this.justin.ty = st.y + st.h / 2;
+        this.justin.moving = true;
+        this.justin.targetStation = tappedStation;
+      } else {
+        // Walk to tap point
+        this.justin.tx = rx;
+        this.justin.ty = ry;
+        this.justin.moving = true;
+        this.justin.targetStation = null;
+      }
     });
   },
 
-  restart() {
-    this.start();
+  resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    this.canvas.width = rect.width * dpr;
+    this.canvas.height = rect.height * dpr;
+    this.W = this.canvas.width;
+    this.H = this.canvas.height;
+    this.ctx.imageSmoothingEnabled = false;
   },
 
-  // --- SCREEN MANAGEMENT ---
-  switchScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+  update() {
+    const j = this.justin;
+    if (j.moving) {
+      const dx = j.tx - j.x, dy = j.ty - j.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const speed = 0.015;
+      if (dist < speed) {
+        j.x = j.tx; j.y = j.ty;
+        j.moving = false;
+        if (j.targetStation && G.isRunning && !G.inMinigame) {
+          G.arriveAtStation(j.targetStation);
+        }
+      } else {
+        j.x += (dx / dist) * speed;
+        j.y += (dy / dist) * speed;
+        j.frame++;
+      }
+    }
   },
 
-  showTransition(text, callback) {
-    const div = document.createElement('div');
-    div.className = 'scene-transition';
-    div.innerHTML = text;
-    document.getElementById('game').appendChild(div);
-    setTimeout(() => { div.remove(); if (callback) callback(); }, 1200);
+  render() {
+    const ctx = this.ctx, W = this.W, H = this.H;
+    // Floor
+    ctx.fillStyle = '#D4C5A9';
+    ctx.fillRect(0, 0, W, H);
+
+    // Floor tiles
+    ctx.strokeStyle = '#C8B898';
+    ctx.lineWidth = 1;
+    const tileSize = W / 8;
+    for (let x = 0; x < W; x += tileSize) {
+      for (let y = 0; y < H; y += tileSize) {
+        ctx.strokeRect(x, y, tileSize, tileSize);
+      }
+    }
+
+    // Outside area (bottom)
+    ctx.fillStyle = '#5A5A5A';
+    ctx.fillRect(0, H * 0.72, W, H * 0.28);
+    // Parking lines
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+      const px = W * 0.1 + i * W * 0.2;
+      ctx.strokeRect(px, H * 0.76, W * 0.15, H * 0.18);
+    }
+
+    // Drive through lane (right side)
+    ctx.fillStyle = '#4A4A4A';
+    ctx.fillRect(W * 0.88, 0, W * 0.12, H * 0.72);
+    ctx.setLineDash([8, 6]);
+    ctx.strokeStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.moveTo(W * 0.94, 0);
+    ctx.lineTo(W * 0.94, H * 0.72);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Kitchen area
+    ctx.fillStyle = '#888';
+    ctx.fillRect(W * 0.3, 0, W * 0.4, H * 0.18);
+    ctx.fillStyle = '#777';
+    ctx.fillRect(W * 0.32, H * 0.02, W * 0.36, H * 0.04);
+
+    // Counter
+    ctx.fillStyle = '#8B6914';
+    ctx.fillRect(W * 0.05, H * 0.18, W * 0.82, H * 0.04);
+
+    // Stations
+    for (const [key, st] of Object.entries(this.stations)) {
+      const sx = st.x * W, sy = st.y * W ? st.y * H : 0, sw = st.w * W, sh = st.h * H;
+      // Glow if available
+      if (key !== 'kitchen' && G.isRunning && !G.inMinigame && G.availableStation === key) {
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 20;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(sx + 2, st.y * H + 2, sw - 4, sh - 4);
+        ctx.shadowBlur = 0;
+      }
+
+      // Station box
+      ctx.fillStyle = st.color + '44';
+      ctx.fillRect(sx, st.y * H, sw, sh);
+      ctx.strokeStyle = st.color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sx, st.y * H, sw, sh);
+
+      // Label
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.max(10, W * 0.025)}px Nunito`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = st.color;
+      ctx.fillRect(sx, st.y * H, sw, Math.max(14, H * 0.03));
+      ctx.fillStyle = '#fff';
+      ctx.fillText(st.label, sx + sw/2, st.y * H + Math.max(11, H * 0.025));
+    }
+
+    // Draw Jacob in kitchen
+    this.drawMiniChar(ctx, 'jacob', W * 0.48, H * 0.04, W * 0.06, H * 0.12);
+
+    // Draw Luke near register
+    this.drawMiniChar(ctx, 'luke', W * 0.4, H * 0.22, W * 0.06, H * 0.12);
+
+    // Draw Justin (player)
+    const jx = this.justin.x * W - W * 0.04;
+    const jy = this.justin.y * H - H * 0.08;
+    this.drawMiniChar(ctx, 'justin', jx, jy, W * 0.08, H * 0.14, this.justin.frame);
+
+    // Name tag above Justin
+    ctx.fillStyle = 'rgba(0,0,0,.6)';
+    const tagW = W * 0.14, tagH = H * 0.025;
+    ctx.fillRect(jx + W*0.04 - tagW/2, jy - tagH - 2, tagW, tagH);
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${Math.max(9, W * 0.02)}px Nunito`;
+    ctx.textAlign = 'center';
+    ctx.fillText('JUSTIN', jx + W * 0.04, jy - 4);
+
+    // Instruction text if no minigame
+    if (G.isRunning && !G.inMinigame) {
+      ctx.fillStyle = 'rgba(0,0,0,.6)';
+      ctx.fillRect(0, H - H * 0.06, W, H * 0.06);
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.max(11, W * 0.028)}px Nunito`;
+      ctx.textAlign = 'center';
+      if (G.availableStation) {
+        ctx.fillText(`Walk to the ${this.stations[G.availableStation]?.label || 'station'} (tap it!)`, W/2, H - H * 0.02);
+      } else {
+        ctx.fillText('Tap a station to walk there', W/2, H - H * 0.02);
+      }
+    }
   },
+
+  drawMiniChar(ctx, charKey, x, y, w, h, frame=0) {
+    // Create offscreen canvas for character
+    const off = document.createElement('canvas');
+    off.width = 32; off.height = 48;
+    const oc = off.getContext('2d');
+    const cfg = Sprites.chars[charKey];
+    if (!cfg) return;
+    Sprites.draw(oc, cfg, 32, 48, frame);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, x, y, w, h);
+  },
+
+  loop() {
+    this.update();
+    this.render();
+    requestAnimationFrame(() => this.loop());
+  }
+};
+
+// =============================================
+// GAME ENGINE
+// =============================================
+const G = {
+  score: 0, strikes: 0, maxStrikes: 3,
+  customerPatience: 100, customersServed: 0,
+  ordersCorrect: 0, ordersMessed: 0,
+  currentRound: 0, totalRounds: 14,
+  isRunning: false, inMinigame: false,
+  andyChance: 0.2, patienceTimer: null,
+  availableStation: null,
+
+  menu: [
+    { id:'cs', name:'Chicken Sand.', short:'Ch.Sand' },
+    { id:'ss', name:'Spicy Sand.', short:'Spicy' },
+    { id:'gs', name:'Grilled Sand.', short:'Grilled' },
+    { id:'ng', name:'Nuggets', short:'Nugs' },
+    { id:'st', name:'Strips', short:'Strips' },
+    { id:'fr', name:'Waffle Fries', short:'Fries' },
+    { id:'dk', name:'Drink', short:'Drink' },
+    { id:'lm', name:'Lemonade', short:'Lemon.' },
+    { id:'ms', name:'Milkshake', short:'Shake' },
+    { id:'mc', name:'Mac & Cheese', short:'Mac&Ch' },
+    { id:'sa', name:'Salad', short:'Salad' },
+    { id:'ck', name:'Cookie', short:'Cookie' },
+  ],
+
+  chars: {
+    justin:{ name:'Justin' }, luke:{ name:'Luke' }, jacob:{ name:'Jacob' },
+    andy:{ name:'Andy' }, hudson:{ name:'Coach Hudson' }, gentry:{ name:'Gentry' },
+    henry:{ name:'Henry' }, black:{ name:'Black' }, carter:{ name:'Carter' },
+    reagan:{ name:'Reagan' }, navaneeth:{ name:'Navaneeth' },
+    walter:{ name:'Walter' }, ranel:{ name:'Ranel' }, declan:{ name:'Declan' },
+    katy:{ name:'Katy' },
+  },
+
+  npcOrders: {
+    hudson: [
+      { greeting:"Justin! Shouldn't you be training? Anyway, fuel for the staff meeting.", items:['cs','fr','dk'] },
+      { greeting:"Cook! Your splits better be improving. Get me a grilled sandwich.", items:['gs','sa','lm'] },
+    ],
+    gentry: [
+      { greeting:"Yo Justin! Lemme get uhhhh...", items:['ss','fr','lm'] },
+      { greeting:"Bro hook me up with nuggets, I'm starving from practice!", items:['ng','fr','dk'] },
+    ],
+    henry: [
+      { greeting:"Hey Justin! What's good? Can I get my usual?", items:['cs','mc','ms'] },
+      { greeting:"Justin! Get me strips and a cookie, I'm in a rush!", items:['st','ck','dk'] },
+    ],
+    black: [
+      { greeting:"Justin, me and Carter are splitting. Ring us up.", items:['ng','ng','fr','fr','dk','dk'] },
+    ],
+    carter: [
+      { greeting:"What's up Justin! Just something quick.", items:['cs','dk'] },
+    ],
+    reagan: [
+      { greeting:"Hey Justin... *smiles* Can I get a salad and lemonade?", items:['sa','lm'] },
+      { greeting:"Hi Justin! You look... busy. Sandwich and fries please.", items:['cs','fr','lm'] },
+    ],
+    navaneeth: [
+      { greeting:"JUSTIN! BRO! I NEED FOOD RIGHT NOW I'M SO HUNGRY!!", items:['ss','ng','fr','fr','dk','ms','ck'] },
+      { greeting:"YO JUSTIN! GET ME EVERYTHING! I just ran 8 miles!", items:['cs','st','fr','mc','dk','lm'] },
+    ],
+    walter: [{ greeting:"Hey man, sandwich combo.", items:['cs','fr','dk'] }],
+    ranel: [{ greeting:"What's good Justin, nuggets please.", items:['ng','fr','lm'] }],
+    declan: [{ greeting:"Justin! Spicy sandwich, extra pickles!", items:['ss','fr','dk'] }],
+    katy: [
+      { greeting:"OH MY GOD JUSTIN HI!! Milkshake? No wait, lemonade. No WAIT, BOTH! And nuggets! And a cookie!", items:['ms','lm','ng','ck'] },
+      { greeting:"JUSTINNNN! Salad because healthy but ALSO fries because BALANCE right??", items:['sa','fr','lm'] },
+    ],
+  },
+
+  lukeRoasts: [
+    "Bro, you run a 4:20 mile but you can't run a register?",
+    "Justin... that's not even close to what they ordered.",
+    "I've seen faster service at the DMV, and you're a runner.",
+    "Do you bag groceries like you run? All over the place.",
+    "Even Jacob in the back is questioning your life choices.",
+    "How are you this bad? I'm impressed by how bad you are.",
+    "If being bad at this was Olympic, you'd finally medal.",
+    "Justin, you're making me look bad to corporate.",
+    "Customers are asking if you're new. You've been here 3 months.",
+    "Reagan is watching... and you just did THAT. Tough scene.",
+  ],
+  lukeGood: [
+    "Okay not bad Justin! Maybe there's hope for you.",
+    "When you actually focus, you're almost competent!",
+    "That was solid! Don't let it go to your head.",
+    "You didn't mess that up! I'm genuinely shocked.",
+  ],
+
+  andyAllegations: [
+    { claim:"Justin was spitting in the lemonade!", defenses:[
+      { text:"That's insane Andy, I was TASTING it for quality control!", q:'good', e:0.7 },
+      { text:"I've been at the register the whole time!", q:'good', e:0.8 },
+      { text:"Maybe a LITTLE but it was an accident!", q:'bad', e:-0.5 },
+    ]},
+    { claim:"I saw Justin eating nuggets from the warmer!", defenses:[
+      { text:"Andy wasn't even in the kitchen. He's lying.", q:'good', e:0.8 },
+      { text:"Luke, you were with me. Back me up!", q:'good', e:0.7 },
+      { text:"Quality samples! It's called quality assurance!", q:'bad', e:-0.3 },
+    ]},
+    { claim:"Justin said 'you're welcome' instead of 'my pleasure'!", defenses:[
+      { text:"I have NEVER said anything other than 'my pleasure'. Ever.", q:'good', e:0.7 },
+      { text:"Check the cameras Andy. I dare you.", q:'good', e:0.8 },
+      { text:"Is that really a fireable offense though?", q:'bad', e:-0.4 },
+    ]},
+    { claim:"Justin was stretching in the walk-in cooler for 20 minutes!", defenses:[
+      { text:"I was in there for 2 minutes grabbing sauce. Chill.", q:'good', e:0.7 },
+      { text:"Andy, you don't even work here. Why are you back there?", q:'good', e:0.9 },
+      { text:"My hamstrings were tight! I have a meet!", q:'bad', e:-0.3 },
+    ]},
+    { claim:"Justin was doing a TikTok dance in the drive-through!", defenses:[
+      { text:"I don't even have TikTok. I'm a serious athlete.", q:'good', e:0.7 },
+      { text:"Luke, anyone complained about drive-through? No? Case closed.", q:'good', e:0.8 },
+      { text:"It was ONE time and the customer loved it!", q:'bad', e:-0.4 },
+    ]},
+    { claim:"Justin drew a cow on a bag and wrote 'eat more chicken' badly!", defenses:[
+      { text:"That's literally the Chick-fil-A brand, Andy. The COWS say that.", q:'good', e:0.8 },
+      { text:"I would never deface company property!", q:'good', e:0.7 },
+      { text:"The customer actually loved it though...", q:'bad', e:-0.2 },
+    ]},
+    { claim:"Justin told a customer the ice cream machine was broken!", defenses:[
+      { text:"We don't even HAVE an ice cream machine. This isn't McDonald's.", q:'good', e:1.0 },
+      { text:"That never happened and everyone knows it.", q:'good', e:0.7 },
+      { text:"I thought it WAS broken!", q:'bad', e:-0.3 },
+    ]},
+  ],
+
+  angryLines: [
+    "Excuse me?? This is NOT what I ordered!",
+    "I've been waiting 15 minutes! What is going on?!",
+    "I asked for NO pickles. There are EXTRA pickles!",
+    "Can I speak to a manager? This is ridiculous.",
+    "Worst service I've ever had. Leaving a review!",
+  ],
+  angryChoices: [
+    { text:"I'm so sorry, let me fix that right away!", q:'good', e:0.3 },
+    { text:"My pleasure! I'll get a corrected order.", q:'good', e:0.4 },
+    { text:"Sir/Ma'am please calm down...", q:'bad', e:-0.3 },
+    { text:"That's actually what you ordered but okay...", q:'bad', e:-0.5 },
+    { text:"*nervous laugh* Haha yeah my bad...", q:'neutral', e:0.0 },
+  ],
+
+  // --- INIT ---
+  start() {
+    this.score=0; this.strikes=0; this.customersServed=0;
+    this.ordersCorrect=0; this.ordersMessed=0; this.currentRound=0;
+    this.customerPatience=100; this.isRunning=true; this.inMinigame=false;
+    this.availableStation=null;
+    Restaurant.justin = { x:0.5, y:0.45, tx:0.5, ty:0.45, frame:0, moving:false, targetStation:null };
+    document.getElementById('title-screen').classList.remove('active');
+    document.getElementById('fired-screen').classList.remove('active');
+    document.getElementById('hud').classList.add('visible');
+    this.updateHUD();
+    this.showDialog('luke', R([
+      "Alright Justin, welcome to another shift. Try not to embarrass us today.",
+      "Justin! You're late. Again. Let's just... try to survive today.",
+      "Okay Justin — customers come in, you go to the stations. Simple right? ...RIGHT?",
+    ]), [
+      { text:"I got this! Let's do it!", action:()=>this.nextRound() },
+      { text:"I make no promises, Luke.", action:()=>{ this.toast("Luke sighs deeply...",'luke'); setTimeout(()=>this.nextRound(),1200); } },
+    ]);
+  },
+  restart() { this.start(); },
 
   // --- HUD ---
   updateHUD() {
-    document.getElementById('hud-score').textContent = this.score;
-    document.getElementById('hud-strikes').textContent = `${this.strikes}/${this.maxStrikes}`;
-    const pb = document.getElementById('patience-bar');
-    pb.style.width = this.customerPatience + '%';
-    pb.style.background = this.customerPatience > 50 ? 'var(--success)' : this.customerPatience > 25 ? 'var(--warning)' : 'var(--danger)';
+    document.getElementById('h-score').textContent = this.score;
+    document.getElementById('h-strikes').textContent = `${Math.ceil(this.strikes)}/${this.maxStrikes}`;
+    const pf = document.getElementById('patience-fill');
+    pf.style.width = this.customerPatience + '%';
+    pf.style.background = this.customerPatience > 50 ? 'var(--success)' : this.customerPatience > 25 ? 'var(--warn)' : 'var(--danger)';
   },
 
   // --- TOAST ---
-  showToast(msg, type = 'good') {
+  toast(msg, type='good') {
     const t = document.createElement('div');
     t.className = `toast toast-${type}`;
     t.textContent = msg;
     document.getElementById('game').appendChild(t);
-    setTimeout(() => t.remove(), 2500);
+    setTimeout(()=>t.remove(), 2500);
   },
 
   // --- DIALOG ---
-  showDialog(charKey, text, choices = [], onDone = null) {
-    const box = document.getElementById('dialog-box');
-    const char = this.characters[charKey] || { name: charKey, emoji: '😀', color: '#333' };
-    document.getElementById('dialog-avatar').textContent = char.emoji;
-    document.getElementById('dialog-avatar').style.background = char.color + '22';
-    document.getElementById('dialog-name').textContent = char.name;
-    document.getElementById('dialog-name').style.color = char.color;
+  showDialog(charKey, text, choices=[], onDone=null) {
+    const box = document.getElementById('dialog');
+    const name = this.chars[charKey]?.name || charKey;
+    // Draw portrait
+    const pc = document.getElementById('dlg-portrait');
+    Sprites.drawChar(pc, charKey);
 
-    // Typewriter effect
-    const textEl = document.getElementById('dialog-text');
+    document.getElementById('dlg-name').textContent = name;
+    const textEl = document.getElementById('dlg-text');
     textEl.textContent = '';
     let i = 0;
-    const type = () => {
-      if (i < text.length) {
-        textEl.textContent += text[i]; i++;
-        setTimeout(type, 18);
-      }
-    };
-    type();
+    const tp = () => { if(i<text.length){ textEl.textContent+=text[i]; i++; setTimeout(tp,16); } };
+    tp();
 
-    const choicesEl = document.getElementById('dialog-choices');
-    choicesEl.innerHTML = '';
-    if (choices.length > 0) {
+    const ce = document.getElementById('dlg-choices');
+    ce.innerHTML = '';
+    if (choices.length) {
       choices.forEach(c => {
-        const btn = document.createElement('button');
-        btn.className = `choice-btn ${c.quality || ''}`;
-        btn.textContent = c.text;
-        btn.onclick = () => {
+        const b = document.createElement('button');
+        b.className = 'ch-btn';
+        b.textContent = c.text;
+        b.onclick = () => {
           box.classList.remove('visible');
           if (c.action) c.action();
-          else if (c.effect !== undefined) {
-            if (c.effect > 0) {
-              this.score += Math.round(c.effect * 50);
-              this.showToast('Good response! +' + Math.round(c.effect * 50), 'good');
-            } else {
-              this.addStrike(0.5);
-              this.showToast('Bad response...', 'bad');
-            }
-            if (onDone) onDone();
+          else if (c.e !== undefined) {
+            if (c.e > 0) { this.score += Math.round(c.e*50); this.toast('Good response! +'+Math.round(c.e*50),'good'); }
+            else { this.addStrike(0.5); this.toast('Bad response...','bad'); }
+            if(onDone) onDone();
           }
         };
-        choicesEl.appendChild(btn);
+        ce.appendChild(b);
       });
     } else {
-      const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.textContent = 'Continue';
-      btn.onclick = () => {
-        box.classList.remove('visible');
-        if (onDone) onDone();
-      };
-      choicesEl.appendChild(btn);
+      const b = document.createElement('button');
+      b.className = 'ch-btn';
+      b.textContent = 'Continue';
+      b.onclick = () => { box.classList.remove('visible'); if(onDone) onDone(); };
+      ce.appendChild(b);
     }
     box.classList.add('visible');
   },
 
-  // --- SCOLDING ---
-  showScold(title, message, callback) {
-    const overlay = document.createElement('div');
-    overlay.className = 'scold-overlay';
-    overlay.innerHTML = `
-      <div class="scold-emoji">😡</div>
-      <h2>${title}</h2>
-      <p>${message}</p>
-      <button class="btn btn-danger btn-small" id="scold-dismiss">I'm sorry...</button>
-    `;
-    document.getElementById('game').appendChild(overlay);
-    overlay.querySelector('#scold-dismiss').onclick = () => {
-      overlay.remove();
-      if (callback) callback();
-    };
+  // --- SCOLD ---
+  showScold(title, msg, cb) {
+    const o = document.createElement('div');
+    o.className = 'scold';
+    o.innerHTML = `<h2>${title}</h2><p>${msg}</p><button class="btn btn-r" style="padding:10px 24px;font-size:.85em" id="scold-go">I'm sorry...</button>`;
+    document.getElementById('game').appendChild(o);
+    o.querySelector('#scold-go').onclick = () => { o.remove(); if(cb) cb(); };
   },
 
-  // --- STRIKES & FIRING ---
-  addStrike(amount = 1) {
-    this.strikes += amount;
+  // --- STRIKES ---
+  addStrike(n=1) {
+    this.strikes += n;
     this.updateHUD();
     if (this.strikes >= this.maxStrikes) {
-      this.getFired("You received too many strikes. Management has decided to let you go.");
+      this.getFired("Too many strikes. Management decided to let you go.");
     } else if (this.strikes >= 2) {
-      this.showScold("FINAL WARNING!", `Luke: "Justin, I'm serious. One more mistake and you're done. I can't keep covering for you."`, null);
+      this.showScold("FINAL WARNING!", "Luke: \"Justin, one more mistake and you're done. I can't keep covering for you.\"");
     }
   },
 
   getFired(reason) {
-    this.isRunning = false;
+    this.isRunning = false; this.inMinigame = false;
     document.getElementById('hud').classList.remove('visible');
-    document.getElementById('dialog-box').classList.remove('visible');
+    document.getElementById('dialog').classList.remove('visible');
+    document.getElementById('minigame-overlay').classList.remove('visible');
     clearInterval(this.patienceTimer);
-
     document.getElementById('fired-reason').textContent = reason;
     document.getElementById('final-stats').innerHTML = `
       <p>Customers Served <span>${this.customersServed}</span></p>
       <p>Orders Correct <span>${this.ordersCorrect}</span></p>
       <p>Orders Messed Up <span>${this.ordersMessed}</span></p>
-      <p>Final Score <span>${this.score}</span></p>
-      <p>Strikes <span>${this.strikes}/${this.maxStrikes}</span></p>
-    `;
-    this.switchScreen('fired-screen');
+      <p>Score <span>${this.score}</span></p>`;
+    document.getElementById('fired-screen').classList.add('active');
   },
 
-  // --- CFA APP ---
+  // --- APP ---
   toggleApp() {
-    const app = document.getElementById('app-screen');
-    if (app.classList.contains('active')) {
-      app.classList.remove('active');
-      return;
-    }
-    const pct = this.maxStrikes > 0 ? Math.max(0, ((this.maxStrikes - this.strikes) / this.maxStrikes) * 100) : 0;
-    const status = this.strikes >= this.maxStrikes ? 'terminated' :
-                   this.strikes >= 2 ? 'danger' :
-                   this.strikes >= 1 ? 'warning' : 'active';
-    const statusText = { active: 'ACTIVE ✓', warning: '⚠️ ON THIN ICE', danger: '🔥 FINAL WARNING', terminated: '🚫 TERMINATED' }[status];
-
+    const a = document.getElementById('app-screen');
+    if (a.classList.contains('active')) { a.classList.remove('active'); return; }
+    const s = this.strikes >= this.maxStrikes ? 'dead' : this.strikes >= 2 ? 'bad' : this.strikes >= 1 ? 'warn' : 'ok';
+    const st = { ok:'ACTIVE', warn:'ON THIN ICE', bad:'FINAL WARNING', dead:'TERMINATED' }[s];
     document.getElementById('app-body').innerHTML = `
-      <div class="stat-card">
-        <h3>Employment Status</h3>
-        <span class="status-badge status-${status}">${statusText}</span>
-      </div>
-      <div class="stat-card">
-        <h3>Performance Score</h3>
-        <div class="stat-value">${this.score}</div>
-      </div>
-      <div class="stat-card">
-        <h3>Strikes</h3>
-        <div class="stat-value">${this.strikes} / ${this.maxStrikes}</div>
-        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${(this.strikes/this.maxStrikes)*100}%;background:var(--danger)"></div></div>
-      </div>
-      <div class="stat-card">
-        <h3>Customers Served</h3>
-        <div class="stat-value">${this.customersServed}</div>
-      </div>
-      <div class="stat-card">
-        <h3>Order Accuracy</h3>
-        <div class="stat-value">${this.customersServed > 0 ? Math.round((this.ordersCorrect / this.customersServed) * 100) : 0}%</div>
-        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${this.customersServed > 0 ? (this.ordersCorrect / this.customersServed) * 100 : 0}%;background:var(--success)"></div></div>
-      </div>
-      <div class="stat-card">
-        <h3>Shift Progress</h3>
-        <div class="stat-value">${this.currentRound} / ${this.totalRounds}</div>
-        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${(this.currentRound/this.totalRounds)*100}%;background:var(--cfa-blue)"></div></div>
-      </div>
-    `;
-    app.classList.add('active');
+      <div class="stat-card"><h3>Status</h3><span class="stat-badge sb-${s}">${st}</span></div>
+      <div class="stat-card"><h3>Score</h3><div class="stat-val">${this.score}</div></div>
+      <div class="stat-card"><h3>Strikes</h3><div class="stat-val">${Math.ceil(this.strikes)}/${this.maxStrikes}</div>
+        <div class="stat-bar"><div class="stat-bar-f" style="width:${(this.strikes/this.maxStrikes)*100}%;background:var(--danger)"></div></div></div>
+      <div class="stat-card"><h3>Customers Served</h3><div class="stat-val">${this.customersServed}</div></div>
+      <div class="stat-card"><h3>Accuracy</h3><div class="stat-val">${this.customersServed>0?Math.round((this.ordersCorrect/this.customersServed)*100):0}%</div>
+        <div class="stat-bar"><div class="stat-bar-f" style="width:${this.customersServed>0?(this.ordersCorrect/this.customersServed)*100:0}%;background:var(--success)"></div></div></div>
+      <div class="stat-card"><h3>Shift Progress</h3><div class="stat-val">${this.currentRound}/${this.totalRounds}</div>
+        <div class="stat-bar"><div class="stat-bar-f" style="width:${(this.currentRound/this.totalRounds)*100}%;background:var(--blue)"></div></div></div>`;
+    a.classList.add('active');
   },
 
-  // --- ROUND SYSTEM ---
+  // --- ROUNDS ---
   nextRound() {
     if (!this.isRunning) return;
     this.currentRound++;
-    if (this.currentRound > this.totalRounds) {
-      this.endShift();
-      return;
-    }
+    if (this.currentRound > this.totalRounds) { this.endShift(); return; }
     this.customerPatience = 100;
+    this.inMinigame = false;
     this.updateHUD();
 
     // Random Andy event
     if (this.currentRound > 2 && Math.random() < this.andyChance) {
-      this.andyEvent(() => this.startMinigame());
+      this.andyEvent(() => this.assignStation());
     } else {
-      this.startMinigame();
+      this.assignStation();
     }
   },
 
-  startMinigame() {
-    if (!this.isRunning) return;
-    const types = ['register', 'bagging', 'curbside', 'ipad', 'drivethrough'];
-    const type = types[Math.floor(Math.random() * types.length)];
+  assignStation() {
+    const stations = ['register','bagging','curbside','ipad','drivethrough'];
+    this.availableStation = stations[Math.floor(Math.random()*stations.length)];
+    this.toast(`Luke: "Justin! Head to ${Restaurant.stations[this.availableStation].label}!"`, 'luke');
+  },
+
+  arriveAtStation(station) {
+    if (station !== this.availableStation) {
+      this.toast("Wrong station! Luke told you to go to " + Restaurant.stations[this.availableStation]?.label, 'warn');
+      return;
+    }
+    this.availableStation = null;
+    this.inMinigame = true;
     const customer = this.pickCustomer();
 
-    // Start patience drain
+    // Patience drain
     clearInterval(this.patienceTimer);
     this.patienceTimer = setInterval(() => {
       this.customerPatience = Math.max(0, this.customerPatience - 1.5);
       this.updateHUD();
       if (this.customerPatience <= 0) {
         clearInterval(this.patienceTimer);
-        this.failMinigame("Customer lost patience and left!");
+        this.failMG("Customer lost patience and left!");
       }
     }, 500);
 
-    switch(type) {
-      case 'register': this.registerMinigame(customer); break;
-      case 'bagging': this.baggingMinigame(customer); break;
-      case 'curbside': this.curbsideMinigame(customer); break;
-      case 'ipad': this.ipadMinigame(customer); break;
-      case 'drivethrough': this.drivethroughMinigame(customer); break;
+    switch(station) {
+      case 'register': this.mgRegister(customer); break;
+      case 'bagging': this.mgBagging(customer); break;
+      case 'curbside': this.mgCurbside(customer); break;
+      case 'ipad': this.mgIPad(customer); break;
+      case 'drivethrough': this.mgDriveThrough(customer); break;
     }
   },
 
   pickCustomer() {
-    const npcKeys = Object.keys(this.npcOrders);
-    const key = npcKeys[Math.floor(Math.random() * npcKeys.length)];
-    const orders = this.npcOrders[key];
-    const order = orders[Math.floor(Math.random() * orders.length)];
-    return { key, ...this.characters[key], order };
+    const keys = Object.keys(this.npcOrders);
+    const k = keys[Math.floor(Math.random()*keys.length)];
+    const orders = this.npcOrders[k];
+    const order = orders[Math.floor(Math.random()*orders.length)];
+    return { key:k, name:this.chars[k]?.name||k, order };
   },
 
-  // ============================================================
-  //  MINIGAME 1: REGISTER
-  // ============================================================
-  registerMinigame(customer) {
-    this.currentMinigame = 'register';
-    const area = document.getElementById('minigame-area');
-    const orderItems = customer.order.items;
-    let enteredItems = [];
+  openMG(title, inst) {
+    const o = document.getElementById('minigame-overlay');
+    document.getElementById('mg-title').textContent = title;
+    document.getElementById('mg-inst').textContent = inst;
+    document.getElementById('mg-area').innerHTML = '';
+    o.classList.add('visible');
+    return document.getElementById('mg-area');
+  },
 
-    // Show customer greeting dialog first
-    this.showDialog(customer.key, customer.order.greeting, [
-      { text: `"Welcome to Chick-fil-A! What can I get for you?"`, action: () => renderRegister() },
-      { text: `"My pleasure! Go ahead with your order."`, action: () => renderRegister() },
+  closeMG() {
+    document.getElementById('minigame-overlay').classList.remove('visible');
+  },
+
+  // ============================
+  //  REGISTER MINIGAME
+  // ============================
+  mgRegister(cust) {
+    let entered = [];
+    const items = cust.order.items;
+
+    this.showDialog(cust.key, cust.order.greeting, [
+      { text:"Welcome to Chick-fil-A! Go ahead!", action: () => render() },
+      { text:"My pleasure! What can I get you?", action: () => render() },
     ]);
 
-    const renderRegister = () => {
-      const orderDisplay = orderItems.map(id => {
-        const item = this.menu.find(m => m.id === id);
-        return item ? item.short : id;
-      }).join(', ');
+    const render = () => {
+      const display = items.map(id => this.menu.find(m=>m.id===id)?.short||id).join(', ');
+      const area = this.openMG('REGISTER', 'Ring up: ' + display);
+      const wrap = document.createElement('div');
+      wrap.className = 'reg-screen';
+      wrap.innerHTML = `<div class="reg-display" id="rd">Tap items to ring up...</div><div class="menu-grid" id="rm"></div><div class="reg-acts"><button class="btn btn-r" id="rc" style="font-size:.78em">Clear</button><button class="btn" style="background:var(--success);color:#fff;font-size:.78em" id="rs">Submit</button></div>`;
+      area.appendChild(wrap);
 
-      area.innerHTML = `
-        <div class="minigame-title">📋 Take The Order</div>
-        <div class="minigame-instruction">Ring up: ${orderDisplay}</div>
-        <div class="register-screen">
-          <div class="order-display" id="reg-display">Tap items to ring them up...</div>
-          <div class="menu-grid" id="reg-menu"></div>
-          <div class="register-actions">
-            <button class="btn btn-danger btn-small" id="reg-clear">Clear</button>
-            <button class="btn btn-success btn-small" id="reg-submit">Submit Order</button>
-          </div>
-        </div>
-      `;
-
-      const menuGrid = document.getElementById('reg-menu');
-      this.menu.forEach(item => {
-        const btn = document.createElement('div');
-        btn.className = 'menu-item';
-        btn.innerHTML = `<span class="item-emoji">${item.emoji}</span>${item.short}`;
-        btn.onclick = () => {
-          enteredItems.push(item.id);
-          this.updateRegisterDisplay(enteredItems);
-        };
-        menuGrid.appendChild(btn);
+      const grid = document.getElementById('rm');
+      this.menu.forEach(m => {
+        const b = document.createElement('div');
+        b.className = 'menu-btn';
+        b.innerHTML = `<span class="mi">${m.short.slice(0,2)}</span>${m.short}`;
+        b.onclick = () => { entered.push(m.id); updDisp(); };
+        grid.appendChild(b);
       });
 
-      document.getElementById('reg-clear').onclick = () => {
-        enteredItems = [];
-        this.updateRegisterDisplay(enteredItems);
+      const updDisp = () => {
+        const d = document.getElementById('rd');
+        d.textContent = entered.length ? entered.map(id=>this.menu.find(m=>m.id===id)?.short||id).join('\n') : 'Tap items to ring up...';
       };
-
-      document.getElementById('reg-submit').onclick = () => {
+      document.getElementById('rc').onclick = () => { entered=[]; updDisp(); };
+      document.getElementById('rs').onclick = () => {
         clearInterval(this.patienceTimer);
-        this.checkRegisterOrder(orderItems, enteredItems, customer);
-      };
-    };
-  },
-
-  updateRegisterDisplay(items) {
-    const display = document.getElementById('reg-display');
-    if (!display) return;
-    if (items.length === 0) {
-      display.textContent = 'Tap items to ring them up...';
-      return;
-    }
-    display.textContent = items.map(id => {
-      const item = this.menu.find(m => m.id === id);
-      return item ? `> ${item.short}` : id;
-    }).join('\n');
-  },
-
-  checkRegisterOrder(expected, entered, customer) {
-    const sortedExpected = [...expected].sort().join(',');
-    const sortedEntered = [...entered].sort().join(',');
-    const correct = sortedExpected === sortedEntered;
-
-    this.customersServed++;
-    if (correct) {
-      this.ordersCorrect++;
-      this.score += 100 + Math.round(this.customerPatience);
-      this.showToast('Order correct! +' + (100 + Math.round(this.customerPatience)), 'good');
-      this.showDialog('luke', this.randFrom(this.lukeCompliments), [], () => this.nextRound());
-    } else {
-      this.ordersMessed++;
-      this.showToast('Wrong order! 😬', 'bad');
-      // Angry customer
-      const reaction = this.randFrom(this.customerReactions.angry);
-      this.showDialog(customer.key, reaction, this.customerReactions.angryChoices, () => {
-        this.addStrike(0.5);
-        this.showDialog('luke', this.randFrom(this.lukeRoasts), [], () => this.nextRound());
-      });
-    }
-    this.updateHUD();
-  },
-
-  // ============================================================
-  //  MINIGAME 2: BAGGING
-  // ============================================================
-  baggingMinigame(customer) {
-    this.currentMinigame = 'bagging';
-    const area = document.getElementById('minigame-area');
-    const orderItems = customer.order.items;
-    let baggedItems = [];
-
-    // Build pool: correct items + distractors
-    const correctEmojis = orderItems.map(id => this.menu.find(m => m.id === id));
-    const distractors = this.menu.filter(m => !orderItems.includes(m.id))
-      .sort(() => Math.random() - 0.5).slice(0, 4);
-    const allItems = [...correctEmojis, ...distractors].sort(() => Math.random() - 0.5);
-
-    this.showDialog('luke', `Justin! ${customer.name}'s order is up. Bag it correctly — Jacob already made the food. Don't mess this up.`, [
-      { text: "On it! 🛍️", action: () => renderBagging() },
-    ]);
-
-    const renderBagging = () => {
-      area.innerHTML = `
-        <div class="minigame-title">🛍️ Bag The Order</div>
-        <div class="bag-area">
-          <div class="bag-order-list">
-            <h3>Order for ${customer.name}:</h3>
-            <div id="bag-order-text">${orderItems.map(id => this.menu.find(m => m.id === id)?.short || id).join(', ')}</div>
-          </div>
-          <div class="minigame-instruction">Tap the correct items, then hit bag!</div>
-          <div class="conveyor" id="conveyor"></div>
-          <div class="bag-target" id="bag-target">
-            <div class="bag-contents" id="bag-contents"></div>
-          </div>
-          <div class="register-actions" style="margin-top:16px;">
-            <button class="btn btn-danger btn-small" id="bag-reset">Reset Bag</button>
-            <button class="btn btn-success btn-small" id="bag-submit">Deliver Bag</button>
-          </div>
-        </div>
-      `;
-
-      const conveyor = document.getElementById('conveyor');
-      allItems.forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.className = 'food-item';
-        div.textContent = item.emoji;
-        div.dataset.id = item.id;
-        div.dataset.idx = idx;
-        div.onclick = () => {
-          if (div.classList.contains('selected')) {
-            div.classList.remove('selected');
-            baggedItems = baggedItems.filter(b => b.idx !== idx);
-          } else {
-            div.classList.add('selected');
-            baggedItems.push({ id: item.id, idx });
-          }
-          this.updateBagContents(baggedItems);
-        };
-        conveyor.appendChild(div);
-      });
-
-      document.getElementById('bag-reset').onclick = () => {
-        baggedItems = [];
-        document.querySelectorAll('.food-item').forEach(f => f.classList.remove('selected'));
-        this.updateBagContents(baggedItems);
-      };
-
-      document.getElementById('bag-submit').onclick = () => {
-        clearInterval(this.patienceTimer);
-        this.checkBagging(orderItems, baggedItems.map(b => b.id), customer);
-      };
-    };
-  },
-
-  updateBagContents(items) {
-    const bc = document.getElementById('bag-contents');
-    if (!bc) return;
-    bc.innerHTML = items.map(b => {
-      const item = this.menu.find(m => m.id === b.id);
-      return `<span class="mini-item">${item?.emoji || '?'}</span>`;
-    }).join('');
-  },
-
-  checkBagging(expected, entered, customer) {
-    const sortedExpected = [...expected].sort().join(',');
-    const sortedEntered = [...entered].sort().join(',');
-    const correct = sortedExpected === sortedEntered;
-
-    this.customersServed++;
-    if (correct) {
-      this.ordersCorrect++;
-      this.score += 120 + Math.round(this.customerPatience);
-      this.showToast('Bagged perfectly! +' + (120 + Math.round(this.customerPatience)), 'good');
-      this.showDialog(customer.key, this.randFrom(this.customerReactions.happy), [], () => {
-        if (Math.random() < 0.3) {
-          this.showDialog('luke', this.randFrom(this.lukeCompliments), [], () => this.nextRound());
+        this.closeMG();
+        const ok = [...items].sort().join() === [...entered].sort().join();
+        this.customersServed++;
+        if (ok) {
+          this.ordersCorrect++; this.score += 100+Math.round(this.customerPatience);
+          this.toast('Order correct! +'+(100+Math.round(this.customerPatience)),'good');
+          this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
         } else {
-          this.nextRound();
+          this.ordersMessed++; this.toast('Wrong order!','bad');
+          this.showDialog(cust.key, R(this.angryLines), this.angryChoices.map(c=>({text:c.text,action:()=>{
+            if(c.e>0){this.score+=Math.round(c.e*50);this.toast('+'+Math.round(c.e*50),'good');}else{this.addStrike(0.5);}
+            this.showDialog('luke',R(this.lukeRoasts),[],()=>this.nextRound());
+          }})));
         }
-      });
-    } else {
-      this.ordersMessed++;
-      this.showToast('Wrong items in the bag! 😫', 'bad');
-      this.showDialog('luke', this.randFrom(this.lukeRoasts), [], () => {
-        this.addStrike(0.5);
-        this.showScold("Manager Warning", `"Justin, you bagged the wrong items for ${customer.name}. This is unacceptable. Jacob worked hard on that order."`, () => this.nextRound());
-      });
-    }
-    this.updateHUD();
+        this.updateHUD();
+      };
+    };
   },
 
-  // ============================================================
-  //  MINIGAME 3: CURBSIDE DELIVERY
-  // ============================================================
-  curbsideMinigame(customer) {
-    this.currentMinigame = 'curbside';
-    const area = document.getElementById('minigame-area');
+  // ============================
+  //  BAGGING MINIGAME
+  // ============================
+  mgBagging(cust) {
+    let picked = [];
+    const items = cust.order.items;
+    const correct = items.map(id=>this.menu.find(m=>m.id===id));
+    const wrong = this.menu.filter(m=>!items.includes(m.id)).sort(()=>Math.random()-.5).slice(0,4);
+    const all = [...correct,...wrong].sort(()=>Math.random()-.5);
 
-    // Generate parking lot with multiple cars
-    const spots = [];
-    const npcKeys = Object.keys(this.npcOrders);
-    const correctSpot = Math.floor(Math.random() * 6);
-
-    for (let i = 0; i < 6; i++) {
-      if (i === correctSpot) {
-        spots.push({ occupied: true, name: customer.name, order: customer.order.items, correct: true, emoji: ['🚗','🚙','🚕','🏎️','🚘'][Math.floor(Math.random()*5)] });
-      } else if (Math.random() > 0.4) {
-        const rk = npcKeys[Math.floor(Math.random() * npcKeys.length)];
-        const rc = this.characters[rk];
-        spots.push({ occupied: true, name: rc?.name || 'Customer', order: [], correct: false, emoji: ['🚗','🚙','🚕','🚘'][Math.floor(Math.random()*4)] });
-      } else {
-        spots.push({ occupied: false });
-      }
-    }
-
-    this.showDialog('luke', `Justin! ${customer.name} is waiting in the parking lot for their curbside order. Find their car and deliver it. Try not to give it to the wrong person... again.`, [
-      { text: "I'll find them! 🏃", action: () => renderParking() },
+    this.showDialog('luke', `Justin! ${cust.name}'s order is up. Bag it correctly. Jacob already made it. Don't mess this up.`, [
+      { text:"On it!", action:()=>render() },
     ]);
 
-    const renderParking = () => {
-      area.innerHTML = `
-        <div class="minigame-title">🚗 Curbside Delivery</div>
-        <div class="minigame-instruction">Find ${customer.name}'s car and deliver their order!</div>
-        <div class="parking-lot" id="parking-lot"></div>
-      `;
+    const render = () => {
+      const area = this.openMG('BAGGING', `Bag order for ${cust.name}`);
+      const w = document.createElement('div');
+      w.className = 'bag-wrap';
+      w.innerHTML = `<div class="bag-ticket"><strong>Order:</strong> ${items.map(id=>this.menu.find(m=>m.id===id)?.short||id).join(', ')}</div><div class="conveyor" id="conv"></div><div class="bag-drop" id="bdrop"></div><div class="reg-acts" style="margin-top:12px"><button class="btn btn-r" style="font-size:.78em" id="brst">Reset</button><button class="btn" style="background:var(--success);color:#fff;font-size:.78em" id="bsub">Deliver Bag</button></div>`;
+      area.appendChild(w);
 
-      const lot = document.getElementById('parking-lot');
-      spots.forEach((spot, idx) => {
-        const div = document.createElement('div');
-        div.className = `parking-spot ${spot.occupied ? 'has-car' : ''}`;
-        if (spot.occupied) {
-          div.innerHTML = `
-            <span class="car-emoji">${spot.emoji}</span>
-            <span class="car-name">${spot.name}</span>
-            <span class="spot-label">Spot ${idx + 1}</span>
-          `;
-          div.onclick = () => {
+      const conv = document.getElementById('conv');
+      all.forEach((item,idx) => {
+        const d = document.createElement('div');
+        d.className = 'food-box';
+        d.textContent = item.short;
+        d.onclick = () => {
+          if(d.classList.contains('picked')){d.classList.remove('picked');picked=picked.filter(p=>p.idx!==idx);}
+          else{d.classList.add('picked');picked.push({id:item.id,idx});}
+          updBag();
+        };
+        conv.appendChild(d);
+      });
+
+      const updBag = () => {
+        document.getElementById('bdrop').innerHTML = picked.map(p=>`<span class="bag-mini">${this.menu.find(m=>m.id===p.id)?.short||''}</span>`).join('');
+      };
+
+      document.getElementById('brst').onclick = () => { picked=[]; document.querySelectorAll('.food-box').forEach(f=>f.classList.remove('picked')); updBag(); };
+      document.getElementById('bsub').onclick = () => {
+        clearInterval(this.patienceTimer);
+        this.closeMG();
+        const ok = [...items].sort().join() === picked.map(p=>p.id).sort().join();
+        this.customersServed++;
+        if(ok){
+          this.ordersCorrect++; this.score+=120+Math.round(this.customerPatience);
+          this.toast('Bagged perfectly! +'+(120+Math.round(this.customerPatience)),'good');
+          this.showDialog(cust.key, R(["Thanks! Perfect order!","That's everything, thanks!","Awesome, appreciate it!"]), [], ()=>this.nextRound());
+        } else {
+          this.ordersMessed++; this.toast('Wrong items in the bag!','bad');
+          this.showDialog('luke', R(this.lukeRoasts), [], ()=>{ this.addStrike(0.5); this.nextRound(); });
+        }
+        this.updateHUD();
+      };
+    };
+  },
+
+  // ============================
+  //  CURBSIDE MINIGAME
+  // ============================
+  mgCurbside(cust) {
+    const spots = [];
+    const nk = Object.keys(this.npcOrders);
+    const correct = Math.floor(Math.random()*6);
+    for(let i=0;i<6;i++){
+      if(i===correct) spots.push({occ:true,name:cust.name,right:true,car:R(['Sedan','SUV','Truck','Van','Coupe'])});
+      else if(Math.random()>.4){const k=nk[Math.floor(Math.random()*nk.length)];spots.push({occ:true,name:this.chars[k]?.name||'Customer',right:false,car:R(['Sedan','SUV','Truck','Hatch'])});}
+      else spots.push({occ:false});
+    }
+
+    this.showDialog('luke', `${cust.name} is waiting in the lot. Find their car and deliver. Don't give it to the wrong person... again.`, [
+      { text:"I'll find them!", action:()=>render() },
+    ]);
+
+    const render = () => {
+      const area = this.openMG('CURBSIDE DELIVERY', `Find ${cust.name}'s car!`);
+      const g = document.createElement('div');
+      g.className = 'park-grid';
+      spots.forEach((sp,idx) => {
+        const d = document.createElement('div');
+        d.className = `park-spot ${sp.occ?'has-car':''}`;
+        if(sp.occ){
+          d.innerHTML = `<span class="car">${R(['[CAR]','[SUV]','[VAN]'])}</span><span class="pname">${sp.name}</span><span class="pnum">Spot ${idx+1} - ${sp.car}</span>`;
+          d.onclick = () => {
             clearInterval(this.patienceTimer);
-            this.checkCurbside(spot, customer);
+            this.closeMG();
+            this.customersServed++;
+            if(sp.right){
+              this.ordersCorrect++; this.score+=80+Math.round(this.customerPatience);
+              this.toast('Delivered! +'+(80+Math.round(this.customerPatience)),'good');
+              this.showDialog(cust.key, R(["Thanks Justin!","Perfect, thanks!","That was fast!"]), [], ()=>this.nextRound());
+            } else {
+              this.ordersMessed++; this.toast('Wrong car!','bad');
+              this.showDialog('luke', `You gave ${cust.name}'s food to ${sp.name}. HOW.`, [], ()=>{ this.addStrike(1); this.nextRound(); });
+            }
+            this.updateHUD();
           };
         } else {
-          div.innerHTML = `<span class="spot-label">Empty</span><span style="font-size:1.5em;opacity:0.3;">🅿️</span>`;
+          d.innerHTML = `<span class="pnum">Empty</span><span style="font-size:1.2em;opacity:.3">P</span>`;
         }
-        lot.appendChild(div);
+        g.appendChild(d);
       });
+      area.appendChild(g);
     };
   },
 
-  checkCurbside(spot, customer) {
-    this.customersServed++;
-    if (spot.correct) {
-      this.ordersCorrect++;
-      this.score += 80 + Math.round(this.customerPatience);
-      this.showToast('Delivered! +' + (80 + Math.round(this.customerPatience)), 'good');
-      this.showDialog(customer.key, this.randFrom([
-        "Thanks Justin! That was fast!",
-        "My pleasure! ...wait, I'm the customer. YOUR pleasure? Is that how it works?",
-        "Perfect, thanks so much!",
-      ]), [], () => this.nextRound());
-    } else {
-      this.ordersMessed++;
-      this.showToast('Wrong car!! 😰', 'bad');
-      this.showDialog('luke', `Justin... you just gave ${customer.name}'s food to ${spot.name}. How. HOW.`, [], () => {
-        this.addStrike(1);
-        this.nextRound();
-      });
-    }
-    this.updateHUD();
-  },
+  // ============================
+  //  OUTSIDE iPAD MINIGAME
+  // ============================
+  mgIPad(cust) {
+    let entered = [];
+    const items = cust.order.items;
+    const weather = R(['94F - Hot out here','62F - Rainy','78F - Cloudy','101F - Scorching','55F - Windy']);
+    const carNum = Math.floor(Math.random()*30)+1;
 
-  // ============================================================
-  //  MINIGAME 4: OUTSIDE iPAD ORDERING
-  // ============================================================
-  ipadMinigame(customer) {
-    this.currentMinigame = 'ipad';
-    const area = document.getElementById('minigame-area');
-    const orderItems = customer.order.items;
-    let enteredItems = [];
-    const weathers = ['☀️ 94°F — Hot out here', '🌧️ 62°F — Rainy', '☁️ 78°F — Cloudy', '🥵 101°F — Scorching', '💨 55°F — Windy'];
-    const weather = this.randFrom(weathers);
-    const carNum = Math.floor(Math.random() * 30) + 1;
-
-    this.showDialog('luke', `Justin! Get outside with the iPad. There's a line of cars wrapped around the building. ${customer.name} is car #${carNum}. Take their order and don't get hit by a car... again.`, [
-      { text: "Heading out! 📱", action: () => renderIPad() },
-      { text: "Can't Jacob do it? It's hot...", action: () => {
-        this.showToast("Luke: \"Jacob makes the food, Justin. GO.\"", 'luke');
-        setTimeout(() => renderIPad(), 1500);
-      }},
+    this.showDialog('luke', `Get outside with the iPad. Line of cars wrapped around. ${cust.name} is car #${carNum}. Take their order.`, [
+      { text:"Heading out!", action:()=>render() },
+      { text:"Can't Jacob do it?", action:()=>{ this.toast("Luke: Jacob MAKES the food. GO.",'luke'); setTimeout(()=>render(),1200); }},
     ]);
 
-    const renderIPad = () => {
-      const orderDisplay = orderItems.map(id => {
-        const item = this.menu.find(m => m.id === id);
-        return item ? item.short : id;
-      }).join(', ');
+    const render = () => {
+      const area = this.openMG('OUTSIDE iPAD ORDER', `Car #${carNum} - ${weather}`);
+      const f = document.createElement('div');
+      f.className = 'ipad-frame';
+      f.innerHTML = `<div class="ipad-inner"><div class="ipad-top"><h3>CFA Order System</h3><span class="car-tag">Car #${carNum}</span></div><div class="ipad-bubble">${cust.order.greeting}</div><div class="ipad-entered" id="ie">Tap items to add...</div><div class="ipad-grid" id="ig"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="ic">Clear</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="is">Send to Kitchen</button></div></div>`;
+      area.appendChild(f);
 
-      area.innerHTML = `
-        <div class="weather-badge">${weather}</div>
-        <div class="minigame-title">📱 Outside iPad Order</div>
-        <div class="minigame-instruction">Car #${carNum} in the drive-through line</div>
-        <div class="ipad-frame">
-          <div class="ipad-screen">
-            <div class="ipad-header">
-              <h3>🐔 CFA Order System</h3>
-              <span class="car-num">Car #${carNum}</span>
-            </div>
-            <div class="ipad-customer-bubble" id="ipad-bubble">
-              ${customer.order.greeting}
-            </div>
-            <div class="ipad-entered" id="ipad-entered">Tap items to add...</div>
-            <div class="ipad-menu-scroll" id="ipad-menu"></div>
-            <div class="register-actions">
-              <button class="btn btn-danger btn-small" id="ipad-clear">Clear</button>
-              <button class="btn btn-success btn-small" id="ipad-send">Send to Kitchen</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      const menuGrid = document.getElementById('ipad-menu');
-      this.menu.forEach(item => {
-        const btn = document.createElement('div');
-        btn.className = 'ipad-menu-item';
-        btn.innerHTML = `<span class="ipad-item-emoji">${item.emoji}</span>${item.short}`;
-        btn.onclick = () => {
-          enteredItems.push(item.id);
-          this.updateIPadDisplay(enteredItems);
-        };
-        menuGrid.appendChild(btn);
+      const grid = document.getElementById('ig');
+      this.menu.forEach(m => {
+        const b = document.createElement('div');
+        b.className = 'ipad-item';
+        b.textContent = m.short;
+        b.onclick = () => { entered.push(m.id); updIpad(); };
+        grid.appendChild(b);
       });
 
-      document.getElementById('ipad-clear').onclick = () => {
-        enteredItems = [];
-        this.updateIPadDisplay(enteredItems);
+      const updIpad = () => {
+        const el = document.getElementById('ie');
+        el.innerHTML = entered.length ? entered.map(id=>`<span class="ipad-chip">${this.menu.find(m=>m.id===id)?.short||id}</span>`).join('') : 'Tap items to add...';
       };
 
-      document.getElementById('ipad-send').onclick = () => {
+      document.getElementById('ic').onclick = () => { entered=[]; updIpad(); };
+      document.getElementById('is').onclick = () => {
         clearInterval(this.patienceTimer);
-        this.checkIPadOrder(orderItems, enteredItems, customer);
-      };
-    };
-  },
-
-  updateIPadDisplay(items) {
-    const el = document.getElementById('ipad-entered');
-    if (!el) return;
-    if (items.length === 0) {
-      el.textContent = 'Tap items to add...';
-      return;
-    }
-    el.innerHTML = items.map(id => {
-      const item = this.menu.find(m => m.id === id);
-      return `<span class="ipad-chip">${item?.emoji || ''} ${item?.short || id}</span>`;
-    }).join('');
-  },
-
-  checkIPadOrder(expected, entered, customer) {
-    const sortedExpected = [...expected].sort().join(',');
-    const sortedEntered = [...entered].sort().join(',');
-    const correct = sortedExpected === sortedEntered;
-
-    this.customersServed++;
-    if (correct) {
-      this.ordersCorrect++;
-      const bonus = Math.round(this.customerPatience);
-      this.score += 110 + bonus;
-      this.showToast('Order sent to Jacob! +' + (110 + bonus), 'good');
-      this.showDialog(customer.key, this.randFrom([
-        "Thanks! That was quick, especially since you're doing this in the parking lot!",
-        "Appreciate it Justin! Stay cool out there!",
-        "Perfect, thanks! Tell Jacob I said what's up!",
-      ]), [], () => {
-        if (Math.random() < 0.4) {
-          this.showDialog('luke', this.randFrom([
-            "Nice work outside, Justin. You didn't get hit by a single car this time!",
-            "Jacob says the order came through clean. I'm... impressed? Don't get used to the praise.",
-            "See? The iPad is easy when you don't drop it. Good job.",
-          ]), [], () => this.nextRound());
+        this.closeMG();
+        const ok = [...items].sort().join() === [...entered].sort().join();
+        this.customersServed++;
+        if(ok){
+          this.ordersCorrect++; this.score+=110+Math.round(this.customerPatience);
+          this.toast('Order sent to Jacob! +'+(110+Math.round(this.customerPatience)),'good');
+          this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
         } else {
-          this.nextRound();
+          this.ordersMessed++; this.toast('Wrong order sent to kitchen!','bad');
+          this.showDialog('luke', R(["Jacob yelled at me because that order makes no sense.","The iPad order is all wrong!","Did the heat get to your brain?"]), [], ()=>{ this.addStrike(0.5); this.nextRound(); });
         }
-      });
-    } else {
-      this.ordersMessed++;
-      this.showToast('Wrong order sent to kitchen! 😬', 'bad');
-      this.showDialog('luke', this.randFrom([
-        "Justin, Jacob just yelled at me because the order that came in makes no sense. What did you type??",
-        "Bro the iPad order is all wrong. The customer is STILL IN THEIR CAR waiting. Fix it!",
-        "Did the heat get to your brain out there? That order was completely wrong.",
-        "Justin I can see the order on screen and that is NOT what they asked for. Come inside.",
-      ]), [], () => {
-        this.addStrike(0.5);
-        this.nextRound();
-      });
-    }
-    this.updateHUD();
-  },
-
-  // ============================================================
-  //  MINIGAME 5: DRIVE-THROUGH WINDOW
-  // ============================================================
-  drivethroughMinigame(customer) {
-    this.currentMinigame = 'drivethrough';
-    const area = document.getElementById('minigame-area');
-    const orderItems = customer.order.items;
-    let handedItems = [];
-
-    // Build tray: correct items + extra wrong items
-    const correctItems = orderItems.map(id => this.menu.find(m => m.id === id));
-    const wrongItems = this.menu.filter(m => !orderItems.includes(m.id))
-      .sort(() => Math.random() - 0.5).slice(0, 3);
-    const trayItems = [...correctItems, ...wrongItems].sort(() => Math.random() - 0.5);
-
-    this.showDialog('luke', `Justin! Drive-through window! ${customer.name} is pulling up. Their food is ready on the counter — hand them the RIGHT items through the window. Do NOT hand them someone else's food.`, [
-      { text: "Window time! 🪟", action: () => renderDT() },
-    ]);
-
-    const renderDT = () => {
-      area.innerHTML = `
-        <div class="minigame-title">🚗 Drive-Through Window</div>
-        <div class="dt-window">
-          <div class="dt-window-frame">
-            <div class="dt-car-view">${this.randFrom(['🚗','🚙','🚕','🏎️','🚘','🛻'])}</div>
-            <div class="dt-customer-name">${customer.name}</div>
-            <div class="dt-customer-says">"${this.randFrom([
-              "Hey! I had a mobile order?",
-              "Hi, picking up for " + customer.name + "!",
-              "What's up! Order for " + customer.name,
-              "Hey Justin! My order ready?",
-            ])}"</div>
-          </div>
-          <div class="dt-counter">
-            <div class="dt-order-ticket">
-              <strong>Order ticket:</strong> ${orderItems.map(id => this.menu.find(m => m.id === id)?.short || id).join(', ')}
-            </div>
-            <div class="dt-handed-list" id="dt-handed"></div>
-            <div class="minigame-instruction" style="color:#ccc;margin-bottom:8px;">Tap items to hand through the window</div>
-            <div class="dt-items-tray" id="dt-tray"></div>
-            <div class="register-actions">
-              <button class="btn btn-danger btn-small" id="dt-reset">Take Back</button>
-              <button class="btn btn-success btn-small" id="dt-done">Close Window</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      const tray = document.getElementById('dt-tray');
-      trayItems.forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.className = 'dt-tray-item';
-        div.textContent = item.emoji;
-        div.dataset.id = item.id;
-        div.dataset.idx = idx;
-        div.onclick = () => {
-          if (div.classList.contains('handed')) return;
-          div.classList.add('handed');
-          handedItems.push({ id: item.id, idx });
-          this.updateDTHanded(handedItems);
-        };
-        tray.appendChild(div);
-      });
-
-      document.getElementById('dt-reset').onclick = () => {
-        handedItems = [];
-        document.querySelectorAll('.dt-tray-item').forEach(d => d.classList.remove('handed'));
-        this.updateDTHanded(handedItems);
-      };
-
-      document.getElementById('dt-done').onclick = () => {
-        clearInterval(this.patienceTimer);
-        this.checkDrivethrough(orderItems, handedItems.map(h => h.id), customer);
+        this.updateHUD();
       };
     };
   },
 
-  updateDTHanded(items) {
-    const el = document.getElementById('dt-handed');
-    if (!el) return;
-    el.innerHTML = items.map(h => {
-      const item = this.menu.find(m => m.id === h.id);
-      return `<span class="dt-handed-chip">${item?.emoji || ''} ${item?.short || ''}</span>`;
-    }).join('');
-  },
+  // ============================
+  //  DRIVE-THROUGH WINDOW
+  // ============================
+  mgDriveThrough(cust) {
+    let handed = [];
+    const items = cust.order.items;
+    const correct = items.map(id=>this.menu.find(m=>m.id===id));
+    const wrong = this.menu.filter(m=>!items.includes(m.id)).sort(()=>Math.random()-.5).slice(0,3);
+    const tray = [...correct,...wrong].sort(()=>Math.random()-.5);
 
-  checkDrivethrough(expected, handed, customer) {
-    const sortedExpected = [...expected].sort().join(',');
-    const sortedHanded = [...handed].sort().join(',');
-    const correct = sortedExpected === sortedHanded;
+    this.showDialog('luke', `Drive-through window! ${cust.name} pulling up. Hand them the RIGHT items. Do NOT give them someone else's food.`, [
+      { text:"Window time!", action:()=>render() },
+    ]);
 
-    this.customersServed++;
-    if (correct) {
-      this.ordersCorrect++;
-      const bonus = Math.round(this.customerPatience);
-      this.score += 90 + bonus;
-      this.showToast('Perfect handoff! +' + (90 + bonus), 'good');
-      this.showDialog(customer.key, this.randFrom([
-        "Thanks Justin! Have a great day!",
-        "Perfect, that's everything! Appreciate it!",
-        "Yooo that was fast! Thanks man!",
-        "My pleasure! ...wait that's YOUR line haha. Thanks!",
-      ]), [], () => this.nextRound());
-    } else {
-      this.ordersMessed++;
-      // Check what went wrong
-      const extra = handed.filter(id => !expected.includes(id));
-      const missing = expected.filter(id => !handed.includes(id));
-      let errMsg = "";
-      if (extra.length > 0 && missing.length > 0) {
-        errMsg = "You handed them wrong items AND forgot items. Classic Justin.";
-      } else if (extra.length > 0) {
-        errMsg = "You gave them someone else's food!! That was for another car!";
-      } else {
-        errMsg = "You forgot items! They're gonna come right back through the line.";
-      }
-      this.showToast('Wrong items handed out! 😰', 'bad');
-      this.showDialog(customer.key, this.randFrom([
-        "Um... this isn't what I ordered??",
-        "Hey, I'm missing stuff here!",
-        "Excuse me? This isn't right at all.",
-        "Bro... I can literally SEE my other items sitting right there on the counter.",
-      ]), this.customerReactions.angryChoices, () => {
-        this.addStrike(0.5);
-        this.showDialog('luke', `${errMsg}\n\n${this.randFrom(this.lukeRoasts)}`, [], () => this.nextRound());
+    const render = () => {
+      const area = this.openMG('DRIVE-THROUGH WINDOW', `Hand ${cust.name} their order`);
+      const w = document.createElement('div');
+      w.className = 'dt-wrap';
+      w.innerHTML = `<div class="dt-window"><div class="dt-car">${R(['[CAR]','[SUV]','[TRUCK]','[VAN]'])}</div><div class="dt-who">${cust.name}</div><div class="dt-says">"${R(["Mobile order for "+cust.name,"Picking up!","Hey, order ready?","What's up Justin!"])}"</div></div><div class="dt-counter"><div class="dt-ticket"><strong>Ticket:</strong> ${items.map(id=>this.menu.find(m=>m.id===id)?.short||id).join(', ')}</div><div class="dt-handed" id="dh"></div><div class="dt-tray" id="dtray"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="drst">Take Back</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="ddn">Close Window</button></div></div>`;
+      area.appendChild(w);
+
+      const dtray = document.getElementById('dtray');
+      tray.forEach((item,idx) => {
+        const d = document.createElement('div');
+        d.className = 'dt-item';
+        d.textContent = item.short;
+        d.onclick = () => { if(d.classList.contains('gone'))return; d.classList.add('gone'); handed.push({id:item.id,idx}); updH(); };
+        dtray.appendChild(d);
       });
-    }
-    this.updateHUD();
+
+      const updH = () => {
+        document.getElementById('dh').innerHTML = handed.map(h=>`<span class="dt-hchip">${this.menu.find(m=>m.id===h.id)?.short||''}</span>`).join('');
+      };
+
+      document.getElementById('drst').onclick = () => { handed=[]; document.querySelectorAll('.dt-item').forEach(d=>d.classList.remove('gone')); updH(); };
+      document.getElementById('ddn').onclick = () => {
+        clearInterval(this.patienceTimer);
+        this.closeMG();
+        const ok = [...items].sort().join() === handed.map(h=>h.id).sort().join();
+        this.customersServed++;
+        if(ok){
+          this.ordersCorrect++; this.score+=90+Math.round(this.customerPatience);
+          this.toast('Perfect handoff! +'+(90+Math.round(this.customerPatience)),'good');
+          this.showDialog(cust.key, R(["Thanks! Have a great day!","Perfect, everything's here!","Fast service, thanks!"]), [], ()=>this.nextRound());
+        } else {
+          this.ordersMessed++; this.toast('Wrong items!','bad');
+          this.showDialog(cust.key, R(["This isn't what I ordered??","I'm missing stuff!","Bro I can see my items right there on the counter."]),
+            this.angryChoices.map(c=>({text:c.text,action:()=>{
+              if(c.e>0){this.score+=Math.round(c.e*50);}else{this.addStrike(0.5);}
+              this.showDialog('luke',R(this.lukeRoasts),[],()=>this.nextRound());
+            }})));
+        }
+        this.updateHUD();
+      };
+    };
   },
 
-  // ============================================================
-  //  ANDY SABOTAGE EVENTS
-  // ============================================================
-  andyEvent(callback) {
-    const allegation = this.andyAllegations[Math.floor(Math.random() * this.andyAllegations.length)];
-    this.showToast('⚠️ ANDY ALERT! Andy has entered the building!', 'andy');
-
-    setTimeout(() => {
-      this.showDialog('andy', `Hey! Manager! I need to report something! ${allegation.claim}`, [], () => {
-        this.showDialog('luke', "Justin... Andy is saying some stuff about you. Care to explain?",
-          allegation.defenses.map(d => ({
-            text: d.text,
-            quality: d.quality,
-            action: () => {
-              if (d.effect > 0) {
-                this.score += Math.round(d.effect * 40);
-                this.showToast('You defended yourself! Andy leaves embarrassed. 😤', 'good');
-                this.showDialog('luke', this.randFrom([
-                  "Yeah Andy, get out of here. Justin's fine. Weird, but fine.",
-                  "Andy, you don't even work here! Security!",
-                  "Nice try Andy. Now leave before I ban you for real.",
-                ]), [], callback);
+  // --- ANDY ---
+  andyEvent(cb) {
+    this.toast('ANDY ALERT! Andy has entered the building!','andy');
+    const a = R(this.andyAllegations);
+    setTimeout(()=>{
+      this.showDialog('andy', `Hey! Manager! ${a.claim}`, [], ()=>{
+        this.showDialog('luke', "Justin... Andy is saying stuff. Care to explain?",
+          a.defenses.map(d=>({
+            text:d.text,
+            action:()=>{
+              if(d.e>0){
+                this.score+=Math.round(d.e*40);
+                this.toast('Defended yourself! Andy leaves.','good');
+                this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], cb);
               } else {
                 this.addStrike(0.5);
-                this.showToast('That defense didn\'t help... 😬', 'bad');
-                this.showDialog('luke', this.randFrom([
-                  "Justin... you're not exactly helping your case here.",
-                  "Dude, just... just don't say anything else. Please.",
-                ]), [], callback);
+                this.toast("That defense didn't help...",'bad');
+                this.showDialog('luke', R(["You're not helping your case here.","Just... don't say anything else."]), [], cb);
               }
             }
           }))
         );
       });
-    }, 1000);
+    }, 800);
   },
 
-  // ============================================================
-  //  END SHIFT
-  // ============================================================
-  endShift() {
-    clearInterval(this.patienceTimer);
-    document.getElementById('hud').classList.remove('visible');
-    document.getElementById('dialog-box').classList.remove('visible');
-
-    const accuracy = this.customersServed > 0 ? Math.round((this.ordersCorrect / this.customersServed) * 100) : 0;
-
-    if (this.strikes >= this.maxStrikes) {
-      this.getFired("After a disastrous shift, management has decided to let you go. Better stick to running, Justin.");
-      return;
-    }
-
-    this.showTransition("Shift Over! 🎉", () => {
-      const area = document.getElementById('minigame-area');
-      this.switchScreen('game-screen');
-      area.innerHTML = `
-        <div style="text-align:center;padding:32px;">
-          <div style="font-size:64px;margin-bottom:16px;">🎉</div>
-          <div class="minigame-title" style="font-size:1.8em;">Shift Complete!</div>
-          <p style="color:#666;margin:12px 0 24px;">You survived! Barely.</p>
-          <div style="background:white;border-radius:16px;padding:20px;text-align:left;box-shadow:0 4px 20px rgba(0,0,0,0.1);margin-bottom:24px;">
-            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Score</span><strong>${this.score}</strong></p>
-            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Customers Served</span><strong>${this.customersServed}</strong></p>
-            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Accuracy</span><strong>${accuracy}%</strong></p>
-            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Strikes</span><strong>${this.strikes}/${this.maxStrikes}</strong></p>
-            <p style="display:flex;justify-content:space-between;padding:8px 0;"><span>Status</span><strong style="color:var(--success);">SURVIVED</strong></p>
-          </div>
-          <button class="btn btn-primary" onclick="Game.start()">Play Again</button>
-        </div>
-      `;
-    });
-  },
-
-  // ============================================================
-  //  MINIGAME FAIL (patience ran out)
-  // ============================================================
-  failMinigame(reason) {
-    this.customersServed++;
-    this.ordersMessed++;
-    this.showToast(reason, 'bad');
+  // --- FAIL ---
+  failMG(reason) {
+    this.closeMG();
+    this.customersServed++; this.ordersMessed++;
+    this.toast(reason,'bad');
     this.addStrike(1);
-    if (this.isRunning) {
-      this.showDialog('luke', this.randFrom(this.lukeRoasts), [], () => this.nextRound());
-    }
+    if(this.isRunning) this.showDialog('luke', R(this.lukeRoasts), [], ()=>this.nextRound());
     this.updateHUD();
   },
 
-  // --- HELPERS ---
-  randFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
+  // --- END SHIFT ---
+  endShift() {
+    clearInterval(this.patienceTimer);
+    this.isRunning = false; this.inMinigame = false;
+    document.getElementById('hud').classList.remove('visible');
+    document.getElementById('dialog').classList.remove('visible');
+    this.closeMG();
+    if(this.strikes>=this.maxStrikes){this.getFired("Disastrous shift. Stick to running, Justin.");return;}
+    const acc = this.customersServed>0?Math.round((this.ordersCorrect/this.customersServed)*100):0;
+    const area = document.getElementById('mg-area');
+    document.getElementById('minigame-overlay').classList.add('visible');
+    document.getElementById('mg-title').textContent = 'SHIFT COMPLETE!';
+    document.getElementById('mg-inst').textContent = 'You survived! Barely.';
+    area.innerHTML = `<div style="width:100%;max-width:320px;background:#222;border-radius:14px;padding:20px;margin-top:20px">
+      <p style="display:flex;justify-content:space-between;padding:6px 0;color:#fff;font-size:.9em"><span>Score</span><strong>${this.score}</strong></p>
+      <p style="display:flex;justify-content:space-between;padding:6px 0;color:#fff;font-size:.9em"><span>Served</span><strong>${this.customersServed}</strong></p>
+      <p style="display:flex;justify-content:space-between;padding:6px 0;color:#fff;font-size:.9em"><span>Accuracy</span><strong>${acc}%</strong></p>
+      <p style="display:flex;justify-content:space-between;padding:6px 0;color:#fff;font-size:.9em"><span>Strikes</span><strong>${Math.ceil(this.strikes)}/${this.maxStrikes}</strong></p>
+      <p style="display:flex;justify-content:space-between;padding:6px 0;color:#0f0;font-size:.9em"><span>Status</span><strong>SURVIVED</strong></p>
+    </div><button class="btn btn-w" style="margin-top:20px" onclick="G.closeMG();G.restart()">Play Again</button>`;
+  },
 };
 
-// Prevent zoom on double tap
-document.addEventListener('touchstart', e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
+function R(a){return a[Math.floor(Math.random()*a.length)];}
 
-let lastTap = 0;
-document.addEventListener('touchend', e => {
-  const now = Date.now();
-  if (now - lastTap < 300) e.preventDefault();
-  lastTap = now;
-}, { passive: false });
+// --- BOOT ---
+window.addEventListener('load', () => {
+  Restaurant.init();
+  Restaurant.loop();
+  // Draw title screen Justin
+  const tc = document.getElementById('title-justin');
+  if (tc) Sprites.drawChar(tc, 'justin');
+});
+
+// Prevent zoom
+document.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault();},{passive:false});
+let lt=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<300)e.preventDefault();lt=n;},{passive:false});
 </script>
 </body>
 </html>
