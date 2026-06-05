@@ -67,15 +67,25 @@ canvas{display:block;width:100%;height:100%}
 .mg-inst{font-size:.78em;color:rgba(255,255,255,.6);text-align:center;margin-bottom:12px;font-weight:600}
 .mg-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding-bottom:20px}
 
-/* Register MG */
-.reg-screen{width:100%;max-width:340px;background:linear-gradient(180deg,#1a1a2e,#14142a);border-radius:16px;padding:14px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.reg-display{background:#0a0a14;color:#0f0;border-radius:8px;padding:10px;font-family:monospace;font-size:.78em;min-height:60px;margin-bottom:10px;white-space:pre-line;border:1px solid #1a3a1a;box-shadow:inset 0 2px 8px rgba(0,0,0,.5)}
-.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.menu-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 2px;text-align:center;font-size:.68em;font-weight:700;color:rgba(255,255,255,.85);cursor:pointer;transition:all .12s}
-.menu-btn:active{background:var(--red);border-color:var(--red);transform:scale(.95);color:#fff}
-.menu-btn .mi{font-size:1.4em;display:block;margin-bottom:2px}
-.reg-acts{display:flex;gap:8px;margin-top:12px}
-.reg-acts .btn{flex:1;padding:11px;font-size:.8em;border-radius:10px}
+/* Register MG - CFA POS Style */
+.reg-screen{width:100%;max-width:360px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.reg-header{background:var(--red);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;color:#fff}
+.reg-header h3{font-size:.8em;font-weight:800}.reg-header .order-num{font-size:.65em;opacity:.8}
+.reg-display{background:#f8f8f8;padding:8px 12px;min-height:50px;max-height:80px;overflow-y:auto;border-bottom:1px solid #eee;font-size:.72em;color:#333}
+.reg-display .reg-item{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dotted #ddd}
+.reg-display .reg-item:last-child{border:none}
+.reg-display .reg-empty{color:#aaa;font-style:italic}
+.reg-cats{display:flex;background:#f0f0f0;border-bottom:1px solid #ddd}
+.reg-cat{flex:1;padding:8px 4px;text-align:center;font-size:.6em;font-weight:800;text-transform:uppercase;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;letter-spacing:.5px}
+.reg-cat.active{color:var(--red);border-bottom-color:var(--red);background:#fff}
+.reg-cat:active{background:#e8e8e8}
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;max-height:200px;overflow-y:auto}
+.menu-btn{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:10px 6px;text-align:left;font-size:.7em;font-weight:700;color:#333;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px}
+.menu-btn:active{background:var(--red);border-color:var(--red);transform:scale(.97);color:#fff}
+.menu-btn .mi{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
+.reg-total{padding:6px 12px;background:#f8f8f8;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:.75em;font-weight:800;color:#333}
+.reg-acts{display:flex;gap:6px;padding:10px}
+.reg-acts .btn{flex:1;padding:11px;font-size:.78em;border-radius:8px}
 
 /* Bagging MG */
 .bag-wrap{width:100%;max-width:340px}
@@ -565,41 +575,35 @@ const Restaurant = {
       }
     }
 
-    // Tables and chairs (booths along left wall)
-    for (let ti = 0; ti < 3; ti++) {
-      const tableY = H * 0.28 + ti * H * 0.13;
-      // Booth back (against wall)
+    // Booth seating along left wall (clean, 2 booths)
+    for (let ti = 0; ti < 2; ti++) {
+      const tableY = H * 0.30 + ti * H * 0.15;
+      // Booth back
       ctx.fillStyle = '#C41230';
-      ctx.fillRect(W * 0.02, tableY, W * 0.03, H * 0.09);
+      this.roundRect(ctx, W * 0.03, tableY, W * 0.025, H * 0.10, 3);
+      ctx.fill();
       // Table
       ctx.fillStyle = '#A08060';
-      ctx.fillRect(W * 0.06, tableY + H*0.02, W * 0.10, H * 0.05);
-      ctx.strokeStyle = '#8A6A4A';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(W * 0.06, tableY + H*0.02, W * 0.10, H * 0.05);
-      // Chairs (opposite side)
+      this.roundRect(ctx, W * 0.065, tableY + H*0.02, W * 0.09, H * 0.06, 4);
+      ctx.fill();
+      // Opposite seat
       ctx.fillStyle = '#C41230';
-      ctx.fillRect(W * 0.17, tableY + H*0.01, W * 0.025, H * 0.03);
-      ctx.fillRect(W * 0.17, tableY + H*0.05, W * 0.025, H * 0.03);
+      this.roundRect(ctx, W * 0.165, tableY + H*0.015, W * 0.025, H * 0.07, 3);
+      ctx.fill();
     }
 
-    // Center tables (round)
-    for (let ci = 0; ci < 2; ci++) {
-      const cx2 = W * 0.38, cy2 = H * 0.32 + ci * H * 0.16;
-      ctx.fillStyle = '#A08060';
-      ctx.beginPath();
-      ctx.arc(cx2, cy2, W * 0.04, 0, Math.PI * 2);
+    // One center table (clean)
+    const cx2 = W * 0.42, cy2 = H * 0.40;
+    ctx.fillStyle = '#A08060';
+    ctx.beginPath();
+    ctx.arc(cx2, cy2, W * 0.035, 0, Math.PI * 2);
+    ctx.fill();
+    // 3 chairs
+    for (let a = 0; a < 3; a++) {
+      const ang = a * Math.PI * 0.667 - 0.5;
+      ctx.fillStyle = '#C41230';
+      this.roundRect(ctx, cx2 + Math.cos(ang)*W*0.055 - W*0.01, cy2 + Math.sin(ang)*W*0.055 - W*0.01, W*0.02, W*0.02, 3);
       ctx.fill();
-      ctx.strokeStyle = '#8A6A4A';
-      ctx.stroke();
-      // Chairs around
-      for (let a = 0; a < 4; a++) {
-        const ang = a * Math.PI * 0.5 + 0.3;
-        const chairX = cx2 + Math.cos(ang) * W * 0.06;
-        const chairY = cy2 + Math.sin(ang) * W * 0.06;
-        ctx.fillStyle = '#C41230';
-        ctx.fillRect(chairX - W*0.012, chairY - W*0.012, W*0.024, W*0.024);
-      }
     }
 
     // ---- BAGGING AREA (right side of counter) ----
@@ -801,24 +805,28 @@ const G = {
   score: 0, strikes: 0, maxStrikes: 3,
   customerPatience: 100, customersServed: 0,
   ordersCorrect: 0, ordersMessed: 0,
-  currentRound: 0, totalRounds: 14,
+  currentRound: 0, totalRounds: 12,
   isRunning: false, inMinigame: false,
-  andyChance: 0.2, patienceTimer: null,
+  andyChance: 0.28, patienceTimer: null,
   availableStation: null,
 
   menu: [
-    { id:'cs', name:'Chicken Sand.', short:'Ch.Sand' },
-    { id:'ss', name:'Spicy Sand.', short:'Spicy' },
-    { id:'gs', name:'Grilled Sand.', short:'Grilled' },
-    { id:'ng', name:'Nuggets', short:'Nugs' },
-    { id:'st', name:'Strips', short:'Strips' },
-    { id:'fr', name:'Waffle Fries', short:'Fries' },
-    { id:'dk', name:'Drink', short:'Drink' },
-    { id:'lm', name:'Lemonade', short:'Lemon.' },
-    { id:'ms', name:'Milkshake', short:'Shake' },
-    { id:'mc', name:'Mac & Cheese', short:'Mac&Ch' },
-    { id:'sa', name:'Salad', short:'Salad' },
-    { id:'ck', name:'Cookie', short:'Cookie' },
+    { id:'cs', name:'Chick-fil-A Sandwich', short:'CFA Sand', cat:'entree' },
+    { id:'ss', name:'Spicy Deluxe', short:'Spicy Dlx', cat:'entree' },
+    { id:'gs', name:'Grilled Sandwich', short:'Grilled', cat:'entree' },
+    { id:'ng', name:'Nuggets 12ct', short:'Nugs 12', cat:'entree' },
+    { id:'st', name:'Chick-n-Strips', short:'Strips', cat:'entree' },
+    { id:'fr', name:'Waffle Fries', short:'Wfl Fries', cat:'side' },
+    { id:'mc', name:'Mac & Cheese', short:'Mac&Ch', cat:'side' },
+    { id:'sa', name:'Side Salad', short:'Salad', cat:'side' },
+    { id:'fs', name:'Fruit Cup', short:'Fruit', cat:'side' },
+    { id:'dk', name:'Soft Drink', short:'Drink', cat:'bev' },
+    { id:'lm', name:'Lemonade', short:'Lemon.', cat:'bev' },
+    { id:'ms', name:'Milkshake', short:'Shake', cat:'bev' },
+    { id:'ic', name:'Iced Coffee', short:'Iced Cof', cat:'bev' },
+    { id:'ck', name:'Chocolate Cookie', short:'Cookie', cat:'dessert' },
+    { id:'br', name:'Brownie', short:'Brownie', cat:'dessert' },
+    { id:'cm', name:'Icedream Cone', short:'Icedream', cat:'dessert' },
   ],
 
   chars: {
@@ -832,57 +840,63 @@ const G = {
 
   npcOrders: {
     hudson: [
-      { greeting:"Justin! Shouldn't you be training? Anyway, fuel for the staff meeting.", items:['cs','fr','dk'] },
-      { greeting:"Cook! Your splits better be improving. Get me a grilled sandwich.", items:['gs','sa','lm'] },
+      { greeting:"Justin! Shouldn't you be out running intervals? Whatever. Grilled sandwich, side salad, lemonade, and a fruit cup for Coach Martinez.", items:['gs','sa','lm','fs'] },
+      { greeting:"Cook! Your 800 split was embarrassing yesterday. Get me a CFA sandwich combo with mac and cheese, NOT fries. And an iced coffee. And don't mess it up like you mess up your kick.", items:['cs','mc','ic'] },
     ],
     gentry: [
-      { greeting:"Yo Justin! Lemme get uhhhh...", items:['ss','fr','lm'] },
-      { greeting:"Bro hook me up with nuggets, I'm starving from practice!", items:['ng','fr','dk'] },
+      { greeting:"Yo Justin! Lemme get uhhhh... spicy deluxe, waffle fries, lemonade, and actually throw a cookie on there too.", items:['ss','fr','lm','ck'] },
+      { greeting:"Bro I need a 12-piece nuggets, mac and cheese, fries, and a milkshake. Practice was brutal.", items:['ng','mc','fr','ms'] },
     ],
     henry: [
-      { greeting:"Hey Justin! What's good? Can I get my usual?", items:['cs','mc','ms'] },
-      { greeting:"Justin! Get me strips and a cookie, I'm in a rush!", items:['st','ck','dk'] },
+      { greeting:"Hey Justin! Usual - CFA sandwich, mac and cheese, milkshake, and a brownie. Actually make it two brownies, I'm splitting with someone.", items:['cs','mc','ms','br','br'] },
+      { greeting:"Justin! Strips, waffle fries, iced coffee, and an icedream cone. Hurry up I gotta go!", items:['st','fr','ic','cm'] },
     ],
     black: [
-      { greeting:"Justin, me and Carter are splitting. Ring us up.", items:['ng','ng','fr','fr','dk','dk'] },
+      { greeting:"Justin, me and Carter are splitting a big order. Two 12-piece nuggets, two fries, a mac and cheese, two drinks, and two cookies.", items:['ng','ng','fr','fr','mc','dk','dk','ck','ck'] },
     ],
     carter: [
-      { greeting:"What's up Justin! Just something quick.", items:['cs','dk'] },
+      { greeting:"What's up Justin! Just a spicy deluxe, fries, lemonade, and a brownie.", items:['ss','fr','lm','br'] },
     ],
     reagan: [
-      { greeting:"Hey Justin... *smiles* Can I get a salad and lemonade?", items:['sa','lm'] },
-      { greeting:"Hi Justin! You look... busy. Sandwich and fries please.", items:['cs','fr','lm'] },
+      { greeting:"Hey Justin... *smiles* Can I get a side salad, fruit cup, and lemonade? Oh and an icedream cone, I'm treating myself.", items:['sa','fs','lm','cm'] },
+      { greeting:"Hi Justin! You look... flustered. I'll have a grilled sandwich, waffle fries, and a lemonade please.", items:['gs','fr','lm'] },
     ],
     navaneeth: [
-      { greeting:"JUSTIN! BRO! I NEED FOOD RIGHT NOW I'M SO HUNGRY!!", items:['ss','ng','fr','fr','dk','ms','ck'] },
-      { greeting:"YO JUSTIN! GET ME EVERYTHING! I just ran 8 miles!", items:['cs','st','fr','mc','dk','lm'] },
+      { greeting:"JUSTIN! BRO! I NEED FOOD RIGHT NOW!! Spicy deluxe, 12-piece nuggets, TWO fries, mac and cheese, milkshake, lemonade, a cookie AND a brownie!! I JUST RAN 10 MILES!!", items:['ss','ng','fr','fr','mc','ms','lm','ck','br'] },
+      { greeting:"YO JUSTIN!! CFA sandwich, strips, waffle fries, mac and cheese, drink, lemonade, icedream cone! DON'T FORGET THE ICEDREAM!!", items:['cs','st','fr','mc','dk','lm','cm'] },
     ],
-    walter: [{ greeting:"Hey man, sandwich combo.", items:['cs','fr','dk'] }],
-    ranel: [{ greeting:"What's good Justin, nuggets please.", items:['ng','fr','lm'] }],
-    declan: [{ greeting:"Justin! Spicy sandwich, extra pickles!", items:['ss','fr','dk'] }],
+    walter: [{ greeting:"Hey man, sandwich combo and a brownie. And actually add a fruit cup.", items:['cs','fr','dk','br','fs'] }],
+    ranel: [{ greeting:"What's good Justin, 12-piece nuggets, fries, lemonade, and two cookies.", items:['ng','fr','lm','ck','ck'] }],
+    declan: [{ greeting:"Justin! Spicy deluxe, extra pickles, waffle fries, iced coffee, and an icedream!", items:['ss','fr','ic','cm'] }],
     katy: [
-      { greeting:"OH MY GOD JUSTIN HI!! Milkshake? No wait, lemonade. No WAIT, BOTH! And nuggets! And a cookie!", items:['ms','lm','ng','ck'] },
-      { greeting:"JUSTINNNN! Salad because healthy but ALSO fries because BALANCE right??", items:['sa','fr','lm'] },
+      { greeting:"OH MY GOD JUSTIN HI!! Okay so milkshake, no wait lemonade, NO WAIT BOTH! And nuggets! And a cookie! And a brownie! And waffle fries! Actually get me a fruit cup too I need vitamins or whatever!", items:['ms','lm','ng','ck','br','fr','fs'] },
+      { greeting:"JUSTINNNN!! Salad because I'm being healthy but ALSO fries AND mac and cheese because like BALANCE right?? And an icedream cone! And an iced coffee!", items:['sa','fr','mc','cm','ic'] },
     ],
   },
 
   lukeRoasts: [
-    "Bro, you run a 4:20 mile but you can't run a register?",
-    "Justin... that's not even close to what they ordered.",
-    "I've seen faster service at the DMV, and you're a runner.",
-    "Do you bag groceries like you run? All over the place.",
-    "Even Jacob in the back is questioning your life choices.",
-    "How are you this bad? I'm impressed by how bad you are.",
-    "If being bad at this was Olympic, you'd finally medal.",
-    "Justin, you're making me look bad to corporate.",
-    "Customers are asking if you're new. You've been here 3 months.",
-    "Reagan is watching... and you just did THAT. Tough scene.",
+    "Bro, you run a 4:20 mile but you can't run a register? Pick a struggle.",
+    "Justin. JUSTIN. That is literally the opposite of what they ordered. Every single item is wrong.",
+    "I've seen faster service from a broken vending machine. And you call yourself a runner.",
+    "How do you bag this wrong? It's putting FOOD in a BAG. A toddler could do this.",
+    "Even Jacob in the back just texted me asking if you're okay. Jacob doesn't even LIKE you.",
+    "How are you this catastrophically bad? Like I genuinely want to study you. For science.",
+    "If being terrible at Chick-fil-A was a sport, you'd have a full-ride scholarship.",
+    "Justin, the owner called. About YOU specifically. That's never good.",
+    "Customers are asking if you're having a medical emergency. You've been here 3 MONTHS.",
+    "Reagan just watched you do that. She looked away. Physically turned her head, Justin.",
+    "I put my reputation on the line hiring you. I am currently regretting every life choice I've ever made.",
+    "That customer just asked if we hire from a prison work-release program. Because of YOU.",
+    "You just cost us a 5-star review. That customer has 50,000 Yelp followers, Justin.",
+    "I don't even have words. Jacob has words though - he said 'tell Justin he's cooked.' His words not mine.",
+    "My 8-year-old sister could do this job better. She's asked to try. I'm considering it.",
+    "The drive-through camera footage of what you just did is going to corporate. Enjoy that.",
   ],
   lukeGood: [
-    "Okay not bad Justin! Maybe there's hope for you.",
-    "When you actually focus, you're almost competent!",
-    "That was solid! Don't let it go to your head.",
-    "You didn't mess that up! I'm genuinely shocked.",
+    "Okay... not completely terrible, Justin. I'll take it.",
+    "When you focus, you're almost at a baseline human competency level. Good job.",
+    "Wow, you got ONE right. Don't celebrate too hard.",
+    "I'm genuinely shocked. Write this date down, you did something correctly.",
   ],
 
   andyAllegations: [
@@ -924,18 +938,24 @@ const G = {
   ],
 
   angryLines: [
-    "Excuse me?? This is NOT what I ordered!",
-    "I've been waiting 15 minutes! What is going on?!",
-    "I asked for NO pickles. There are EXTRA pickles!",
-    "Can I speak to a manager? This is ridiculous.",
-    "Worst service I've ever had. Leaving a review!",
+    "Excuse me?? This is NOT what I ordered! I want to speak to whoever is in charge RIGHT NOW.",
+    "I have been standing here for FIFTEEN MINUTES. I could have driven to the one across town and back by now!",
+    "I specifically said NO pickles. There are SO MANY pickles. It's like a pickle sandwich with chicken on the side!",
+    "Get me your manager. NOW. This is the most incompetent service I have EVER experienced in my entire life.",
+    "I'm leaving a one-star review. Actually I'm leaving ZERO stars. I'll find a way. My followers will hear about this.",
+    "Are you new? Actually don't answer that, I don't care. Fix my order or I'm calling corporate.",
+    "My food is cold. My drink is wrong. And I'm pretty sure you charged me twice. WHAT is happening here??",
+    "I asked for a GRILLED sandwich. This is SPICY. I'm ALLERGIC to spicy. Do you even LISTEN?!",
+    "I watched you make my order and you looked confused the ENTIRE time. That's not reassuring!",
+    "My kids are screaming in the car because their nuggets have been 'coming right up' for 20 minutes!!",
   ],
   angryChoices: [
-    { text:"I'm so sorry, let me fix that right away!", q:'good', e:0.3 },
-    { text:"My pleasure! I'll get a corrected order.", q:'good', e:0.4 },
-    { text:"Sir/Ma'am please calm down...", q:'bad', e:-0.3 },
-    { text:"That's actually what you ordered but okay...", q:'bad', e:-0.5 },
-    { text:"*nervous laugh* Haha yeah my bad...", q:'neutral', e:0.0 },
+    { text:"I'm so sorry about that, let me fix it right away!", q:'good', e:0.2 },
+    { text:"My pleasure! I sincerely apologize, I'll get this corrected.", q:'good', e:0.3 },
+    { text:"Okay calm down it's just chicken...", q:'bad', e:-0.6 },
+    { text:"That's literally what you ordered. I heard you say it.", q:'bad', e:-0.7 },
+    { text:"*freezes up and says nothing*", q:'bad', e:-0.4 },
+    { text:"Uhh... do you want to speak to Luke? He's right there...", q:'neutral', e:-0.1 },
   ],
 
   // --- INIT ---
@@ -1100,7 +1120,8 @@ const G = {
 
   arriveAtStation(station) {
     if (station !== this.availableStation) {
-      this.toast("Wrong station! Luke told you to go to " + Restaurant.stations[this.availableStation]?.label, 'warn');
+      this.toast("WRONG STATION! Luke said " + Restaurant.stations[this.availableStation]?.label + "!", 'bad');
+      this.addStrike(0.25);
       return;
     }
     this.availableStation = null;
@@ -1110,7 +1131,7 @@ const G = {
     // Patience drain
     clearInterval(this.patienceTimer);
     this.patienceTimer = setInterval(() => {
-      this.customerPatience = Math.max(0, this.customerPatience - 1.5);
+      this.customerPatience = Math.max(0, this.customerPatience - 2.2);
       this.updateHUD();
       if (this.customerPatience <= 0) {
         clearInterval(this.patienceTimer);
@@ -1149,37 +1170,65 @@ const G = {
   },
 
   // ============================
-  //  REGISTER MINIGAME
+  //  REGISTER MINIGAME (CFA POS)
   // ============================
   mgRegister(cust) {
     let entered = [];
     const items = cust.order.items;
+    let activeCat = 'entree';
+    const cats = {entree:'Entrees',side:'Sides',bev:'Beverages',dessert:'Desserts'};
+    const orderNum = Math.floor(Math.random()*900)+100;
 
     this.showDialog(cust.key, cust.order.greeting, [
-      { text:"Welcome to Chick-fil-A! Go ahead!", action: () => render() },
-      { text:"My pleasure! What can I get you?", action: () => render() },
+      { text:"Welcome to Chick-fil-A! Go ahead.", action: () => render() },
+      { text:"My pleasure, what can I get you?", action: () => render() },
     ]);
 
     const render = () => {
-      const display = items.map(id => this.menu.find(m=>m.id===id)?.short||id).join(', ');
-      const area = this.openMG('REGISTER', 'Ring up: ' + display);
+      const area = this.openMG('REGISTER', `Order #${orderNum} for ${cust.name}`);
       const wrap = document.createElement('div');
       wrap.className = 'reg-screen';
-      wrap.innerHTML = `<div class="reg-display" id="rd">Tap items to ring up...</div><div class="menu-grid" id="rm"></div><div class="reg-acts"><button class="btn btn-r" id="rc" style="font-size:.78em">Clear</button><button class="btn" style="background:var(--success);color:#fff;font-size:.78em" id="rs">Submit</button></div>`;
+      wrap.innerHTML = `
+        <div class="reg-header"><h3>Chick-fil-A POS</h3><span class="order-num">Order #${orderNum}</span></div>
+        <div class="reg-display" id="rd"><span class="reg-empty">No items entered...</span></div>
+        <div class="reg-total" id="rtotal"><span>Items: 0</span><span>Needed: ${items.length}</span></div>
+        <div class="reg-cats" id="rcats"></div>
+        <div class="menu-grid" id="rm"></div>
+        <div class="reg-acts">
+          <button class="btn btn-r" id="rc">VOID</button>
+          <button class="btn" style="background:var(--success);color:#fff" id="rs">SEND ORDER</button>
+        </div>`;
       area.appendChild(wrap);
 
-      const grid = document.getElementById('rm');
-      this.menu.forEach(m => {
-        const b = document.createElement('div');
-        b.className = 'menu-btn';
-        b.innerHTML = `<span class="mi">${m.short.slice(0,2)}</span>${m.short}`;
-        b.onclick = () => { entered.push(m.id); updDisp(); };
-        grid.appendChild(b);
+      // Build category tabs
+      const catsEl = document.getElementById('rcats');
+      Object.entries(cats).forEach(([k,v]) => {
+        const tab = document.createElement('div');
+        tab.className = `reg-cat ${k===activeCat?'active':''}`;
+        tab.textContent = v;
+        tab.onclick = () => { activeCat = k; renderMenu(); document.querySelectorAll('.reg-cat').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); };
+        catsEl.appendChild(tab);
       });
+
+      const renderMenu = () => {
+        const grid = document.getElementById('rm');
+        grid.innerHTML = '';
+        this.menu.filter(m=>m.cat===activeCat).forEach(m => {
+          const b = document.createElement('div');
+          b.className = 'menu-btn';
+          b.innerHTML = `<span class="mi"></span>${m.name}`;
+          b.onclick = () => { entered.push(m.id); updDisp(); };
+          grid.appendChild(b);
+        });
+      };
+      renderMenu();
 
       const updDisp = () => {
         const d = document.getElementById('rd');
-        d.textContent = entered.length ? entered.map(id=>this.menu.find(m=>m.id===id)?.short||id).join('\n') : 'Tap items to ring up...';
+        const t = document.getElementById('rtotal');
+        if (!entered.length) { d.innerHTML = '<span class="reg-empty">No items entered...</span>'; }
+        else { d.innerHTML = entered.map(id=>{const m=this.menu.find(x=>x.id===id);return `<div class="reg-item"><span>${m?.name||id}</span><span>1</span></div>`;}).join(''); }
+        t.innerHTML = `<span>Items: ${entered.length}</span><span style="color:${entered.length===items.length?'var(--success)':entered.length>items.length?'var(--danger)':'#333'}">Needed: ${items.length}</span>`;
       };
       document.getElementById('rc').onclick = () => { entered=[]; updDisp(); };
       document.getElementById('rs').onclick = () => {
@@ -1192,10 +1241,11 @@ const G = {
           this.toast('Order correct! +'+(100+Math.round(this.customerPatience)),'good');
           this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
         } else {
-          this.ordersMessed++; this.toast('Wrong order!','bad');
+          this.ordersMessed++; this.toast('Wrong order sent!','bad');
+          // WRONG = customer blows up, then Luke destroys you, then strike
           this.showDialog(cust.key, R(this.angryLines), this.angryChoices.map(c=>({text:c.text,action:()=>{
-            if(c.e>0){this.score+=Math.round(c.e*50);this.toast('+'+Math.round(c.e*50),'good');}else{this.addStrike(0.5);}
-            this.showDialog('luke',R(this.lukeRoasts),[],()=>this.nextRound());
+            if(c.e>0){this.score+=Math.round(c.e*30);}else{this.addStrike(0.5);}
+            this.showDialog('luke',R(this.lukeRoasts),[],()=>{this.addStrike(0.5);this.nextRound();});
           }})));
         }
         this.updateHUD();
