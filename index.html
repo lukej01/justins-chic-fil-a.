@@ -1,1 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#E51636">
+<title>Justin's Chick-fil-A Shift</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
 
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+
+:root {
+  --cfa-red: #E51636;
+  --cfa-dark-red: #C41230;
+  --cfa-blue: #004F71;
+  --cfa-white: #FFFFFF;
+  --cfa-cream: #FFF5E1;
+  --cfa-gold: #FFD700;
+  --cfa-brown: #8B4513;
+  --danger: #FF3333;
+  --success: #28A745;
+  --warning: #FFC107;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+  background: #1a1a2e;
+  touch-action: manipulation;
+}
+
+#game {
+  width: 100%; height: 100%;
+  position: relative;
+  overflow: hidden;
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--cfa-cream);
+}
+
+/* ========== SCREENS ========== */
+.screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ========== TITLE SCREEN ========== */
+#title-screen {
+  background: linear-gradient(180deg, var(--cfa-red) 0%, #B01030 60%, #8B0A20 100%);
+  align-items: center; justify-content: center; text-align: center; color: white;
+}
+#title-screen .logo-container {
+  animation: floatY 3s ease-in-out infinite;
+}
+#title-screen .logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.4em; line-height: 1.1;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+  margin-bottom: 8px;
+}
+#title-screen .subtitle {
+  font-size: 1em; opacity: 0.9;
+  font-weight: 700; letter-spacing: 1px;
+}
+#title-screen .character-preview {
+  width: 150px; height: 150px; margin: 24px auto;
+  background: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  font-size: 80px;
+  animation: pulse 2s ease-in-out infinite;
+}
+.btn {
+  padding: 16px 48px; border: none; border-radius: 50px;
+  font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: 1.1em; cursor: pointer; transition: all 0.2s;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.btn:active { transform: scale(0.95); }
+.btn-primary {
+  background: white; color: var(--cfa-red);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.btn-danger { background: var(--danger); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-small { padding: 10px 24px; font-size: 0.85em; }
+
+#start-btn { margin-top: 32px; }
+
+/* ========== HUD ========== */
+#hud {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 12px 16px; z-index: 50;
+  background: linear-gradient(180deg, rgba(229,22,54,0.95) 0%, rgba(229,22,54,0.85) 100%);
+  display: none; align-items: center; justify-content: space-between;
+  color: white; font-weight: 700; font-size: 0.85em;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+#hud.visible { display: flex; }
+.hud-item { display: flex; align-items: center; gap: 4px; }
+.hud-icon { font-size: 1.1em; }
+#patience-bar-container {
+  width: 60px; height: 8px; background: rgba(255,255,255,0.3);
+  border-radius: 4px; overflow: hidden;
+}
+#patience-bar {
+  height: 100%; background: var(--success); border-radius: 4px;
+  transition: width 0.3s, background 0.3s;
+}
+#app-btn {
+  background: white; color: var(--cfa-red); border: none;
+  padding: 4px 10px; border-radius: 12px; font-weight: 800;
+  font-size: 0.75em; font-family: 'Nunito', sans-serif; cursor: pointer;
+}
+
+/* ========== MAIN GAME SCREEN ========== */
+#game-screen {
+  background: var(--cfa-cream);
+}
+.restaurant-bg {
+  flex: 1; display: flex; flex-direction: column;
+  padding-top: 56px;
+}
+
+/* ========== DIALOG BOX ========== */
+#dialog-box {
+  display: none; position: absolute; bottom: 0; left: 0; right: 0;
+  background: white; border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+  padding: 20px; z-index: 100;
+  max-height: 70vh; overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+#dialog-box.visible { display: block; }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.dialog-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+}
+.dialog-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+}
+.dialog-name {
+  font-weight: 800; font-size: 1em; color: var(--cfa-red);
+}
+.dialog-text {
+  font-size: 0.95em; line-height: 1.5; color: #333;
+  margin-bottom: 16px; min-height: 40px;
+}
+.dialog-choices {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.choice-btn {
+  width: 100%; padding: 14px 16px; border: 2px solid #eee;
+  border-radius: 14px; background: white; text-align: left;
+  font-family: 'Nunito', sans-serif; font-weight: 700;
+  font-size: 0.9em; color: #333; cursor: pointer;
+  transition: all 0.2s;
+}
+.choice-btn:active { background: var(--cfa-red); color: white; border-color: var(--cfa-red); }
+.choice-btn.good { border-left: 4px solid var(--success); }
+.choice-btn.bad { border-left: 4px solid var(--danger); }
+.choice-btn.neutral { border-left: 4px solid var(--warning); }
+
+/* ========== MINIGAME AREA ========== */
+.minigame-area {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 16px; position: relative;
+}
+
+.minigame-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3em; color: var(--cfa-red);
+  text-align: center; margin-bottom: 12px;
+}
+
+.minigame-instruction {
+  font-size: 0.85em; color: #666; text-align: center;
+  margin-bottom: 16px; font-weight: 600;
+}
+
+/* ========== REGISTER MINIGAME ========== */
+.register-screen {
+  width: 100%; max-width: 360px; background: white;
+  border-radius: 16px; padding: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.order-display {
+  background: #1a1a2e; color: #0f0; border-radius: 8px;
+  padding: 12px; font-family: monospace; font-size: 0.85em;
+  min-height: 80px; margin-bottom: 12px;
+}
+.menu-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.menu-item {
+  background: var(--cfa-cream); border: 2px solid #ddd;
+  border-radius: 12px; padding: 10px 4px; text-align: center;
+  font-size: 0.7em; font-weight: 700; cursor: pointer;
+  transition: all 0.15s;
+}
+.menu-item:active { background: var(--cfa-red); color: white; transform: scale(0.95); }
+.menu-item .item-emoji { font-size: 1.8em; display: block; margin-bottom: 2px; }
+.register-actions {
+  display: flex; gap: 8px; margin-top: 12px;
+}
+.register-actions .btn { flex: 1; padding: 12px; font-size: 0.85em; }
+
+/* ========== BAGGING MINIGAME ========== */
+.bag-area {
+  width: 100%; max-width: 360px; position: relative;
+}
+.conveyor {
+  display: flex; gap: 10px; overflow-x: auto; padding: 12px;
+  background: #ddd; border-radius: 12px; margin-bottom: 16px;
+  min-height: 80px; align-items: center;
+}
+.food-item {
+  width: 64px; height: 64px; background: white;
+  border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 2em; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;
+  transition: all 0.2s; border: 2px solid transparent;
+}
+.food-item.selected { border-color: var(--cfa-red); transform: scale(1.1); }
+.food-item:active { transform: scale(0.9); }
+.bag-target {
+  width: 120px; height: 140px; margin: 0 auto;
+  background: linear-gradient(180deg, #D2691E 0%, #8B4513 100%);
+  border-radius: 4px 4px 12px 12px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5em; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.bag-target::before {
+  content: ''; position: absolute; top: -8px; left: -4px; right: -4px;
+  height: 16px; background: #D2691E; border-radius: 8px 8px 0 0;
+}
+.bag-contents {
+  display: flex; flex-wrap: wrap; gap: 2px; padding: 8px;
+  justify-content: center;
+}
+.bag-contents .mini-item { font-size: 1.2em; }
+.bag-order-list {
+  background: white; border-radius: 12px; padding: 12px;
+  margin-bottom: 12px; font-size: 0.85em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.bag-order-list h3 { color: var(--cfa-red); font-size: 0.9em; margin-bottom: 6px; }
+
+/* ========== CURBSIDE MINIGAME ========== */
+.parking-lot {
+  width: 100%; max-width: 360px;
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.parking-spot {
+  background: #555; border-radius: 12px; padding: 16px;
+  text-align: center; color: white; min-height: 100px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px; cursor: pointer;
+  border: 3px dashed #777; transition: all 0.2s;
+}
+.parking-spot.has-car {
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  border-style: solid; border-color: #4a90d9;
+}
+.parking-spot.has-car:active { transform: scale(0.95); }
+.parking-spot .car-emoji { font-size: 2.2em; }
+.parking-spot .spot-label { font-size: 0.75em; font-weight: 700; opacity: 0.8; }
+.parking-spot .car-name { font-size: 0.8em; font-weight: 700; }
+.parking-spot .car-order { font-size: 0.7em; opacity: 0.8; }
+
+/* ========== CFA APP SCREEN ========== */
+#app-screen {
+  background: white; z-index: 200;
+}
+.app-header {
+  background: var(--cfa-red); color: white; padding: 20px 16px;
+  text-align: center;
+}
+.app-header h2 { font-family: 'Fredoka One', cursive; font-size: 1.3em; }
+.app-header .employee-name { font-size: 0.9em; opacity: 0.9; margin-top: 4px; }
+.app-body { flex: 1; overflow-y: auto; padding: 16px; }
+.stat-card {
+  background: #f8f8f8; border-radius: 16px; padding: 16px;
+  margin-bottom: 12px;
+}
+.stat-card h3 { font-size: 0.85em; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.stat-value { font-size: 2em; font-weight: 900; color: var(--cfa-red); }
+.stat-bar-bg {
+  width: 100%; height: 12px; background: #eee; border-radius: 6px;
+  overflow: hidden; margin-top: 8px;
+}
+.stat-bar-fill {
+  height: 100%; border-radius: 6px; transition: width 0.5s;
+}
+.status-badge {
+  display: inline-block; padding: 6px 16px; border-radius: 20px;
+  font-weight: 800; font-size: 0.85em; margin-top: 8px;
+}
+.status-active { background: #e8f5e9; color: var(--success); }
+.status-warning { background: #fff3e0; color: #F57C00; }
+.status-danger { background: #ffebee; color: var(--danger); }
+.status-terminated { background: #000; color: var(--danger); font-size: 1.2em; letter-spacing: 2px; }
+.app-close-btn {
+  width: calc(100% - 32px); margin: 16px;
+  padding: 14px; border: none; border-radius: 14px;
+  background: var(--cfa-red); color: white;
+  font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: 1em; cursor: pointer;
+}
+
+/* ========== FIRED SCREEN ========== */
+#fired-screen {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+  align-items: center; justify-content: center; text-align: center;
+  color: white; padding: 32px;
+}
+#fired-screen .fired-icon { font-size: 80px; margin-bottom: 16px; }
+#fired-screen h1 {
+  font-family: 'Fredoka One', cursive; font-size: 2.2em;
+  color: var(--danger); margin-bottom: 8px;
+}
+#fired-screen .fired-reason {
+  font-size: 0.95em; opacity: 0.7; margin-bottom: 24px; line-height: 1.5;
+}
+#fired-screen .final-stats {
+  background: rgba(255,255,255,0.05); border-radius: 16px;
+  padding: 20px; margin-bottom: 24px; width: 100%;
+}
+#fired-screen .final-stats p {
+  display: flex; justify-content: space-between;
+  padding: 6px 0; font-size: 0.9em; opacity: 0.8;
+}
+#fired-screen .final-stats span { font-weight: 800; }
+
+/* ========== OUTSIDE iPAD MINIGAME ========== */
+.ipad-frame {
+  width: 100%; max-width: 340px; background: #1a1a2e;
+  border-radius: 20px; padding: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.ipad-screen {
+  background: white; border-radius: 12px; padding: 16px;
+  min-height: 300px;
+}
+.ipad-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--cfa-red);
+}
+.ipad-header h3 { font-size: 0.9em; color: var(--cfa-red); }
+.ipad-header .car-num { background: var(--cfa-blue); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75em; font-weight: 800; }
+.ipad-customer-bubble {
+  background: #f0f0f0; border-radius: 14px 14px 14px 4px;
+  padding: 12px; margin-bottom: 10px; font-size: 0.85em; color: #333;
+  line-height: 1.4;
+}
+.ipad-menu-scroll {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+  max-height: 180px; overflow-y: auto; margin-bottom: 12px;
+}
+.ipad-menu-item {
+  display: flex; align-items: center; gap: 6px;
+  background: #f8f8f8; border: 2px solid #eee; border-radius: 10px;
+  padding: 8px; font-size: 0.75em; font-weight: 700; cursor: pointer;
+  transition: all 0.15s;
+}
+.ipad-menu-item:active { background: var(--cfa-red); color: white; border-color: var(--cfa-red); }
+.ipad-menu-item .ipad-item-emoji { font-size: 1.4em; }
+.ipad-entered {
+  background: var(--cfa-cream); border-radius: 10px; padding: 8px;
+  min-height: 36px; margin-bottom: 10px; font-size: 0.8em; color: #666;
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+.ipad-chip {
+  background: var(--cfa-red); color: white; padding: 3px 10px;
+  border-radius: 20px; font-size: 0.85em; font-weight: 700;
+}
+.weather-badge {
+  position: absolute; top: 70px; right: 16px;
+  background: rgba(0,0,0,0.5); color: white;
+  padding: 4px 10px; border-radius: 10px;
+  font-size: 0.75em; font-weight: 700; z-index: 10;
+}
+
+/* ========== DRIVE-THROUGH WINDOW MINIGAME ========== */
+.dt-window {
+  width: 100%; max-width: 360px; position: relative;
+}
+.dt-window-frame {
+  background: linear-gradient(180deg, #555 0%, #444 100%);
+  border-radius: 16px 16px 0 0; padding: 16px;
+  border: 4px solid #333; border-bottom: none;
+  min-height: 160px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+.dt-car-view {
+  font-size: 3.5em; margin-bottom: 8px;
+  animation: carPull 0.5s ease-out;
+}
+@keyframes carPull {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.dt-customer-name {
+  color: white; font-weight: 800; font-size: 1em; margin-bottom: 4px;
+}
+.dt-customer-says {
+  color: #ccc; font-size: 0.8em; font-style: italic;
+}
+.dt-counter {
+  background: #8B4513; padding: 16px; border-radius: 0 0 16px 16px;
+  border: 4px solid #6B3410; border-top: 2px solid #A0522D;
+}
+.dt-items-tray {
+  display: flex; gap: 8px; overflow-x: auto;
+  padding: 8px; background: rgba(255,255,255,0.1);
+  border-radius: 10px; margin-bottom: 12px; min-height: 70px;
+  align-items: center;
+}
+.dt-tray-item {
+  width: 56px; height: 56px; background: white;
+  border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-size: 1.8em; flex-shrink: 0;
+  cursor: pointer; transition: all 0.15s;
+  border: 2px solid transparent;
+}
+.dt-tray-item.handed { opacity: 0.3; transform: scale(0.8); pointer-events: none; }
+.dt-tray-item:active { transform: scale(0.9); }
+.dt-handed-list {
+  display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
+  min-height: 24px; margin-bottom: 8px;
+}
+.dt-handed-chip {
+  background: rgba(255,255,255,0.2); padding: 2px 8px;
+  border-radius: 8px; font-size: 0.8em; color: white;
+}
+.dt-order-ticket {
+  background: white; border-radius: 8px; padding: 8px 12px;
+  font-size: 0.8em; margin-bottom: 10px; color: #333;
+}
+.dt-order-ticket strong { color: var(--cfa-red); }
+
+/* ========== NOTIFICATION TOAST ========== */
+.toast {
+  position: absolute; top: 60px; left: 16px; right: 16px;
+  padding: 14px 16px; border-radius: 14px; color: white;
+  font-weight: 700; font-size: 0.85em; z-index: 300;
+  animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.2s forwards;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  display: flex; align-items: center; gap: 8px;
+}
+.toast-good { background: var(--success); }
+.toast-bad { background: var(--danger); }
+.toast-warning { background: var(--warning); color: #333; }
+.toast-andy { background: #6f42c1; }
+.toast-luke { background: var(--cfa-blue); }
+
+/* ========== SCOLDING OVERLAY ========== */
+.scold-overlay {
+  position: absolute; inset: 0; z-index: 250;
+  background: rgba(0,0,0,0.85); display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; text-align: center; color: white;
+  animation: fadeIn 0.3s;
+}
+.scold-overlay .scold-emoji { font-size: 64px; margin-bottom: 16px; }
+.scold-overlay h2 { font-family: 'Fredoka One', cursive; color: var(--danger); font-size: 1.5em; margin-bottom: 12px; }
+.scold-overlay p { font-size: 0.95em; line-height: 1.5; opacity: 0.9; margin-bottom: 20px; }
+
+/* ========== ANIMATIONS ========== */
+@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-20px); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+.shake { animation: shake 0.4s ease-in-out; }
+
+/* ========== TRANSITION ========== */
+.scene-transition {
+  position: absolute; inset: 0; background: var(--cfa-red);
+  z-index: 500; display: flex; align-items: center; justify-content: center;
+  color: white; font-family: 'Fredoka One', cursive; font-size: 1.5em;
+  text-align: center; padding: 32px;
+}
+</style>
+</head>
+<body>
+<div id="game">
+
+  <!-- ===== TITLE SCREEN ===== -->
+  <div id="title-screen" class="screen active">
+    <div class="logo-container">
+      <div class="logo">Justin's<br>Chick-fil-A<br>Shift</div>
+      <div class="subtitle">Can you survive the shift?</div>
+    </div>
+    <div class="character-preview">🧑‍🍳</div>
+    <p style="font-size:0.85em;opacity:0.8;margin-top:8px;font-weight:600;">Starring Justin Cook</p>
+    <p style="font-size:0.7em;opacity:0.5;margin-top:4px;">Distance Runner • Terrible Employee</p>
+    <button class="btn btn-primary" id="start-btn" onclick="Game.start()">Start Shift</button>
+  </div>
+
+  <!-- ===== MAIN GAME SCREEN ===== -->
+  <div id="game-screen" class="screen">
+    <div class="restaurant-bg">
+      <div class="minigame-area" id="minigame-area"></div>
+    </div>
+  </div>
+
+  <!-- ===== HUD ===== -->
+  <div id="hud">
+    <div class="hud-item"><span class="hud-icon">⭐</span><span id="hud-score">0</span></div>
+    <div class="hud-item"><span class="hud-icon">😊</span>
+      <div id="patience-bar-container"><div id="patience-bar" style="width:100%"></div></div>
+    </div>
+    <div class="hud-item"><span class="hud-icon">⚠️</span><span id="hud-strikes">0/3</span></div>
+    <button id="app-btn" onclick="Game.toggleApp()">📱 App</button>
+  </div>
+
+  <!-- ===== DIALOG BOX ===== -->
+  <div id="dialog-box">
+    <div class="dialog-header">
+      <div class="dialog-avatar" id="dialog-avatar">😀</div>
+      <div class="dialog-name" id="dialog-name">Luke</div>
+    </div>
+    <div class="dialog-text" id="dialog-text"></div>
+    <div class="dialog-choices" id="dialog-choices"></div>
+  </div>
+
+  <!-- ===== CFA APP SCREEN ===== -->
+  <div id="app-screen" class="screen">
+    <div class="app-header">
+      <h2>🐔 CFA Team Member</h2>
+      <div class="employee-name">Justin Cook • Team Member</div>
+    </div>
+    <div class="app-body" id="app-body"></div>
+    <button class="app-close-btn" onclick="Game.toggleApp()">Close App</button>
+  </div>
+
+  <!-- ===== FIRED SCREEN ===== -->
+  <div id="fired-screen" class="screen">
+    <div class="fired-icon">🚫</div>
+    <h1>TERMINATED</h1>
+    <div class="fired-reason" id="fired-reason">Your employment has been terminated.</div>
+    <div class="final-stats" id="final-stats"></div>
+    <button class="btn btn-danger" onclick="Game.restart()">Try Another Shift</button>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+//  JUSTIN'S CHICK-FIL-A SHIFT — FULL GAME ENGINE
+// ============================================================
+
+const Game = {
+  // --- STATE ---
+  score: 0,
+  strikes: 0,
+  maxStrikes: 3,
+  customerPatience: 100,
+  customersServed: 0,
+  ordersCorrect: 0,
+  ordersMessed: 0,
+  currentRound: 0,
+  totalRounds: 12,
+  isRunning: false,
+  andyChance: 0.2,
+  patienceTimer: null,
+  currentMinigame: null,
+  scoldQueue: [],
+
+  // --- CHARACTERS ---
+  characters: {
+    justin: { name: 'Justin', emoji: '👱', color: '#4a90d9', desc: 'Blonde hair, blue eyes, distance runner, terrible at this job' },
+    luke: { name: 'Luke', emoji: '👨‍💼', color: '#004F71', desc: 'Shift leader, brunette, blue eyes, attractive, makes fun of Justin' },
+    jacob: { name: 'Jacob', emoji: '👨‍🍳', color: '#8B4513', desc: 'Kitchen staff, makes the food' },
+    andy: { name: 'Andy', emoji: '👨‍🦱', color: '#6f42c1', desc: 'Brunette, curly hair, brown eyes, trying to get Justin fired' },
+    hudson: { name: 'Coach Hudson', emoji: '🧔', color: '#2c3e50', desc: 'Cross country coach, 50s' },
+    gentry: { name: 'Gentry', emoji: '🧑', color: '#e67e22', desc: 'Mixed boy' },
+    henry: { name: 'Henry', emoji: '👦', color: '#27ae60', desc: 'White, curly brown hair, brown eyes' },
+    black: { name: 'Black', emoji: '👦', color: '#3498db', desc: 'Twin, blonde hair' },
+    carter: { name: 'Carter', emoji: '👦', color: '#e74c3c', desc: 'Twin, reddish brunette' },
+    reagan: { name: 'Reagan', emoji: '👩', color: '#e91e63', desc: 'Brunette, Justin\'s love interest' },
+    navaneeth: { name: 'Navaneeth', emoji: '🧑', color: '#f39c12', desc: 'Indian, lots of hair, loud and crazy' },
+    walter: { name: 'Walter', emoji: '🧑', color: '#1abc9c', desc: 'Regular customer' },
+    ranel: { name: 'Ranel', emoji: '🧑', color: '#9b59b6', desc: 'Regular customer' },
+    declan: { name: 'Declan', emoji: '🧑', color: '#2ecc71', desc: 'Regular customer' },
+    katy: { name: 'Katy', emoji: '👩‍🦰', color: '#ff6b6b', desc: 'Loud annoying red head girl' },
+  },
+
+  // --- MENU ITEMS ---
+  menu: [
+    { id: 'chicken_sandwich', name: 'Chicken Sandwich', emoji: '🍔', short: 'Ch. Sand.' },
+    { id: 'spicy_sandwich', name: 'Spicy Sandwich', emoji: '🌶️', short: 'Spicy Sand.' },
+    { id: 'grilled_sandwich', name: 'Grilled Sandwich', emoji: '🥪', short: 'Grill Sand.' },
+    { id: 'nuggets', name: 'Nuggets', emoji: '🍗', short: 'Nuggets' },
+    { id: 'strips', name: 'Strips', emoji: '🍖', short: 'Strips' },
+    { id: 'fries', name: 'Waffle Fries', emoji: '🍟', short: 'Fries' },
+    { id: 'drink', name: 'Drink', emoji: '🥤', short: 'Drink' },
+    { id: 'lemonade', name: 'Lemonade', emoji: '🍋', short: 'Lemonade' },
+    { id: 'milkshake', name: 'Milkshake', emoji: '🥛', short: 'Milkshake' },
+    { id: 'mac_cheese', name: 'Mac & Cheese', emoji: '🧀', short: 'Mac&Cheese' },
+    { id: 'salad', name: 'Salad', emoji: '🥗', short: 'Salad' },
+    { id: 'cookie', name: 'Cookie', emoji: '🍪', short: 'Cookie' },
+  ],
+
+  // --- LUKE ROASTS ---
+  lukeRoasts: [
+    "Bro, you run a 4:20 mile but you can't run a register? 💀",
+    "Justin... my guy... that's not even close to what they ordered.",
+    "I've seen faster service at the DMV, and you're a distance runner.",
+    "Do you bag groceries like you run? Because this is ALL over the place.",
+    "Even Jacob in the back is questioning your life choices right now.",
+    "How are you this bad? Like genuinely, I'm impressed by how bad you are.",
+    "If being bad at Chick-fil-A was an Olympic sport, you'd finally medal.",
+    "Justin, I like you man, but you're making me look bad to corporate.",
+    "Did you just put fries in a milkshake bag? That's... creative, I guess.",
+    "The customers are starting to ask if you're new. You've been here 3 months.",
+    "Reagan is watching... and you just did THAT. Tough scene buddy.",
+    "Your cross country coach would be disappointed in this performance.",
+  ],
+
+  lukeCompliments: [
+    "Okay okay, not bad Justin! Maybe there's hope for you yet.",
+    "See? When you actually focus, you're almost competent!",
+    "Hey that was actually solid! Don't let it go to your head though.",
+    "Wow, you didn't mess that up! I'm genuinely shocked. Good job.",
+    "Look at you! Employee of the minute right there!",
+  ],
+
+  // --- ANDY'S FALSE ALLEGATIONS ---
+  andyAllegations: [
+    { claim: "Justin was spitting in the lemonade!", defenses: [
+      { text: "That's insane Andy, I was TASTING it for quality control!", quality: 'good', effect: 0.7 },
+      { text: "Why would I do that?? I've been at the register the whole time!", quality: 'good', effect: 0.8 },
+      { text: "No I wasn't! ...okay maybe a LITTLE but it was an accident!", quality: 'bad', effect: -0.5 },
+    ]},
+    { claim: "I saw Justin eating nuggets from the warmer!", defenses: [
+      { text: "Andy literally wasn't even in the kitchen area. He's lying.", quality: 'good', effect: 0.8 },
+      { text: "Luke, you were with me the whole time. Back me up here!", quality: 'good', effect: 0.7 },
+      { text: "Those were quality samples! It's called quality assurance!", quality: 'bad', effect: -0.3 },
+    ]},
+    { claim: "Justin told a customer 'you're welcome' instead of 'my pleasure'!", defenses: [
+      { text: "I have NEVER said anything other than 'my pleasure'. Ever.", quality: 'good', effect: 0.7 },
+      { text: "Check the security cameras Andy. I dare you.", quality: 'good', effect: 0.8 },
+      { text: "Is... is that really a fireable offense though?", quality: 'bad', effect: -0.4 },
+    ]},
+    { claim: "Justin was doing stretches in the walk-in cooler for 20 minutes!", defenses: [
+      { text: "I was in there for 2 minutes grabbing sauce, Andy. Chill.", quality: 'good', effect: 0.7 },
+      { text: "Andy, you literally don't even work here. Why are you back there?", quality: 'good', effect: 0.9 },
+      { text: "My hamstrings were tight! I have a meet this weekend!", quality: 'bad', effect: -0.3 },
+    ]},
+    { claim: "Justin drew a picture of a cow on a customer's bag and wrote 'eat more chicken' badly!", defenses: [
+      { text: "That's literally the Chick-fil-A brand, Andy. The COWS say that.", quality: 'good', effect: 0.8 },
+      { text: "I would never deface company property! That's ridiculous!", quality: 'good', effect: 0.7 },
+      { text: "Okay but the customer actually loved it though...", quality: 'bad', effect: -0.2 },
+    ]},
+    { claim: "Justin was timing his register speed with a stopwatch like it was a race!", defenses: [
+      { text: "Andy is making things up. Again. As usual.", quality: 'good', effect: 0.7 },
+      { text: "I was using the TIMER on the ORDER SCREEN, Andy. It's part of the system!", quality: 'good', effect: 0.9 },
+      { text: "I mean... faster service is a GOOD thing right?", quality: 'bad', effect: -0.2 },
+    ]},
+    { claim: "Justin told a customer the ice cream machine was broken as a prank!", defenses: [
+      { text: "We don't even HAVE an ice cream machine, Andy. This isn't McDonald's.", quality: 'good', effect: 1.0 },
+      { text: "That literally never happened and everyone here knows it.", quality: 'good', effect: 0.7 },
+      { text: "I thought it WAS broken! The milkshake thing was making weird noises!", quality: 'bad', effect: -0.3 },
+    ]},
+    { claim: "Justin was doing a TikTok dance in the drive-through window!", defenses: [
+      { text: "I don't even have TikTok, Andy. I'm a serious athlete.", quality: 'good', effect: 0.7 },
+      { text: "Luke, has anyone complained about the drive-through? No? Case closed.", quality: 'good', effect: 0.8 },
+      { text: "It was ONE time and the customer loved it!", quality: 'bad', effect: -0.4 },
+    ]},
+  ],
+
+  // --- CUSTOMER DIALOGUES ---
+  customerReactions: {
+    happy: [
+      "Thank you so much! My pleasure— I mean, YOUR pleasure... you know what I mean!",
+      "Perfect order! Finally someone who knows what they're doing!",
+      "Wow, that was fast! Great job!",
+      "This is why I come to Chick-fil-A. Thanks!",
+    ],
+    angry: [
+      "Excuse me?? This is NOT what I ordered!",
+      "I've been waiting for 15 minutes! What is going on back there?!",
+      "I asked for NO pickles. There are EXTRA pickles. How?!",
+      "Can I speak to a manager? This is ridiculous.",
+      "This is the worst service I've ever had and I'm leaving a review!",
+      "Are you even paying attention or just standing there?",
+    ],
+    angryChoices: [
+      { text: '"I\'m so sorry, let me fix that for you right away!"', quality: 'good', effect: 0.3 },
+      { text: '"My pleasure! I\'ll get you a corrected order immediately."', quality: 'good', effect: 0.4 },
+      { text: '"Sir/Ma\'am this is a Chick-fil-A, please calm down..."', quality: 'bad', effect: -0.3 },
+      { text: '"That\'s actually what you ordered but okay..."', quality: 'bad', effect: -0.5 },
+      { text: '*nervous laugh* "Haha yeah my bad..."', quality: 'neutral', effect: 0.0 },
+    ],
+  },
+
+  // --- NPC SPECIFIC LINES ---
+  npcOrders: {
+    hudson: [
+      { greeting: "Justin! Shouldn't you be training right now? Anyway, I need fuel for the coaching staff meeting.", items: ['chicken_sandwich', 'fries', 'drink'] },
+      { greeting: "Cook! Your split times better be improving. Now get me a grilled sandwich, I'm watching my figure.", items: ['grilled_sandwich', 'salad', 'lemonade'] },
+    ],
+    gentry: [
+      { greeting: "Yo Justin! Lemme get uhhhh...", items: ['spicy_sandwich', 'fries', 'lemonade'] },
+      { greeting: "Bro hook me up with some nuggets, I'm starving from practice!", items: ['nuggets', 'fries', 'drink'] },
+    ],
+    henry: [
+      { greeting: "Hey Justin! What's good? Can I get my usual?", items: ['chicken_sandwich', 'mac_cheese', 'milkshake'] },
+      { greeting: "Justin! Dude! Get me some strips and a cookie, I'm in a rush!", items: ['strips', 'cookie', 'drink'] },
+    ],
+    black: [
+      { greeting: "Justin, me and Carter are splitting. Ring us up.", items: ['nuggets', 'nuggets', 'fries', 'fries', 'drink', 'drink'] },
+    ],
+    carter: [
+      { greeting: "What's up Justin! Can I just get something quick?", items: ['chicken_sandwich', 'drink'] },
+    ],
+    reagan: [
+      { greeting: "Hey Justin... *smiles* Can I get a salad and lemonade please?", items: ['salad', 'lemonade'] },
+      { greeting: "Hi Justin! You look... busy. I'll just have a sandwich and fries.", items: ['chicken_sandwich', 'fries', 'lemonade'] },
+    ],
+    navaneeth: [
+      { greeting: "JUSTIN! BRO! WHAT'S UP! I NEED FOOD RIGHT NOW I'M SO HUNGRY I MIGHT PASS OUT!!", items: ['spicy_sandwich', 'nuggets', 'fries', 'fries', 'drink', 'milkshake', 'cookie'] },
+      { greeting: "YO JUSTIN! GET ME EVERYTHING! I just ran 8 miles and I need CALORIES!", items: ['chicken_sandwich', 'strips', 'fries', 'mac_cheese', 'drink', 'lemonade'] },
+    ],
+    walter: [
+      { greeting: "Hey man, can I just get a sandwich combo?", items: ['chicken_sandwich', 'fries', 'drink'] },
+    ],
+    ranel: [
+      { greeting: "What's good Justin, let me get some nuggets.", items: ['nuggets', 'fries', 'lemonade'] },
+    ],
+    declan: [
+      { greeting: "Justin! Bro! Spicy sandwich, extra pickles!", items: ['spicy_sandwich', 'fries', 'drink'] },
+    ],
+    katy: [
+      { greeting: "OH MY GOD JUSTIN HI!! Can I get like a milkshake?? Actually no wait, a lemonade. No WAIT, a milkshake AND a lemonade! And nuggets! And a cookie!", items: ['milkshake', 'lemonade', 'nuggets', 'cookie'] },
+      { greeting: "JUSTINNNN! Okay so I want a salad because I'm being healthy but ALSO fries because like, balance, right?? RIGHT??", items: ['salad', 'fries', 'lemonade'] },
+    ],
+  },
+
+  // --- INIT ---
+  start() {
+    this.score = 0;
+    this.strikes = 0;
+    this.customersServed = 0;
+    this.ordersCorrect = 0;
+    this.ordersMessed = 0;
+    this.currentRound = 0;
+    this.customerPatience = 100;
+    this.isRunning = true;
+    this.switchScreen('game-screen');
+    document.getElementById('hud').classList.add('visible');
+    this.updateHUD();
+    this.showTransition("Starting Shift... 🐔", () => {
+      this.showDialog('luke', this.randFrom([
+        "Alright Justin, welcome to another shift. Try not to embarrass us today, okay?",
+        "Justin! You're late. Again. Like always. Let's just... try to survive today.",
+        "Okay Justin, here's the deal — customers come in, you take their order, bag their food, and bring it to their car. Simple, right? ...RIGHT?",
+      ]), [
+        { text: "I got this! Let's do it! 💪", action: () => this.nextRound() },
+        { text: "I make no promises, Luke.", action: () => { this.showToast("Luke sighs deeply...", 'luke'); setTimeout(() => this.nextRound(), 1500); } },
+      ]);
+    });
+  },
+
+  restart() {
+    this.start();
+  },
+
+  // --- SCREEN MANAGEMENT ---
+  switchScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  },
+
+  showTransition(text, callback) {
+    const div = document.createElement('div');
+    div.className = 'scene-transition';
+    div.innerHTML = text;
+    document.getElementById('game').appendChild(div);
+    setTimeout(() => { div.remove(); if (callback) callback(); }, 1200);
+  },
+
+  // --- HUD ---
+  updateHUD() {
+    document.getElementById('hud-score').textContent = this.score;
+    document.getElementById('hud-strikes').textContent = `${this.strikes}/${this.maxStrikes}`;
+    const pb = document.getElementById('patience-bar');
+    pb.style.width = this.customerPatience + '%';
+    pb.style.background = this.customerPatience > 50 ? 'var(--success)' : this.customerPatience > 25 ? 'var(--warning)' : 'var(--danger)';
+  },
+
+  // --- TOAST ---
+  showToast(msg, type = 'good') {
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    document.getElementById('game').appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  },
+
+  // --- DIALOG ---
+  showDialog(charKey, text, choices = [], onDone = null) {
+    const box = document.getElementById('dialog-box');
+    const char = this.characters[charKey] || { name: charKey, emoji: '😀', color: '#333' };
+    document.getElementById('dialog-avatar').textContent = char.emoji;
+    document.getElementById('dialog-avatar').style.background = char.color + '22';
+    document.getElementById('dialog-name').textContent = char.name;
+    document.getElementById('dialog-name').style.color = char.color;
+
+    // Typewriter effect
+    const textEl = document.getElementById('dialog-text');
+    textEl.textContent = '';
+    let i = 0;
+    const type = () => {
+      if (i < text.length) {
+        textEl.textContent += text[i]; i++;
+        setTimeout(type, 18);
+      }
+    };
+    type();
+
+    const choicesEl = document.getElementById('dialog-choices');
+    choicesEl.innerHTML = '';
+    if (choices.length > 0) {
+      choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = `choice-btn ${c.quality || ''}`;
+        btn.textContent = c.text;
+        btn.onclick = () => {
+          box.classList.remove('visible');
+          if (c.action) c.action();
+          else if (c.effect !== undefined) {
+            if (c.effect > 0) {
+              this.score += Math.round(c.effect * 50);
+              this.showToast('Good response! +' + Math.round(c.effect * 50), 'good');
+            } else {
+              this.addStrike(0.5);
+              this.showToast('Bad response...', 'bad');
+            }
+            if (onDone) onDone();
+          }
+        };
+        choicesEl.appendChild(btn);
+      });
+    } else {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = 'Continue';
+      btn.onclick = () => {
+        box.classList.remove('visible');
+        if (onDone) onDone();
+      };
+      choicesEl.appendChild(btn);
+    }
+    box.classList.add('visible');
+  },
+
+  // --- SCOLDING ---
+  showScold(title, message, callback) {
+    const overlay = document.createElement('div');
+    overlay.className = 'scold-overlay';
+    overlay.innerHTML = `
+      <div class="scold-emoji">😡</div>
+      <h2>${title}</h2>
+      <p>${message}</p>
+      <button class="btn btn-danger btn-small" id="scold-dismiss">I'm sorry...</button>
+    `;
+    document.getElementById('game').appendChild(overlay);
+    overlay.querySelector('#scold-dismiss').onclick = () => {
+      overlay.remove();
+      if (callback) callback();
+    };
+  },
+
+  // --- STRIKES & FIRING ---
+  addStrike(amount = 1) {
+    this.strikes += amount;
+    this.updateHUD();
+    if (this.strikes >= this.maxStrikes) {
+      this.getFired("You received too many strikes. Management has decided to let you go.");
+    } else if (this.strikes >= 2) {
+      this.showScold("FINAL WARNING!", `Luke: "Justin, I'm serious. One more mistake and you're done. I can't keep covering for you."`, null);
+    }
+  },
+
+  getFired(reason) {
+    this.isRunning = false;
+    document.getElementById('hud').classList.remove('visible');
+    document.getElementById('dialog-box').classList.remove('visible');
+    clearInterval(this.patienceTimer);
+
+    document.getElementById('fired-reason').textContent = reason;
+    document.getElementById('final-stats').innerHTML = `
+      <p>Customers Served <span>${this.customersServed}</span></p>
+      <p>Orders Correct <span>${this.ordersCorrect}</span></p>
+      <p>Orders Messed Up <span>${this.ordersMessed}</span></p>
+      <p>Final Score <span>${this.score}</span></p>
+      <p>Strikes <span>${this.strikes}/${this.maxStrikes}</span></p>
+    `;
+    this.switchScreen('fired-screen');
+  },
+
+  // --- CFA APP ---
+  toggleApp() {
+    const app = document.getElementById('app-screen');
+    if (app.classList.contains('active')) {
+      app.classList.remove('active');
+      return;
+    }
+    const pct = this.maxStrikes > 0 ? Math.max(0, ((this.maxStrikes - this.strikes) / this.maxStrikes) * 100) : 0;
+    const status = this.strikes >= this.maxStrikes ? 'terminated' :
+                   this.strikes >= 2 ? 'danger' :
+                   this.strikes >= 1 ? 'warning' : 'active';
+    const statusText = { active: 'ACTIVE ✓', warning: '⚠️ ON THIN ICE', danger: '🔥 FINAL WARNING', terminated: '🚫 TERMINATED' }[status];
+
+    document.getElementById('app-body').innerHTML = `
+      <div class="stat-card">
+        <h3>Employment Status</h3>
+        <span class="status-badge status-${status}">${statusText}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Performance Score</h3>
+        <div class="stat-value">${this.score}</div>
+      </div>
+      <div class="stat-card">
+        <h3>Strikes</h3>
+        <div class="stat-value">${this.strikes} / ${this.maxStrikes}</div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${(this.strikes/this.maxStrikes)*100}%;background:var(--danger)"></div></div>
+      </div>
+      <div class="stat-card">
+        <h3>Customers Served</h3>
+        <div class="stat-value">${this.customersServed}</div>
+      </div>
+      <div class="stat-card">
+        <h3>Order Accuracy</h3>
+        <div class="stat-value">${this.customersServed > 0 ? Math.round((this.ordersCorrect / this.customersServed) * 100) : 0}%</div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${this.customersServed > 0 ? (this.ordersCorrect / this.customersServed) * 100 : 0}%;background:var(--success)"></div></div>
+      </div>
+      <div class="stat-card">
+        <h3>Shift Progress</h3>
+        <div class="stat-value">${this.currentRound} / ${this.totalRounds}</div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${(this.currentRound/this.totalRounds)*100}%;background:var(--cfa-blue)"></div></div>
+      </div>
+    `;
+    app.classList.add('active');
+  },
+
+  // --- ROUND SYSTEM ---
+  nextRound() {
+    if (!this.isRunning) return;
+    this.currentRound++;
+    if (this.currentRound > this.totalRounds) {
+      this.endShift();
+      return;
+    }
+    this.customerPatience = 100;
+    this.updateHUD();
+
+    // Random Andy event
+    if (this.currentRound > 2 && Math.random() < this.andyChance) {
+      this.andyEvent(() => this.startMinigame());
+    } else {
+      this.startMinigame();
+    }
+  },
+
+  startMinigame() {
+    if (!this.isRunning) return;
+    const types = ['register', 'bagging', 'curbside', 'ipad', 'drivethrough'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const customer = this.pickCustomer();
+
+    // Start patience drain
+    clearInterval(this.patienceTimer);
+    this.patienceTimer = setInterval(() => {
+      this.customerPatience = Math.max(0, this.customerPatience - 1.5);
+      this.updateHUD();
+      if (this.customerPatience <= 0) {
+        clearInterval(this.patienceTimer);
+        this.failMinigame("Customer lost patience and left!");
+      }
+    }, 500);
+
+    switch(type) {
+      case 'register': this.registerMinigame(customer); break;
+      case 'bagging': this.baggingMinigame(customer); break;
+      case 'curbside': this.curbsideMinigame(customer); break;
+      case 'ipad': this.ipadMinigame(customer); break;
+      case 'drivethrough': this.drivethroughMinigame(customer); break;
+    }
+  },
+
+  pickCustomer() {
+    const npcKeys = Object.keys(this.npcOrders);
+    const key = npcKeys[Math.floor(Math.random() * npcKeys.length)];
+    const orders = this.npcOrders[key];
+    const order = orders[Math.floor(Math.random() * orders.length)];
+    return { key, ...this.characters[key], order };
+  },
+
+  // ============================================================
+  //  MINIGAME 1: REGISTER
+  // ============================================================
+  registerMinigame(customer) {
+    this.currentMinigame = 'register';
+    const area = document.getElementById('minigame-area');
+    const orderItems = customer.order.items;
+    let enteredItems = [];
+
+    // Show customer greeting dialog first
+    this.showDialog(customer.key, customer.order.greeting, [
+      { text: `"Welcome to Chick-fil-A! What can I get for you?"`, action: () => renderRegister() },
+      { text: `"My pleasure! Go ahead with your order."`, action: () => renderRegister() },
+    ]);
+
+    const renderRegister = () => {
+      const orderDisplay = orderItems.map(id => {
+        const item = this.menu.find(m => m.id === id);
+        return item ? item.short : id;
+      }).join(', ');
+
+      area.innerHTML = `
+        <div class="minigame-title">📋 Take The Order</div>
+        <div class="minigame-instruction">Ring up: ${orderDisplay}</div>
+        <div class="register-screen">
+          <div class="order-display" id="reg-display">Tap items to ring them up...</div>
+          <div class="menu-grid" id="reg-menu"></div>
+          <div class="register-actions">
+            <button class="btn btn-danger btn-small" id="reg-clear">Clear</button>
+            <button class="btn btn-success btn-small" id="reg-submit">Submit Order</button>
+          </div>
+        </div>
+      `;
+
+      const menuGrid = document.getElementById('reg-menu');
+      this.menu.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'menu-item';
+        btn.innerHTML = `<span class="item-emoji">${item.emoji}</span>${item.short}`;
+        btn.onclick = () => {
+          enteredItems.push(item.id);
+          this.updateRegisterDisplay(enteredItems);
+        };
+        menuGrid.appendChild(btn);
+      });
+
+      document.getElementById('reg-clear').onclick = () => {
+        enteredItems = [];
+        this.updateRegisterDisplay(enteredItems);
+      };
+
+      document.getElementById('reg-submit').onclick = () => {
+        clearInterval(this.patienceTimer);
+        this.checkRegisterOrder(orderItems, enteredItems, customer);
+      };
+    };
+  },
+
+  updateRegisterDisplay(items) {
+    const display = document.getElementById('reg-display');
+    if (!display) return;
+    if (items.length === 0) {
+      display.textContent = 'Tap items to ring them up...';
+      return;
+    }
+    display.textContent = items.map(id => {
+      const item = this.menu.find(m => m.id === id);
+      return item ? `> ${item.short}` : id;
+    }).join('\n');
+  },
+
+  checkRegisterOrder(expected, entered, customer) {
+    const sortedExpected = [...expected].sort().join(',');
+    const sortedEntered = [...entered].sort().join(',');
+    const correct = sortedExpected === sortedEntered;
+
+    this.customersServed++;
+    if (correct) {
+      this.ordersCorrect++;
+      this.score += 100 + Math.round(this.customerPatience);
+      this.showToast('Order correct! +' + (100 + Math.round(this.customerPatience)), 'good');
+      this.showDialog('luke', this.randFrom(this.lukeCompliments), [], () => this.nextRound());
+    } else {
+      this.ordersMessed++;
+      this.showToast('Wrong order! 😬', 'bad');
+      // Angry customer
+      const reaction = this.randFrom(this.customerReactions.angry);
+      this.showDialog(customer.key, reaction, this.customerReactions.angryChoices, () => {
+        this.addStrike(0.5);
+        this.showDialog('luke', this.randFrom(this.lukeRoasts), [], () => this.nextRound());
+      });
+    }
+    this.updateHUD();
+  },
+
+  // ============================================================
+  //  MINIGAME 2: BAGGING
+  // ============================================================
+  baggingMinigame(customer) {
+    this.currentMinigame = 'bagging';
+    const area = document.getElementById('minigame-area');
+    const orderItems = customer.order.items;
+    let baggedItems = [];
+
+    // Build pool: correct items + distractors
+    const correctEmojis = orderItems.map(id => this.menu.find(m => m.id === id));
+    const distractors = this.menu.filter(m => !orderItems.includes(m.id))
+      .sort(() => Math.random() - 0.5).slice(0, 4);
+    const allItems = [...correctEmojis, ...distractors].sort(() => Math.random() - 0.5);
+
+    this.showDialog('luke', `Justin! ${customer.name}'s order is up. Bag it correctly — Jacob already made the food. Don't mess this up.`, [
+      { text: "On it! 🛍️", action: () => renderBagging() },
+    ]);
+
+    const renderBagging = () => {
+      area.innerHTML = `
+        <div class="minigame-title">🛍️ Bag The Order</div>
+        <div class="bag-area">
+          <div class="bag-order-list">
+            <h3>Order for ${customer.name}:</h3>
+            <div id="bag-order-text">${orderItems.map(id => this.menu.find(m => m.id === id)?.short || id).join(', ')}</div>
+          </div>
+          <div class="minigame-instruction">Tap the correct items, then hit bag!</div>
+          <div class="conveyor" id="conveyor"></div>
+          <div class="bag-target" id="bag-target">
+            <div class="bag-contents" id="bag-contents"></div>
+          </div>
+          <div class="register-actions" style="margin-top:16px;">
+            <button class="btn btn-danger btn-small" id="bag-reset">Reset Bag</button>
+            <button class="btn btn-success btn-small" id="bag-submit">Deliver Bag</button>
+          </div>
+        </div>
+      `;
+
+      const conveyor = document.getElementById('conveyor');
+      allItems.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'food-item';
+        div.textContent = item.emoji;
+        div.dataset.id = item.id;
+        div.dataset.idx = idx;
+        div.onclick = () => {
+          if (div.classList.contains('selected')) {
+            div.classList.remove('selected');
+            baggedItems = baggedItems.filter(b => b.idx !== idx);
+          } else {
+            div.classList.add('selected');
+            baggedItems.push({ id: item.id, idx });
+          }
+          this.updateBagContents(baggedItems);
+        };
+        conveyor.appendChild(div);
+      });
+
+      document.getElementById('bag-reset').onclick = () => {
+        baggedItems = [];
+        document.querySelectorAll('.food-item').forEach(f => f.classList.remove('selected'));
+        this.updateBagContents(baggedItems);
+      };
+
+      document.getElementById('bag-submit').onclick = () => {
+        clearInterval(this.patienceTimer);
+        this.checkBagging(orderItems, baggedItems.map(b => b.id), customer);
+      };
+    };
+  },
+
+  updateBagContents(items) {
+    const bc = document.getElementById('bag-contents');
+    if (!bc) return;
+    bc.innerHTML = items.map(b => {
+      const item = this.menu.find(m => m.id === b.id);
+      return `<span class="mini-item">${item?.emoji || '?'}</span>`;
+    }).join('');
+  },
+
+  checkBagging(expected, entered, customer) {
+    const sortedExpected = [...expected].sort().join(',');
+    const sortedEntered = [...entered].sort().join(',');
+    const correct = sortedExpected === sortedEntered;
+
+    this.customersServed++;
+    if (correct) {
+      this.ordersCorrect++;
+      this.score += 120 + Math.round(this.customerPatience);
+      this.showToast('Bagged perfectly! +' + (120 + Math.round(this.customerPatience)), 'good');
+      this.showDialog(customer.key, this.randFrom(this.customerReactions.happy), [], () => {
+        if (Math.random() < 0.3) {
+          this.showDialog('luke', this.randFrom(this.lukeCompliments), [], () => this.nextRound());
+        } else {
+          this.nextRound();
+        }
+      });
+    } else {
+      this.ordersMessed++;
+      this.showToast('Wrong items in the bag! 😫', 'bad');
+      this.showDialog('luke', this.randFrom(this.lukeRoasts), [], () => {
+        this.addStrike(0.5);
+        this.showScold("Manager Warning", `"Justin, you bagged the wrong items for ${customer.name}. This is unacceptable. Jacob worked hard on that order."`, () => this.nextRound());
+      });
+    }
+    this.updateHUD();
+  },
+
+  // ============================================================
+  //  MINIGAME 3: CURBSIDE DELIVERY
+  // ============================================================
+  curbsideMinigame(customer) {
+    this.currentMinigame = 'curbside';
+    const area = document.getElementById('minigame-area');
+
+    // Generate parking lot with multiple cars
+    const spots = [];
+    const npcKeys = Object.keys(this.npcOrders);
+    const correctSpot = Math.floor(Math.random() * 6);
+
+    for (let i = 0; i < 6; i++) {
+      if (i === correctSpot) {
+        spots.push({ occupied: true, name: customer.name, order: customer.order.items, correct: true, emoji: ['🚗','🚙','🚕','🏎️','🚘'][Math.floor(Math.random()*5)] });
+      } else if (Math.random() > 0.4) {
+        const rk = npcKeys[Math.floor(Math.random() * npcKeys.length)];
+        const rc = this.characters[rk];
+        spots.push({ occupied: true, name: rc?.name || 'Customer', order: [], correct: false, emoji: ['🚗','🚙','🚕','🚘'][Math.floor(Math.random()*4)] });
+      } else {
+        spots.push({ occupied: false });
+      }
+    }
+
+    this.showDialog('luke', `Justin! ${customer.name} is waiting in the parking lot for their curbside order. Find their car and deliver it. Try not to give it to the wrong person... again.`, [
+      { text: "I'll find them! 🏃", action: () => renderParking() },
+    ]);
+
+    const renderParking = () => {
+      area.innerHTML = `
+        <div class="minigame-title">🚗 Curbside Delivery</div>
+        <div class="minigame-instruction">Find ${customer.name}'s car and deliver their order!</div>
+        <div class="parking-lot" id="parking-lot"></div>
+      `;
+
+      const lot = document.getElementById('parking-lot');
+      spots.forEach((spot, idx) => {
+        const div = document.createElement('div');
+        div.className = `parking-spot ${spot.occupied ? 'has-car' : ''}`;
+        if (spot.occupied) {
+          div.innerHTML = `
+            <span class="car-emoji">${spot.emoji}</span>
+            <span class="car-name">${spot.name}</span>
+            <span class="spot-label">Spot ${idx + 1}</span>
+          `;
+          div.onclick = () => {
+            clearInterval(this.patienceTimer);
+            this.checkCurbside(spot, customer);
+          };
+        } else {
+          div.innerHTML = `<span class="spot-label">Empty</span><span style="font-size:1.5em;opacity:0.3;">🅿️</span>`;
+        }
+        lot.appendChild(div);
+      });
+    };
+  },
+
+  checkCurbside(spot, customer) {
+    this.customersServed++;
+    if (spot.correct) {
+      this.ordersCorrect++;
+      this.score += 80 + Math.round(this.customerPatience);
+      this.showToast('Delivered! +' + (80 + Math.round(this.customerPatience)), 'good');
+      this.showDialog(customer.key, this.randFrom([
+        "Thanks Justin! That was fast!",
+        "My pleasure! ...wait, I'm the customer. YOUR pleasure? Is that how it works?",
+        "Perfect, thanks so much!",
+      ]), [], () => this.nextRound());
+    } else {
+      this.ordersMessed++;
+      this.showToast('Wrong car!! 😰', 'bad');
+      this.showDialog('luke', `Justin... you just gave ${customer.name}'s food to ${spot.name}. How. HOW.`, [], () => {
+        this.addStrike(1);
+        this.nextRound();
+      });
+    }
+    this.updateHUD();
+  },
+
+  // ============================================================
+  //  MINIGAME 4: OUTSIDE iPAD ORDERING
+  // ============================================================
+  ipadMinigame(customer) {
+    this.currentMinigame = 'ipad';
+    const area = document.getElementById('minigame-area');
+    const orderItems = customer.order.items;
+    let enteredItems = [];
+    const weathers = ['☀️ 94°F — Hot out here', '🌧️ 62°F — Rainy', '☁️ 78°F — Cloudy', '🥵 101°F — Scorching', '💨 55°F — Windy'];
+    const weather = this.randFrom(weathers);
+    const carNum = Math.floor(Math.random() * 30) + 1;
+
+    this.showDialog('luke', `Justin! Get outside with the iPad. There's a line of cars wrapped around the building. ${customer.name} is car #${carNum}. Take their order and don't get hit by a car... again.`, [
+      { text: "Heading out! 📱", action: () => renderIPad() },
+      { text: "Can't Jacob do it? It's hot...", action: () => {
+        this.showToast("Luke: \"Jacob makes the food, Justin. GO.\"", 'luke');
+        setTimeout(() => renderIPad(), 1500);
+      }},
+    ]);
+
+    const renderIPad = () => {
+      const orderDisplay = orderItems.map(id => {
+        const item = this.menu.find(m => m.id === id);
+        return item ? item.short : id;
+      }).join(', ');
+
+      area.innerHTML = `
+        <div class="weather-badge">${weather}</div>
+        <div class="minigame-title">📱 Outside iPad Order</div>
+        <div class="minigame-instruction">Car #${carNum} in the drive-through line</div>
+        <div class="ipad-frame">
+          <div class="ipad-screen">
+            <div class="ipad-header">
+              <h3>🐔 CFA Order System</h3>
+              <span class="car-num">Car #${carNum}</span>
+            </div>
+            <div class="ipad-customer-bubble" id="ipad-bubble">
+              ${customer.order.greeting}
+            </div>
+            <div class="ipad-entered" id="ipad-entered">Tap items to add...</div>
+            <div class="ipad-menu-scroll" id="ipad-menu"></div>
+            <div class="register-actions">
+              <button class="btn btn-danger btn-small" id="ipad-clear">Clear</button>
+              <button class="btn btn-success btn-small" id="ipad-send">Send to Kitchen</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const menuGrid = document.getElementById('ipad-menu');
+      this.menu.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'ipad-menu-item';
+        btn.innerHTML = `<span class="ipad-item-emoji">${item.emoji}</span>${item.short}`;
+        btn.onclick = () => {
+          enteredItems.push(item.id);
+          this.updateIPadDisplay(enteredItems);
+        };
+        menuGrid.appendChild(btn);
+      });
+
+      document.getElementById('ipad-clear').onclick = () => {
+        enteredItems = [];
+        this.updateIPadDisplay(enteredItems);
+      };
+
+      document.getElementById('ipad-send').onclick = () => {
+        clearInterval(this.patienceTimer);
+        this.checkIPadOrder(orderItems, enteredItems, customer);
+      };
+    };
+  },
+
+  updateIPadDisplay(items) {
+    const el = document.getElementById('ipad-entered');
+    if (!el) return;
+    if (items.length === 0) {
+      el.textContent = 'Tap items to add...';
+      return;
+    }
+    el.innerHTML = items.map(id => {
+      const item = this.menu.find(m => m.id === id);
+      return `<span class="ipad-chip">${item?.emoji || ''} ${item?.short || id}</span>`;
+    }).join('');
+  },
+
+  checkIPadOrder(expected, entered, customer) {
+    const sortedExpected = [...expected].sort().join(',');
+    const sortedEntered = [...entered].sort().join(',');
+    const correct = sortedExpected === sortedEntered;
+
+    this.customersServed++;
+    if (correct) {
+      this.ordersCorrect++;
+      const bonus = Math.round(this.customerPatience);
+      this.score += 110 + bonus;
+      this.showToast('Order sent to Jacob! +' + (110 + bonus), 'good');
+      this.showDialog(customer.key, this.randFrom([
+        "Thanks! That was quick, especially since you're doing this in the parking lot!",
+        "Appreciate it Justin! Stay cool out there!",
+        "Perfect, thanks! Tell Jacob I said what's up!",
+      ]), [], () => {
+        if (Math.random() < 0.4) {
+          this.showDialog('luke', this.randFrom([
+            "Nice work outside, Justin. You didn't get hit by a single car this time!",
+            "Jacob says the order came through clean. I'm... impressed? Don't get used to the praise.",
+            "See? The iPad is easy when you don't drop it. Good job.",
+          ]), [], () => this.nextRound());
+        } else {
+          this.nextRound();
+        }
+      });
+    } else {
+      this.ordersMessed++;
+      this.showToast('Wrong order sent to kitchen! 😬', 'bad');
+      this.showDialog('luke', this.randFrom([
+        "Justin, Jacob just yelled at me because the order that came in makes no sense. What did you type??",
+        "Bro the iPad order is all wrong. The customer is STILL IN THEIR CAR waiting. Fix it!",
+        "Did the heat get to your brain out there? That order was completely wrong.",
+        "Justin I can see the order on screen and that is NOT what they asked for. Come inside.",
+      ]), [], () => {
+        this.addStrike(0.5);
+        this.nextRound();
+      });
+    }
+    this.updateHUD();
+  },
+
+  // ============================================================
+  //  MINIGAME 5: DRIVE-THROUGH WINDOW
+  // ============================================================
+  drivethroughMinigame(customer) {
+    this.currentMinigame = 'drivethrough';
+    const area = document.getElementById('minigame-area');
+    const orderItems = customer.order.items;
+    let handedItems = [];
+
+    // Build tray: correct items + extra wrong items
+    const correctItems = orderItems.map(id => this.menu.find(m => m.id === id));
+    const wrongItems = this.menu.filter(m => !orderItems.includes(m.id))
+      .sort(() => Math.random() - 0.5).slice(0, 3);
+    const trayItems = [...correctItems, ...wrongItems].sort(() => Math.random() - 0.5);
+
+    this.showDialog('luke', `Justin! Drive-through window! ${customer.name} is pulling up. Their food is ready on the counter — hand them the RIGHT items through the window. Do NOT hand them someone else's food.`, [
+      { text: "Window time! 🪟", action: () => renderDT() },
+    ]);
+
+    const renderDT = () => {
+      area.innerHTML = `
+        <div class="minigame-title">🚗 Drive-Through Window</div>
+        <div class="dt-window">
+          <div class="dt-window-frame">
+            <div class="dt-car-view">${this.randFrom(['🚗','🚙','🚕','🏎️','🚘','🛻'])}</div>
+            <div class="dt-customer-name">${customer.name}</div>
+            <div class="dt-customer-says">"${this.randFrom([
+              "Hey! I had a mobile order?",
+              "Hi, picking up for " + customer.name + "!",
+              "What's up! Order for " + customer.name,
+              "Hey Justin! My order ready?",
+            ])}"</div>
+          </div>
+          <div class="dt-counter">
+            <div class="dt-order-ticket">
+              <strong>Order ticket:</strong> ${orderItems.map(id => this.menu.find(m => m.id === id)?.short || id).join(', ')}
+            </div>
+            <div class="dt-handed-list" id="dt-handed"></div>
+            <div class="minigame-instruction" style="color:#ccc;margin-bottom:8px;">Tap items to hand through the window</div>
+            <div class="dt-items-tray" id="dt-tray"></div>
+            <div class="register-actions">
+              <button class="btn btn-danger btn-small" id="dt-reset">Take Back</button>
+              <button class="btn btn-success btn-small" id="dt-done">Close Window</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const tray = document.getElementById('dt-tray');
+      trayItems.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'dt-tray-item';
+        div.textContent = item.emoji;
+        div.dataset.id = item.id;
+        div.dataset.idx = idx;
+        div.onclick = () => {
+          if (div.classList.contains('handed')) return;
+          div.classList.add('handed');
+          handedItems.push({ id: item.id, idx });
+          this.updateDTHanded(handedItems);
+        };
+        tray.appendChild(div);
+      });
+
+      document.getElementById('dt-reset').onclick = () => {
+        handedItems = [];
+        document.querySelectorAll('.dt-tray-item').forEach(d => d.classList.remove('handed'));
+        this.updateDTHanded(handedItems);
+      };
+
+      document.getElementById('dt-done').onclick = () => {
+        clearInterval(this.patienceTimer);
+        this.checkDrivethrough(orderItems, handedItems.map(h => h.id), customer);
+      };
+    };
+  },
+
+  updateDTHanded(items) {
+    const el = document.getElementById('dt-handed');
+    if (!el) return;
+    el.innerHTML = items.map(h => {
+      const item = this.menu.find(m => m.id === h.id);
+      return `<span class="dt-handed-chip">${item?.emoji || ''} ${item?.short || ''}</span>`;
+    }).join('');
+  },
+
+  checkDrivethrough(expected, handed, customer) {
+    const sortedExpected = [...expected].sort().join(',');
+    const sortedHanded = [...handed].sort().join(',');
+    const correct = sortedExpected === sortedHanded;
+
+    this.customersServed++;
+    if (correct) {
+      this.ordersCorrect++;
+      const bonus = Math.round(this.customerPatience);
+      this.score += 90 + bonus;
+      this.showToast('Perfect handoff! +' + (90 + bonus), 'good');
+      this.showDialog(customer.key, this.randFrom([
+        "Thanks Justin! Have a great day!",
+        "Perfect, that's everything! Appreciate it!",
+        "Yooo that was fast! Thanks man!",
+        "My pleasure! ...wait that's YOUR line haha. Thanks!",
+      ]), [], () => this.nextRound());
+    } else {
+      this.ordersMessed++;
+      // Check what went wrong
+      const extra = handed.filter(id => !expected.includes(id));
+      const missing = expected.filter(id => !handed.includes(id));
+      let errMsg = "";
+      if (extra.length > 0 && missing.length > 0) {
+        errMsg = "You handed them wrong items AND forgot items. Classic Justin.";
+      } else if (extra.length > 0) {
+        errMsg = "You gave them someone else's food!! That was for another car!";
+      } else {
+        errMsg = "You forgot items! They're gonna come right back through the line.";
+      }
+      this.showToast('Wrong items handed out! 😰', 'bad');
+      this.showDialog(customer.key, this.randFrom([
+        "Um... this isn't what I ordered??",
+        "Hey, I'm missing stuff here!",
+        "Excuse me? This isn't right at all.",
+        "Bro... I can literally SEE my other items sitting right there on the counter.",
+      ]), this.customerReactions.angryChoices, () => {
+        this.addStrike(0.5);
+        this.showDialog('luke', `${errMsg}\n\n${this.randFrom(this.lukeRoasts)}`, [], () => this.nextRound());
+      });
+    }
+    this.updateHUD();
+  },
+
+  // ============================================================
+  //  ANDY SABOTAGE EVENTS
+  // ============================================================
+  andyEvent(callback) {
+    const allegation = this.andyAllegations[Math.floor(Math.random() * this.andyAllegations.length)];
+    this.showToast('⚠️ ANDY ALERT! Andy has entered the building!', 'andy');
+
+    setTimeout(() => {
+      this.showDialog('andy', `Hey! Manager! I need to report something! ${allegation.claim}`, [], () => {
+        this.showDialog('luke', "Justin... Andy is saying some stuff about you. Care to explain?",
+          allegation.defenses.map(d => ({
+            text: d.text,
+            quality: d.quality,
+            action: () => {
+              if (d.effect > 0) {
+                this.score += Math.round(d.effect * 40);
+                this.showToast('You defended yourself! Andy leaves embarrassed. 😤', 'good');
+                this.showDialog('luke', this.randFrom([
+                  "Yeah Andy, get out of here. Justin's fine. Weird, but fine.",
+                  "Andy, you don't even work here! Security!",
+                  "Nice try Andy. Now leave before I ban you for real.",
+                ]), [], callback);
+              } else {
+                this.addStrike(0.5);
+                this.showToast('That defense didn\'t help... 😬', 'bad');
+                this.showDialog('luke', this.randFrom([
+                  "Justin... you're not exactly helping your case here.",
+                  "Dude, just... just don't say anything else. Please.",
+                ]), [], callback);
+              }
+            }
+          }))
+        );
+      });
+    }, 1000);
+  },
+
+  // ============================================================
+  //  END SHIFT
+  // ============================================================
+  endShift() {
+    clearInterval(this.patienceTimer);
+    document.getElementById('hud').classList.remove('visible');
+    document.getElementById('dialog-box').classList.remove('visible');
+
+    const accuracy = this.customersServed > 0 ? Math.round((this.ordersCorrect / this.customersServed) * 100) : 0;
+
+    if (this.strikes >= this.maxStrikes) {
+      this.getFired("After a disastrous shift, management has decided to let you go. Better stick to running, Justin.");
+      return;
+    }
+
+    this.showTransition("Shift Over! 🎉", () => {
+      const area = document.getElementById('minigame-area');
+      this.switchScreen('game-screen');
+      area.innerHTML = `
+        <div style="text-align:center;padding:32px;">
+          <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+          <div class="minigame-title" style="font-size:1.8em;">Shift Complete!</div>
+          <p style="color:#666;margin:12px 0 24px;">You survived! Barely.</p>
+          <div style="background:white;border-radius:16px;padding:20px;text-align:left;box-shadow:0 4px 20px rgba(0,0,0,0.1);margin-bottom:24px;">
+            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Score</span><strong>${this.score}</strong></p>
+            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Customers Served</span><strong>${this.customersServed}</strong></p>
+            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Accuracy</span><strong>${accuracy}%</strong></p>
+            <p style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;"><span>Strikes</span><strong>${this.strikes}/${this.maxStrikes}</strong></p>
+            <p style="display:flex;justify-content:space-between;padding:8px 0;"><span>Status</span><strong style="color:var(--success);">SURVIVED</strong></p>
+          </div>
+          <button class="btn btn-primary" onclick="Game.start()">Play Again</button>
+        </div>
+      `;
+    });
+  },
+
+  // ============================================================
+  //  MINIGAME FAIL (patience ran out)
+  // ============================================================
+  failMinigame(reason) {
+    this.customersServed++;
+    this.ordersMessed++;
+    this.showToast(reason, 'bad');
+    this.addStrike(1);
+    if (this.isRunning) {
+      this.showDialog('luke', this.randFrom(this.lukeRoasts), [], () => this.nextRound());
+    }
+    this.updateHUD();
+  },
+
+  // --- HELPERS ---
+  randFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
+};
+
+// Prevent zoom on double tap
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+let lastTap = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTap < 300) e.preventDefault();
+  lastTap = now;
+}, { passive: false });
+</script>
+</body>
+</html>
