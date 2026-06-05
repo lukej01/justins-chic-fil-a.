@@ -1534,7 +1534,15 @@ const G = {
     const textEl = document.getElementById('dlg-text');
     textEl.textContent = '';
     let i = 0;
-    const tp = () => { if(i<text.length){ textEl.textContent+=text[i]; i++; setTimeout(tp,16); } };
+    const tp = () => {
+      if (i < text.length) {
+        textEl.textContent += text[i];
+        // chirp every 2 non-space characters
+        if (text[i] !== ' ' && i % 2 === 0) SFX.voice(charKey);
+        i++;
+        setTimeout(tp, 16);
+      }
+    };
     tp();
 
     const ce = document.getElementById('dlg-choices');
@@ -2382,6 +2390,31 @@ const SFX = {
     if (!this._ctx) this._ctx = new (window.AudioContext || window.webkitAudioContext)();
     if (this._ctx.state === 'suspended') this._ctx.resume();
     return this._ctx;
+  },
+  // Voice profiles: [waveType, baseFreq, pitchVariance, vol]
+  voices: {
+    luke:     ['square',   400, 60,  0.09],
+    justin:   ['sine',     520, 80,  0.08],
+    andy:     ['sawtooth', 260, 40,  0.11],
+    reagan:   ['sine',     680, 90,  0.08],
+    navaneeth:['square',   600, 120, 0.10],
+    hudson:   ['square',   300, 30,  0.10],
+    jacob:    ['sawtooth', 360, 50,  0.09],
+    katy:     ['sine',     740, 100, 0.08],
+    gentry:   ['triangle', 460, 60,  0.08],
+    henry:    ['square',   500, 80,  0.08],
+    black:    ['triangle', 420, 50,  0.08],
+    carter:   ['triangle', 480, 60,  0.08],
+    walter:   ['triangle', 380, 40,  0.08],
+    ranel:    ['triangle', 430, 50,  0.08],
+    declan:   ['square',   510, 70,  0.08],
+    _default: ['triangle', 420, 60,  0.08],
+  },
+  voice(charKey) {
+    if (this._muted) return;
+    const v = this.voices[charKey] || this.voices._default;
+    const freq = v[1] + (Math.random() - 0.5) * v[2];
+    this._play(v[0], freq, 0.065, v[3]);
   },
   _play(type, freq, dur, vol=0.18, detune=0) {
     if (this._muted) return;
