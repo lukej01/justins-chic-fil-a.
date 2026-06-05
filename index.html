@@ -892,6 +892,20 @@ const IconLib = {
     br: '<rect x="7" y="9" width="18" height="14" rx="2" fill="#5C3A22"/><rect x="7" y="9" width="18" height="5" rx="2" fill="#6E4A2E"/><path d="M11 12l2 2M18 11l2 2" stroke="#3e2616" stroke-width="1" fill="none"/>',
     // Icedream cone
     cm: '<path d="M16 27l-5-11h10z" fill="#D6A461"/><path d="M11.5 16h9M12.8 18.5h6.4M14 21h4" stroke="#b9863f" stroke-width=".8" fill="none"/><path d="M16 4c4 0 6 3 5 6 1.6 1 1 4.2-1.6 4.6.6 2.2-2 3.2-3.6 2-1.6 1.2-4.2.2-3.6-2C8 18.2 8.6 15 10 14c-1.2-3 1-6 6-10z" fill="#fff" stroke="#eee" stroke-width=".8"/>',
+    // Sweet tea
+    tea: '<path d="M10 9h12l-1.5 17h-9z" fill="#fff" stroke="#ddd" stroke-width="1"/><path d="M10.7 12h10.6l-1.2 13h-8.2z" fill="#8B5E2A"/><rect x="16" y="2" width="2" height="9" rx="1" fill="#E51636"/><circle cx="21" cy="9" r="2.6" fill="#F2C14E"/>',
+    // Bottled water
+    wt: '<path d="M13 6h6v3l1.2 2.4V25a2 2 0 0 1-2 2h-4.4a2 2 0 0 1-2-2V11.4L13 9z" fill="#cfe7f2" stroke="#9fc4d6" stroke-width="1"/><rect x="12.5" y="3.5" width="7" height="2.8" rx="1" fill="#7fb0c8"/><rect x="12.8" y="15" width="6.4" height="5" fill="#fff" opacity=".4"/>',
+    // Hot coffee
+    hc: '<path d="M9 12h12v7a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 9 19z" fill="#fff" stroke="#ddd" stroke-width="1"/><path d="M21 13.5h2.2a3.2 3.2 0 0 1 0 6.4H21" fill="none" stroke="#ccc" stroke-width="1.6"/><path d="M11 14h8v5a2.8 2.8 0 0 1-2.8 2.8h-2.4A2.8 2.8 0 0 1 11 19z" fill="#7A4A28"/><path d="M12.5 4.5c0 1.6 1 1.6 1 3.2M16.5 3.5c0 1.6 1 1.6 1 3.2" stroke="#bbb" stroke-width="1.2" fill="none" stroke-linecap="round"/>',
+    // Extra pickles
+    xp: '<ellipse cx="16" cy="16" rx="10" ry="8" fill="#7FA63C" stroke="#5d7d2a" stroke-width="1.5"/><g fill="#aacb6a"><circle cx="13" cy="14" r="1.3"/><circle cx="19" cy="14" r="1.3"/><circle cx="16" cy="18" r="1.3"/><circle cx="12" cy="18" r="1.1"/><circle cx="20" cy="18" r="1.1"/></g>',
+    // No pickles
+    np: '<ellipse cx="16" cy="16" rx="10" ry="8" fill="#7FA63C" stroke="#5d7d2a" stroke-width="1.5"/><g fill="#aacb6a"><circle cx="13" cy="14" r="1.3"/><circle cx="19" cy="14" r="1.3"/><circle cx="16" cy="18" r="1.3"/></g><path d="M7 7l18 18" stroke="#E51636" stroke-width="2.6" stroke-linecap="round"/>',
+    // Extra ice
+    xi: '<g fill="#bfe0f0" stroke="#8fc0d8" stroke-width="1"><rect x="6" y="11" width="9" height="9" rx="2" transform="rotate(-8 10 15)"/><rect x="16" y="14" width="9" height="9" rx="2" transform="rotate(10 20 18)"/><rect x="13" y="5" width="8" height="8" rx="2"/></g>',
+    // Add cheese
+    ch: '<path d="M6 13l16-5 4 13-16 5z" fill="#F2C14E" stroke="#d9a93a" stroke-width="1"/><circle cx="13" cy="14" r="1.3" fill="#d9a93a"/><circle cx="18" cy="17" r="1.3" fill="#d9a93a"/><circle cx="15" cy="19.5" r="1" fill="#d9a93a"/>',
     _default: '<circle cx="16" cy="16" r="10" fill="#E8B26A"/>',
   },
   food(id) { return this._svg(this.foodDefs[id] || this.foodDefs._default); },
@@ -914,6 +928,10 @@ const IconLib = {
   speakerOff: '<svg class="fi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   x: '<svg class="fi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
 };
+// Dipping-sauce cups (one soufflé-cup shape, tinted per sauce)
+[['sc','#D98A3A'],['po','#E5732B'],['hm','#E8B400'],['bq','#7A2E1E'],['rn','#EFEAE0'],['sr','#D8211C']].forEach(([id, c]) => {
+  IconLib.foodDefs[id] = `<path d="M8 11h16l-2 13a2 2 0 0 1-2 1.7H12a2 2 0 0 1-2-1.7z" fill="#fff" stroke="#ddd" stroke-width="1"/><ellipse cx="16" cy="12" rx="8" ry="2.6" fill="${c}"/><ellipse cx="16" cy="12" rx="8" ry="2.6" fill="none" stroke="#cfcfcf" stroke-width=".5"/>`;
+});
 
 // =============================================
 // GAME ENGINE
@@ -924,7 +942,7 @@ const G = {
   ordersCorrect: 0, ordersMessed: 0,
   currentRound: 0, totalRounds: 12,
   isRunning: false, inMinigame: false,
-  andyChance: 0.32, patienceTimer: null,
+  andyChance: 0.46, patienceTimer: null,
   availableStation: null,
   patienceDrainRate: 1.5,
   isReaganCustomer: false,
@@ -945,9 +963,23 @@ const G = {
     { id:'lm', name:'Lemonade', short:'Lemon.', cat:'bev' },
     { id:'ms', name:'Milkshake', short:'Shake', cat:'bev' },
     { id:'ic', name:'Iced Coffee', short:'Iced Cof', cat:'bev' },
+    { id:'tea', name:'Sweet Tea', short:'Sweet Tea', cat:'bev' },
+    { id:'wt', name:'Bottled Water', short:'Water', cat:'bev' },
+    { id:'hc', name:'Hot Coffee', short:'Hot Cof', cat:'bev' },
     { id:'ck', name:'Chocolate Cookie', short:'Cookie', cat:'dessert' },
     { id:'br', name:'Brownie', short:'Brownie', cat:'dessert' },
     { id:'cm', name:'Icedream Cone', short:'Icedream', cat:'dessert' },
+    // Sauces & modifiers — anything a customer can ask for is orderable
+    { id:'sc', name:'Chick-fil-A Sauce', short:'CFA Sauce', cat:'extra' },
+    { id:'po', name:'Polynesian Sauce', short:'Polynesian', cat:'extra' },
+    { id:'hm', name:'Honey Mustard', short:'Honey Mus', cat:'extra' },
+    { id:'bq', name:'Barbeque Sauce', short:'BBQ', cat:'extra' },
+    { id:'rn', name:'Garden Ranch', short:'Ranch', cat:'extra' },
+    { id:'sr', name:'Sriracha', short:'Sriracha', cat:'extra' },
+    { id:'xp', name:'Extra Pickles', short:'Xtra Pkl', cat:'extra' },
+    { id:'np', name:'No Pickles', short:'No Pkl', cat:'extra' },
+    { id:'xi', name:'Extra Ice', short:'Xtra Ice', cat:'extra' },
+    { id:'ch', name:'Add Cheese', short:'+Cheese', cat:'extra' },
   ],
 
   chars: {
@@ -962,41 +994,51 @@ const G = {
   npcOrders: {
     hudson: [
       { greeting:"Justin! Shouldn't you be out running intervals? Whatever. Grilled sandwich, side salad, lemonade, and a fruit cup for Coach Martinez.", items:['gs','sa','lm','fs'], hudsonFlavor:true },
-      { greeting:"Cook! Your 800 split was embarrassing yesterday. Get me a CFA sandwich combo with mac and cheese, NOT fries. And an iced coffee. And don't mess it up like you mess up your kick.", items:['cs','mc','ic'], hudsonFlavor:true },
+      { greeting:"Cook! Your 800 split was embarrassing yesterday. Get me a CFA sandwich combo with mac and cheese, NOT fries. And an iced coffee with extra ice. And don't mess it up like you mess up your kick.", items:['cs','mc','ic','xi'], hudsonFlavor:true },
       { greeting:"Cook! Stand up straight behind that register. Your posture is PATHETIC. CFA sandwich, fries, lemonade. And I want to see those shoulders BACK while you ring it up.", items:['cs','fr','lm'], hudsonFlavor:true },
     ],
     gentry: [
-      { greeting:"Yo Justin! Lemme get uhhhh... spicy deluxe, waffle fries, lemonade, and actually throw a cookie on there too.", items:['ss','fr','lm','ck'], gentryFlavor:true },
-      { greeting:"Bro I need a 12-piece nuggets, mac and cheese, fries, and a milkshake. Practice was brutal.", items:['ng','mc','fr','ms'], gentryFlavor:true },
-      { greeting:"Aight so... nuggets, but like the 12-piece, then fries obviously, iced coffee with extra ice, a brownie, AND a cookie. Oh and a lemonade. Yeah that's it. Wait, add mac and cheese.", items:['ng','fr','ic','br','ck','lm','mc'], gentryFlavor:true },
+      { greeting:"Yo Justin! Lemme get uhhhh... spicy deluxe, waffle fries, lemonade, and actually throw a cookie on there too. Oh and a Chick-fil-A sauce.", items:['ss','fr','lm','ck','sc'], gentryFlavor:true },
+      { greeting:"Bro I need a 12-piece nuggets, mac and cheese, fries, and a milkshake. Practice was brutal. Throw in a BBQ and a ranch.", items:['ng','mc','fr','ms','bq','rn'], gentryFlavor:true },
+      { greeting:"Aight so... nuggets, but like the 12-piece, then fries obviously, iced coffee with extra ice, a brownie, AND a cookie. Oh and a lemonade. Yeah that's it. Wait, add mac and cheese.", items:['ng','fr','ic','xi','br','ck','lm','mc'], gentryFlavor:true },
+      { greeting:"Spicy deluxe with extra pickles, waffle fries with a BBQ AND a honey mustard, a sweet tea, and a cookie. I contain multitudes.", items:['ss','xp','fr','bq','hm','tea','ck'], gentryFlavor:true },
     ],
     henry: [
-      { greeting:"Hey Justin! *shows phone* BRO LOOK AT THIS MEME. Okay okay sorry. Usual - CFA sandwich, mac and cheese, milkshake, and a brownie. Actually make it two brownies, I'm splitting with someone.", items:['cs','mc','ms','br','br'], henryFlavor:true },
-      { greeting:"Justin! *scrolling phone* Wait hold on this is so funny-- okay sorry. Strips, waffle fries, iced coffee, and an icedream cone. *shows another meme* LOOK AT THIS ONE", items:['st','fr','ic','cm'], henryFlavor:true },
+      { greeting:"Hey Justin! *shows phone* BRO LOOK AT THIS MEME. Okay okay sorry. Usual - CFA sandwich, mac and cheese, milkshake, and a brownie. Actually make it two brownies, I'm splitting with someone. And a Chick-fil-A sauce.", items:['cs','mc','ms','br','br','sc'], henryFlavor:true },
+      { greeting:"Justin! *scrolling phone* Wait hold on this is so funny-- okay sorry. Strips, waffle fries, honey mustard, iced coffee, and an icedream cone. *shows another meme* LOOK AT THIS ONE", items:['st','fr','hm','ic','cm'], henryFlavor:true },
     ],
     black: [
-      { greeting:"Justin, me and Carter are splitting a big order. Two 12-piece nuggets, two fries, a mac and cheese, two drinks, and two cookies.", items:['ng','ng','fr','fr','mc','dk','dk','ck','ck'], blackCarterFlavor:true },
+      { greeting:"Justin, me and Carter are splitting a big order. Two 12-piece nuggets, two fries, a mac and cheese, two drinks, two cookies, and two Polynesian sauces.", items:['ng','ng','fr','fr','mc','dk','dk','ck','ck','po','po'], blackCarterFlavor:true },
       { greeting:"Yo Justin. Carter wants a spicy deluxe but I think he should get grilled. Actually get both and we'll figure it out. And two fries, two drinks.", items:['ss','gs','fr','fr','dk','dk'], blackCarterFlavor:true },
     ],
     carter: [
-      { greeting:"What's up Justin! Just a spicy deluxe, fries, lemonade, and a brownie.", items:['ss','fr','lm','br'] },
+      { greeting:"What's up Justin! Just a spicy deluxe with extra pickles, fries, lemonade, a brownie, and a Polynesian sauce.", items:['ss','xp','fr','lm','br','po'] },
       { greeting:"Yooo Justin! Me and Black can't decide. He wants nuggets, I want strips. Get both. Two fries, two lemonades, and two cookies.", items:['ng','st','fr','fr','lm','lm','ck','ck'], blackCarterFlavor:true },
     ],
     reagan: [
       { greeting:"Hey Justin... *smiles* Can I get a side salad, fruit cup, and lemonade? Oh and an icedream cone, I'm treating myself.", items:['sa','fs','lm','cm'] },
-      { greeting:"Hi Justin! You look... flustered. I'll have a grilled sandwich, waffle fries, and a lemonade please.", items:['gs','fr','lm'] },
+      { greeting:"Hi Justin! You look... flustered. I'll have a grilled sandwich, no pickles, waffle fries, and a lemonade please.", items:['gs','np','fr','lm'] },
       { greeting:"Hey! Justin! I brought some friends but they already ordered. Just a milkshake and a cookie for me. *smiles again*", items:['ms','ck'] },
     ],
     navaneeth: [
       { greeting:"JUSTIN! BRO! I NEED FOOD RIGHT NOW!! Spicy deluxe, 12-piece nuggets, TWO fries, mac and cheese, milkshake, lemonade, a cookie AND a brownie!! I JUST RAN 10 MILES!!", items:['ss','ng','fr','fr','mc','ms','lm','ck','br'], navFlavor:true },
-      { greeting:"YO JUSTIN!! CFA sandwich, strips, waffle fries, mac and cheese, drink, lemonade, icedream cone! DON'T FORGET THE ICEDREAM!!", items:['cs','st','fr','mc','dk','lm','cm'], navFlavor:true },
+      { greeting:"YO JUSTIN!! CFA sandwich, strips, waffle fries, mac and cheese, drink, lemonade, icedream cone, AND like three Chick-fil-A sauces! DON'T FORGET THE ICEDREAM!!", items:['cs','st','fr','mc','dk','lm','cm','sc','sc','sc'], navFlavor:true },
       { greeting:"JUSTIN WAIT. CHANGE OF PLANS. Nuggets - NO WAIT - strips - ACTUALLY BOTH. Fries, mac and cheese, WAIT ADD ANOTHER FRIES. Milkshake AND lemonade AND a drink. Cookie. Brownie. ICEDREAM. GO GO GO!!", items:['ng','st','fr','fr','mc','ms','lm','dk','ck','br','cm'], navFlavor:true },
     ],
-    walter: [{ greeting:"Hey man, sandwich combo and a brownie. And actually add a fruit cup.", items:['cs','fr','dk','br','fs'] }],
-    ranel: [{ greeting:"What's good Justin, 12-piece nuggets, fries, lemonade, and two cookies.", items:['ng','fr','lm','ck','ck'] }],
-    declan: [{ greeting:"Justin! Spicy deluxe, extra pickles, waffle fries, iced coffee, and an icedream!", items:['ss','fr','ic','cm'] }],
+    walter: [
+      { greeting:"Hey man, sandwich combo and a brownie. And actually add a fruit cup. Couple Chick-fil-A sauces too.", items:['cs','fr','dk','br','fs','sc','sc'] },
+      { greeting:"Just a 12-piece nuggets and three sauces — one Chick-fil-A, one Polynesian, one honey mustard.", items:['ng','sc','po','hm'] },
+    ],
+    ranel: [
+      { greeting:"What's good Justin, 12-piece nuggets, fries, lemonade, two cookies, and three Chick-fil-A sauces for the nuggets.", items:['ng','fr','lm','ck','ck','sc','sc','sc'] },
+      { greeting:"Grilled sandwich, NO pickles, side salad with a ranch, and a bottled water. Tryna be healthy.", items:['gs','np','sa','rn','wt'] },
+    ],
+    declan: [
+      { greeting:"Justin! Spicy deluxe, extra pickles, waffle fries, iced coffee with extra ice, and an icedream!", items:['ss','xp','fr','ic','xi','cm'] },
+      { greeting:"Yo Justin — 12-piece nuggets with a Polynesian AND a Chick-fil-A sauce, waffle fries, and a sweet tea.", items:['ng','po','sc','fr','tea'] },
+    ],
     katy: [
-      { greeting:"OH MY GOD JUSTIN HI!! So okay I have SO much to tell you. First of all, did you hear about— oh right, food. Okay so milkshake, no wait lemonade, NO WAIT BOTH! And nuggets! And a cookie! And a brownie! And waffle fries! Actually get me a fruit cup too I need vitamins or whatever! ANYWAY so as I was saying—", items:['ms','lm','ng','ck','br','fr','fs'], katyFlavor:true },
+      { greeting:"OH MY GOD JUSTIN HI!! So okay I have SO much to tell you. First of all, did you hear about— oh right, food. Okay so milkshake, no wait lemonade, NO WAIT BOTH! And nuggets! And a cookie! And a brownie! And waffle fries! Actually get me a fruit cup too I need vitamins or whatever! And like a ranch and a Chick-fil-A sauce! ANYWAY so as I was saying—", items:['ms','lm','ng','ck','br','fr','fs','rn','sc'], katyFlavor:true },
       { greeting:"JUSTINNNN!! Okay so listen, I was telling Gentry about this thing and— oh wait I need to order. Salad because I'm being healthy but ALSO fries AND mac and cheese because like BALANCE right?? And an icedream cone! And an iced coffee! Okay ANYWAY so Gentry said—", items:['sa','fr','mc','cm','ic'], katyFlavor:true },
     ],
   },
@@ -1755,7 +1797,7 @@ const G = {
     }
 
     // === CHAOS EVENTS (random between rounds) ===
-    if (this.currentRound > 1 && Math.random() < 0.20) {
+    if (this.currentRound > 1 && Math.random() < 0.34) {
       this.triggerChaos(() => this.afterChaos());
       return;
     }
@@ -1764,8 +1806,8 @@ const G = {
   },
 
   afterChaos() {
-    // Andy event check (one roll per round now — he used to gang up on you)
-    const andyRolls = 1;
+    // Andy event check — round 9 he really gangs up on you
+    const andyRolls = this.currentRound === 9 ? 2 : 1;
     let andyCount = 0;
     for (let i = 0; i < andyRolls; i++) {
       if (this.currentRound > 2 && Math.random() < this.andyChance) {
@@ -2008,7 +2050,7 @@ const G = {
   _orderPad(area, opts) {
     let entered = [];
     let activeCat = 'entree';
-    const cats = { entree:'Entrees', side:'Sides', bev:'Beverages', dessert:'Desserts' };
+    const cats = { entree:'Mains', side:'Sides', bev:'Drinks', dessert:'Sweets', extra:'Extras' };
     const items = opts.items;
 
     const wrap = document.createElement('div');
@@ -2245,7 +2287,7 @@ const G = {
       const area = this.openMG('BAGGING', `Bag order for ${cust.name} — tap items into the bag`);
       this._pickPad(area, {
         items,
-        decoyCount: 4,
+        decoyCount: 5,
         sendLabel: 'Deliver Bag',
         onSend: (picked) => {
           clearInterval(this.patienceTimer);
@@ -2435,7 +2477,7 @@ const G = {
       area.appendChild(win);
       this._pickPad(area, {
         items,
-        decoyCount: 3,
+        decoyCount: 4,
         sendLabel: 'Close Window',
         onSend: (handed) => {
           clearInterval(this.patienceTimer);
