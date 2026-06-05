@@ -823,7 +823,7 @@ const G = {
   ordersCorrect: 0, ordersMessed: 0,
   currentRound: 0, totalRounds: 12,
   isRunning: false, inMinigame: false,
-  andyChance: 0.35, patienceTimer: null,
+  andyChance: 0.55, patienceTimer: null,
   availableStation: null,
   patienceDrainRate: 2.2,
   isReaganCustomer: false,
@@ -1100,54 +1100,44 @@ const G = {
         { text: "What's the difference honestly?", good: false },
         { text: "It just slipped out I swear!", good: true },
       ],
-      effect: function(cb) {
-        G.showDialog('luke', G.chaosEvents[3].lukeReaction, G.chaosEvents[3].choices.map(c => ({
+      effect: function(evt, cb) {
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
           text: c.text,
           action: () => {
-            if (c.good) {
-              G.toast("Luke is furious but lets it slide...", 'warn');
-            } else {
-              G.addStrike(0.5);
-              G.toast("Luke is LIVID. +0.5 strike!", 'bad');
-            }
+            if (c.good) { G.toast("Luke is furious but lets it slide...", 'warn'); }
+            else { G.addStrike(0.5); G.toast("Luke is LIVID. +0.5 strike!", 'bad'); }
             cb();
           }
-        })));
-        return true; // signals that effect handles its own dialog
+        }))); return true;
       }
     },
     {
       name: 'zone_out',
-      intro: "Justin completely zones out thinking about his next cross country race. A customer has been waiting for 45 seconds staring at him.",
+      intro: "Justin completely zones out thinking about his next cross country race. A customer has been waiting 45 seconds just... staring at him.",
       lukeReaction: "JUSTIN! Are you DAYDREAMING right now?! There is a CUSTOMER standing RIGHT THERE! What are you thinking about?!",
       choices: [
         { text: "Sorry! I was... calculating our inventory needs!", good: true },
         { text: "I was thinking about my race strategy for Saturday...", good: false },
         { text: "What? Oh! Sorry! I'm here! I'm focused!", good: true },
       ],
-      effect: function(cb) {
+      effect: function(evt, cb) {
         G.customerPatience = Math.max(0, G.customerPatience - 15);
         G.updateHUD();
-        G.showDialog('luke', G.chaosEvents[4].lukeReaction, G.chaosEvents[4].choices.map(c => ({
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
           text: c.text,
           action: () => {
-            if (c.good) {
-              G.toast("Close call. Stay focused!", 'warn');
-            } else {
-              G.addStrike(0.25);
-              G.toast("Luke shakes his head in disbelief.", 'bad');
-            }
+            if (c.good) { G.toast("Close call. Stay focused!", 'warn'); }
+            else { G.addStrike(0.25); G.toast("Luke shakes his head in disbelief.", 'bad'); }
             cb();
           }
-        })));
-        return true;
+        }))); return true;
       }
     },
     {
       name: 'ipad_drop',
       intro: "Justin drops the iPad outside! It's sliding across the asphalt while cars HONK and customers stare!",
       lukeReaction: "That iPad costs $800, Justin. EIGHT HUNDRED DOLLARS. If there's a single crack I'm taking it out of your paycheck for the next YEAR.",
-      effect: function(cb) {
+      effect: function(evt, cb) {
         G.customerPatience = Math.max(0, G.customerPatience - 25);
         G.toast("Dropped the iPad! Cars honking! -25 patience", 'chaos');
         G.updateHUD();
@@ -1158,7 +1148,7 @@ const G = {
       name: 'fire_alarm',
       intro: "The fryer just set off the FIRE ALARM! The entire restaurant is PANICKING! Customers are running for the exits!",
       lukeReaction: "FALSE ALARM! EVERYONE CALM DOWN! Justin, go reset the alarm panel and then get back to work. We're losing customers by the SECOND!",
-      effect: function(cb) {
+      effect: function(evt, cb) {
         G.customerPatience = Math.max(0, G.customerPatience - 30);
         G.toast("FIRE ALARM! Total chaos! -30 patience", 'chaos');
         G.updateHUD();
@@ -1174,20 +1164,261 @@ const G = {
         { text: "Hold on Luke, it might be important— Hi Mom...", good: false },
         { text: "I thought it was on silent I SWEAR!", good: true },
       ],
-      effect: function(cb) {
-        G.showDialog('luke', G.chaosEvents[7].lukeReaction, G.chaosEvents[7].choices.map(c => ({
+      effect: function(evt, cb) {
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
           text: c.text,
           action: () => {
-            if (c.good) {
-              G.toast("Awkward... but crisis averted.", 'warn');
-            } else {
-              G.addStrike(0.5);
-              G.toast("Luke looks like he's about to explode.", 'bad');
-            }
+            if (c.good) { G.toast("Awkward... but crisis averted.", 'warn'); }
+            else { G.addStrike(0.5); G.toast("Luke looks like he's about to explode.", 'bad'); }
             cb();
           }
-        })));
-        return true;
+        }))); return true;
+      }
+    },
+    {
+      name: 'stretching',
+      intro: "Justin is doing HIGH KNEES behind the register between customers. Full sprint warmup. In full uniform. Customers are recording on their phones.",
+      lukeReaction: "JUSTIN. What in the WORLD are you doing?! This is a Chick-fil-A, not a TRACK MEET! PUT YOUR LEGS DOWN RIGHT NOW!",
+      choices: [
+        { text: "I'm staying loose! It helps with reaction time!", good: false },
+        { text: "*stops immediately* I was just... nothing. I was doing nothing.", good: true },
+        { text: "Coach Hudson says I should never stop moving...", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 12);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Luke stares for 5 full seconds. 'Never again.'", 'warn'); }
+            else { G.addStrike(0.5); G.toast("Someone definitely posted that. +0.5 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'wrong_bag',
+      intro: "Justin confidently hands a curbside bag to the wrong car. The actual customer is honking. The wrong customer drove away. With the food.",
+      lukeReaction: "Justin. That was NOT their order. You just gave a stranger $40 of free food. We are remaking that ENTIRE ORDER.",
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 22);
+        G.score = Math.max(0, G.score - 80);
+        G.toast("Wrong car got the food! -80 score, -22 patience", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'jacob_incident',
+      intro: "Something flies out of the kitchen and HITS Justin in the back of the head. Jacob is not making eye contact. Customers saw everything.",
+      lukeReaction: "I... I am not even going to ask. Justin are you okay? Actually, I don't care. Get back to work.",
+      choices: [
+        { text: "I'm fine! Totally fine! Everything's fine!", good: true },
+        { text: "JACOB THREW SOMETHING AT ME—", good: false },
+        { text: "*slowly turns around, locks eyes with Jacob, says nothing*", good: true },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 10);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Professional. Somehow.", 'warn'); }
+            else { G.addStrike(0.25); G.toast("Don't start drama on the floor, Justin.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'running_advice',
+      intro: "A customer mentioned they jog in the morning. Justin has now been giving unsolicited marathon training advice for 3 minutes. There are 8 people in line.",
+      lukeReaction: "JUSTIN! You are NOT a personal trainer! You are a CASHIER! STOP COACHING THE CUSTOMERS!",
+      choices: [
+        { text: "But she was asking about her 5K time and—", good: false },
+        { text: "*immediately ends conversation* My pleasure! Next please!", good: true },
+        { text: "I'm networking, Luke. Building community.", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 18);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("8 people waited but okay. Crisis averted.", 'warn'); }
+            else { G.addStrike(0.5); G.toast("'Building community.' Luke is done with you.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'headset_dies',
+      intro: "Justin's drive-through headset just cut out mid-order. He's been nodding for 2 minutes at static. He has no idea what the customer wants. The customer is furious.",
+      lukeReaction: "Justin... have you just been nodding at a dead headset this whole time?! SWAP IT OUT! We have BACKUPS FOR A REASON!",
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 20);
+        G.toast("Headset died! No idea what they ordered! -20 patience", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'complained_sighing',
+      intro: "A customer is demanding to speak to a manager. Reason: Justin was 'sighing too loudly and it was off-putting.' Luke is walking over.",
+      lukeReaction: "A customer complained... that you were SIGHING too much. Justin. Are you sighing at customers?",
+      choices: [
+        { text: "I didn't even know I was doing it, I'm so sorry!", good: true },
+        { text: "It's been a long shift and I'm tired—", good: false },
+        { text: "She was rude first and you know it.", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 10);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Smoothed over. Barely.", 'warn'); }
+            else { G.addStrike(0.5); G.toast("Luke is questioning all his life decisions. +0.5 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'cow_in_freezer',
+      intro: "A kid is crying because Justin told him the cow mascot lives in the walk-in freezer. The mom is LIVID. Luke is sprinting over.",
+      lukeReaction: "Justin did you tell a child that our MASCOT LIVES IN THE FREEZER?! Why would you SAY THAT?! He's CRYING, Justin!",
+      choices: [
+        { text: "I was just joking! I thought he was older!", good: true },
+        { text: "...I mean technically the mascot IS on the door...", good: false },
+        { text: "Kids love dark humor! It builds character!", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 20);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Mom gave you a death stare but accepted the apology.", 'warn'); }
+            else { G.addStrike(0.75); G.toast("You made a child cry about a frozen cow. +0.75 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'milkshake_machine',
+      intro: "The milkshake machine is broken and making an unholy noise. Justin tried to fix it himself. There is vanilla shake on the ceiling.",
+      lukeReaction: "WHAT IS ON THE CEILING?! Justin... WHO told you to touch the machine?! Are you a TECHNICIAN?! Are you??",
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 25);
+        G.addStrike(0.25);
+        G.toast("Milkshake machine EXPLODED. +0.25 strike, -25 patience", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'wrong_order_return',
+      intro: "An angry customer just came BACK with the wrong order Justin gave them 20 minutes ago. They're holding the bag like evidence. Luke is watching.",
+      lukeReaction: "This man drove back here, Justin. He drove BACK. Look at his face. LOOK AT IT.",
+      choices: [
+        { text: "Sir I am SO sorry, let me fix that right now! My pleasure!", good: true },
+        { text: "I'm like 90% sure that's the right order though...", good: false },
+        { text: "*studies receipt* ...I made this correctly. He changed his mind.", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 15);
+        G.score = Math.max(0, G.score - 50);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Fixed. Still embarrassing. -50 score.", 'warn'); }
+            else { G.addStrike(0.75); G.toast("You argued with a returning customer. +0.75 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'humming_incident',
+      intro: "Justin has been humming Sabrina Carpenter out loud for the past 4 minutes during service. He doesn't realize he's doing it. Three customers have complained.",
+      lukeReaction: "Justin. Do you hear yourself right now? You're HUMMING. Out loud. TO CUSTOMERS. This is not a concert.",
+      choices: [
+        { text: "*instantly stops* I didn't know! I swear!", good: true },
+        { text: "It was creating a positive atmosphere, Luke.", good: false },
+        { text: "The customers liked it! One lady smiled!", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 8);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Luke is restraining himself.", 'warn'); }
+            else { G.addStrike(0.25); G.toast("'Positive atmosphere.' Unbelievable. +0.25 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'outrun_car',
+      intro: "Justin just told a drive-through customer he could outrun their Prius. The customer has their window down. They heard everything.",
+      lukeReaction: "Did you just... challenge a customer to a RACE?! At a DRIVE-THROUGH?! JUSTIN!",
+      choices: [
+        { text: "I meant it as a compliment to their Prius?", good: false },
+        { text: "It was a JOKE! I was breaking the ice!", good: true },
+        { text: "I mean I could though. I have the splits to back it up.", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 12);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("They laughed it off. Luke did not.", 'warn'); }
+            else { G.addStrike(0.5); G.toast("He did NOT think it was a compliment. +0.5 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
+      }
+    },
+    {
+      name: 'sauce_frenzy',
+      intro: "Justin has been putting 8 Chick-fil-A sauces in every single bag without being asked. The back is now completely out of sauce. Customers are finding out.",
+      lukeReaction: "Justin. We're OUT of CFA sauce. You put sauce in EVERY BAG. Do you know how much that costs us?! People are ASKING for sauce and we have NONE.",
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 20);
+        G.score = Math.max(0, G.score - 60);
+        G.toast("No more sauce! Customers furious! -60 score", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'dumpster_fries',
+      intro: "A coworker just found Justin eating waffle fries behind the dumpster on a 4-minute 'bathroom break'. He says he was 'carb loading for later'.",
+      lukeReaction: "You were EATING behind the DUMPSTER?! On the CLOCK?! Justin those fries were for a customer's ORDER!",
+      choices: [
+        { text: "I'll pay for them! I'm so sorry! Never again!", good: true },
+        { text: "I needed the fuel, Luke. You don't understand distance runners.", good: false },
+        { text: "It was only like 6 fries. 7 max.", good: false },
+      ],
+      effect: function(evt, cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 15);
+        G.updateHUD();
+        G.showDialog('luke', evt.lukeReaction, evt.choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) { G.toast("Crisis averted. Luke is keeping this on file.", 'warn'); }
+            else { G.addStrike(0.5); G.toast("'7 max.' Luke is calling your parents. +0.5 strike.", 'bad'); }
+            cb();
+          }
+        }))); return true;
       }
     },
   ],
@@ -1411,7 +1642,7 @@ const G = {
     }
 
     // === CHAOS EVENTS (random between rounds) ===
-    if (this.currentRound > 1 && Math.random() < 0.30) {
+    if (this.currentRound > 1 && Math.random() < 0.50) {
       this.triggerChaos(() => this.afterChaos());
       return;
     }
@@ -1448,7 +1679,7 @@ const G = {
     this.toast('CHAOS EVENT!', 'chaos');
     setTimeout(() => {
       this.showDialog('justin', evt.intro, [], () => {
-        const handlesDialog = evt.effect(cb);
+        const handlesDialog = evt.effect(evt, cb);
         if (!handlesDialog) {
           this.showDialog('luke', evt.lukeReaction, [], cb);
         }
