@@ -185,7 +185,7 @@ canvas{display:block;width:100%;height:100%}
 .tix-line{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .tix-item{display:inline-flex;align-items:center;gap:3px;background:rgba(0,0,0,.05);border-radius:10px;padding:2px 7px;font-size:.82em;font-weight:700}
 .tix-item .tix-x{color:var(--red);font-weight:900}
-/* Watch Jacob (Caitlin side-game) */
+/* Watch Jacob (Kaitlyn side-game) */
 .wj-wrap{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:stretch;gap:12px}
 .wj-cam{background:#0e1118;border:2px solid #28344f;border-radius:14px;padding:10px;position:relative;overflow:hidden}
 .wj-camlabel{font-size:.62em;font-weight:800;color:#5fd0ff;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase}
@@ -436,7 +436,7 @@ const Sprites = {
     declan:   { hair:'short', hairColor:'#5A3A20', skinColor:'#FDDCB5', eyeColor:'#556B2F', shirtColor:'#2ECC71', pantsColor:'#335', isApron:false, hat:false },
     katy:     { hair:'red-long', hairColor:'#CC4422', skinColor:'#FDDCB5', eyeColor:'#4488CC', shirtColor:'#FF6B6B', pantsColor:'#446', isApron:false, hat:false },
     nicolas:  { hair:'short', hairColor:'#1A1008', skinColor:'#E3BC92', eyeColor:'#2A1A0A', shirtColor:'#00A3E0', pantsColor:'#1c1c1c', isApron:false, hat:false },
-    caitlin:  { hair:'long', hairColor:'#6B4A2A', skinColor:'#FDE3C8', eyeColor:'#3A7A4A', shirtColor:'#C2185B', pantsColor:'#446', isApron:false, hat:false },
+    kaitlyn:  { hair:'long', hairColor:'#6B4A2A', skinColor:'#FDE3C8', eyeColor:'#3A7A4A', shirtColor:'#C2185B', pantsColor:'#446', isApron:false, hat:false },
     charles:  { hair:'short', hairColor:'#7A5B1A', skinColor:'#FDE3C8', eyeColor:'#5A3A1A', shirtColor:'#5C5470', pantsColor:'#2c2c2c', isApron:false, hat:false },
     levi:     { hair:'lots',  hairColor:'#C49A3C', skinColor:'#FDDCB5', eyeColor:'#5A3A1A', shirtColor:'#B8572A', pantsColor:'#336',    isApron:false, hat:false },
     stranger: { hair:'short', hairColor:'#333',    skinColor:'#D4AA78', eyeColor:'#444',    shirtColor:'#555',    pantsColor:'#333',    isApron:false, hat:false },
@@ -1048,7 +1048,7 @@ const G = {
     henry:{ name:'Henry' }, black:{ name:'Black' }, carter:{ name:'Carter' },
     reagan:{ name:'Reagan' }, navaneeth:{ name:'Navaneeth' },
     walter:{ name:'Walter' }, ranel:{ name:'Ranel' }, declan:{ name:'Declan' },
-    katy:{ name:'Katy' }, nicolas:{ name:'Nicolas' }, caitlin:{ name:'Caitlin' },
+    katy:{ name:'Katy' }, nicolas:{ name:'Nicolas' }, kaitlyn:{ name:'Kaitlyn' },
     charles:{ name:'Charles Weiner' }, levi:{ name:'Levi Howard Weiner' },
     stranger:{ name:'???' }, hudsons_brother:{ name:"Coach Hudson's Bro" },
     ethan:{ name:'Ethan Bridge' }, ethan_gf:{ name:"Ethan's Girlfriend" },
@@ -1109,9 +1109,9 @@ const G = {
       { greeting:"Hey legend! 12-piece and a sweet tea. I'll be gone before you blink.", items:['ng','tea'], nicolasFlavor:true },
       { greeting:"Yo Justin! CFA sandwich, waffle fries, and a Chick-fil-A sauce. You're the GOAT, man.", items:['cs','fr','sc'], nicolasFlavor:true },
     ],
-    caitlin: [
-      { greeting:"Hi Justin! I'll take a grilled sandwich and a lemonade — *glances toward the kitchen* ...is Jacob back there? Keep an eye on him for me, would you?", items:['gs','lm'], caitlinFlavor:true, chatter:"So anyway, my sister said the funniest thing— wait. What is Jacob DOING back there?" },
-      { greeting:"Justin! A 12-piece and a sweet tea, please. *narrows eyes at the kitchen* He better not be chatting anybody up while I'm standing here.", items:['ng','tea'], caitlinFlavor:true, chatter:"Keep watching him, Justin. I notice everything, okay? Everything." },
+    kaitlyn: [
+      { greeting:"Hi Justin! I'll take a grilled sandwich and a lemonade — *glances toward the kitchen* ...is Jacob back there? Keep an eye on him for me, would you?", items:['gs','lm'], kaitlynFlavor:true, chatter:"So anyway, my sister said the funniest thing— wait. What is Jacob DOING back there?" },
+      { greeting:"Justin! A 12-piece and a sweet tea, please. *narrows eyes at the kitchen* He better not be chatting anybody up while I'm standing here.", items:['ng','tea'], kaitlynFlavor:true, chatter:"Keep watching him, Justin. I notice everything, okay? Everything." },
     ],
     charles: [
       { greeting:"Justin! Charles Weiner. You may know my son. CFA sandwich, waffle fries, lemonade, and a honey mustard. Pleasure doing business.", items:['cs','fr','lm','hm'] },
@@ -1807,7 +1807,7 @@ const G = {
       this.toast('Luke: "Corporate is watching today. Don\'t embarrass me."', 'luke');
     }
     if (this.currentRound === 4) {
-      this.toast('Luke: "Heads up — Caitlin just walked in. Keep an eye on Jacob back there."', 'warn');
+      this.toast('Luke: "Heads up — Kaitlyn just walked in. Keep an eye on Jacob back there."', 'warn');
     }
     if (this.currentRound === 6) {
       this.patienceDrainRate = 1.3;
@@ -1889,8 +1889,8 @@ const G = {
     this.inMinigame = true;
     const customer = this.pickCustomer();
 
-    // Caitlin Serna — runs her own "watch Jacob" side game (no standard timer)
-    if (customer.key === 'caitlin') { this.mgWatchJacob(customer); return; }
+    // Kaitlyn Serna — runs her own "watch Jacob" side game (no standard timer)
+    if (customer.key === 'kaitlyn') { this.mgWatchJacob(customer); return; }
 
     // Levi Howard Weiner — "The Weiner Special" assembly game (handles its own timer)
     if (customer.key === 'levi') { this.mgWeinerSpecial(customer); return; }
@@ -1930,7 +1930,7 @@ const G = {
   pickCustomer() {
     // Guaranteed special character rounds — every game sees all the unique content
     const guaranteed = {
-      4:  'caitlin',  // Watch Jacob side game
+      4:  'kaitlyn',  // Watch Jacob side game
       6:  'ethan',    // Ethan + freshman GF double order (during lunch rush)
       8:  'nicolas',  // The GOAT (chill patience drain)
       9:  'levi',     // Weiner Special (+ double Andy from round 9 rule)
@@ -2583,8 +2583,8 @@ const G = {
   },
 
   // ============================
-  //  CAITLIN SERNA — WATCH JACOB (side game)
-  //  Caitlin orders while you keep Jacob from flirting with other girls.
+  //  KAITLYN SERNA — WATCH JACOB (side game)
+  //  Kaitlyn orders while you keep Jacob from flirting with other girls.
   // ============================
   mgWatchJacob(cust) {
     this.inMinigame = true;
@@ -2601,12 +2601,12 @@ const G = {
 
     const cleanup = () => { clearTimeout(winT); clearTimeout(nextT); winT = nextT = null; };
 
-    this.showDialog('caitlin', order.greeting, [
+    this.showDialog('kaitlyn', order.greeting, [
       { text: "Of course! (better watch Jacob...)", action: () => start() },
     ]);
 
     const start = () => {
-      const area = this.openMG('WATCH JACOB', "Caitlin's ordering — don't let Jacob flirt with other girls!");
+      const area = this.openMG('WATCH JACOB', "Kaitlyn's ordering — don't let Jacob flirt with other girls!");
       const w = document.createElement('div');
       w.className = 'wj-wrap';
       w.innerHTML = `
@@ -2623,7 +2623,7 @@ const G = {
         <div class="wj-status"><span id="wj-caught">Caught: 0</span><span id="wj-prog"></span><span id="wj-missed">Missed: 0</span></div>
         <button class="btn btn-r wj-btn" id="wj-stop">GET BACK TO WORK, JACOB!</button>`;
       area.appendChild(w);
-      Sprites.drawChar(document.getElementById('wj-cait'), 'caitlin');
+      Sprites.drawChar(document.getElementById('wj-cait'), 'kaitlyn');
       Sprites.drawChar(document.getElementById('wj-jacob'), 'jacob');
       updProg();
       document.getElementById('wj-stop').onclick = () => tap();
@@ -2673,7 +2673,7 @@ const G = {
       } else {
         missed++; this.customerPatience = Math.max(0, this.customerPatience - 18); this.updateHUD();
         SFX.fail();
-        this.toast(R(["Jacob slipped away!", "Caitlin SAW that!", "Jacob is FLIRTING!"]), 'bad');
+        this.toast(R(["Jacob slipped away!", "Kaitlyn SAW that!", "Jacob is FLIRTING!"]), 'bad');
       }
       updProg();
       if (missed >= 3) return finish();
@@ -2690,17 +2690,17 @@ const G = {
         const bonus = 80 + caught * 15;
         this.score += bonus;
         SFX.success();
-        this.toast('Caitlin happy & Jacob behaved! +' + bonus, 'good');
+        this.toast('Kaitlyn happy & Jacob behaved! +' + bonus, 'good');
         this.checkSpeedBonus();
         this.myPleasure(0.5);
-        this.showDialog('caitlin', R([
+        this.showDialog('kaitlyn', R([
           "Thanks Justin! And thanks for keeping Jacob in line, haha.",
           "Perfect order AND Jacob didn't embarrass himself. You're the best!",
           "See? This is why I come to YOUR register. Bye Justin!",
         ]), [], () => this.nextRound());
       } else {
         this.ordersMessed++;
-        this.showDialog('caitlin', R([
+        this.showDialog('kaitlyn', R([
           "Justin you weren't even listening to me! And Jacob?? UGH.",
           "I'm leaving. You let Jacob run absolutely wild back there.",
           "Worst service ever. Jacob was flirting the ENTIRE time!",
@@ -3060,7 +3060,7 @@ const SFX = {
     jacob:    ['sawtooth', 360, 50,  0.09],
     katy:     ['sine',     740, 100, 0.08],
     nicolas:  ['square',   560, 90,  0.09],
-    caitlin:  ['sine',     700, 95,  0.08],
+    kaitlyn:  ['sine',     700, 95,  0.08],
     charles:  ['triangle', 330, 25,  0.08],
     levi:     ['square',   490, 70,  0.09],
     stranger: ['sine',     420, 50,  0.07],
