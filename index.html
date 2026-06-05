@@ -51,7 +51,7 @@ canvas{display:block;width:100%;height:100%}
 
 /* Toast */
 .toast{position:absolute;top:54px;left:12px;right:12px;padding:12px;border-radius:12px;color:#fff;font-weight:700;font-size:.8em;z-index:300;animation:tIn .3s ease-out,tOut .3s ease-in 2s forwards;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.toast-good{background:var(--success)}.toast-bad{background:var(--danger)}.toast-warn{background:var(--warn);color:#333}.toast-andy{background:#6f42c1}.toast-luke{background:var(--blue)}
+.toast-good{background:var(--success)}.toast-bad{background:var(--danger)}.toast-warn{background:var(--warn);color:#333}.toast-andy{background:#6f42c1}.toast-luke{background:var(--blue)}.toast-chaos{background:#FF6F00}
 @keyframes tIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
 
@@ -66,6 +66,19 @@ canvas{display:block;width:100%;height:100%}
 .mg-title{font-family:'Fredoka One',cursive;font-size:1.2em;color:#fff;text-align:center;margin-bottom:4px;text-shadow:0 2px 8px rgba(229,22,54,.4)}
 .mg-inst{font-size:.78em;color:rgba(255,255,255,.6);text-align:center;margin-bottom:12px;font-weight:600}
 .mg-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding-bottom:20px}
+
+/* MG Timer */
+.mg-timer{font-family:'Fredoka One',cursive;font-size:1.1em;color:#fff;text-align:center;margin-bottom:6px;padding:4px 16px;border-radius:20px;display:inline-block}
+.mg-timer.timer-ok{background:rgba(40,167,69,.3);color:#4f4}
+.mg-timer.timer-warn{background:rgba(255,193,7,.3);color:#FFC107}
+.mg-timer.timer-crit{background:rgba(255,51,51,.4);color:#f55;animation:timerPulse .5s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.mg-wrong-flash{position:fixed;inset:0;background:rgba(255,0,0,.15);z-index:999;pointer-events:none;animation:wrongFlash .4s ease-out forwards}
+@keyframes wrongFlash{from{opacity:1}to{opacity:0}}
+.speed-bonus{font-family:'Fredoka One',cursive;font-size:1.4em;color:#FFD700;text-align:center;animation:bonusPop .5s ease-out;text-shadow:0 0 20px rgba(255,215,0,.5)}
+@keyframes bonusPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.honk-text{position:absolute;top:10%;right:5%;font-family:'Fredoka One',cursive;font-size:1em;color:#FF6F00;animation:honkShake .3s ease-in-out infinite;z-index:160}
+@keyframes honkShake{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 
 /* Register MG - CFA POS Style */
 .reg-screen{width:100%;max-width:360px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3)}
@@ -94,7 +107,9 @@ canvas{display:block;width:100%;height:100%}
 .conveyor{display:flex;gap:8px;overflow-x:auto;padding:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:12px;min-height:70px;align-items:center}
 .food-box{width:56px;height:56px;background:rgba(255,255,255,.92);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.85em;flex-shrink:0;cursor:pointer;border:2px solid transparent;transition:all .15s;font-weight:800;color:#333;box-shadow:0 2px 6px rgba(0,0,0,.1)}
 .food-box.picked{border-color:var(--success);background:#d4edda;box-shadow:0 0 12px rgba(40,167,69,.3)}
+.food-box.wrong-pick{border-color:var(--danger);background:#ffcccc;animation:wrongItem .4s ease-out}
 .food-box:active{transform:scale(.9)}
+@keyframes wrongItem{0%{transform:translateX(-4px)}25%{transform:translateX(4px)}50%{transform:translateX(-4px)}75%{transform:translateX(4px)}100%{transform:translateX(0)}}
 .bag-drop{width:110px;height:130px;margin:0 auto;background:linear-gradient(180deg,#d4a85a,#8B5e23);border-radius:4px 4px 12px 12px;position:relative;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px;gap:3px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .bag-drop::before{content:'';position:absolute;top:-8px;left:-4px;right:-4px;height:14px;background:#d4a85a;border-radius:8px 8px 0 0}
 .bag-mini{font-size:.68em;font-weight:800;background:rgba(255,255,255,.25);padding:2px 6px;border-radius:6px;color:#fff}
@@ -200,6 +215,7 @@ canvas{display:block;width:100%;height:100%}
   <div id="minigame-overlay">
     <div class="mg-title" id="mg-title"></div>
     <div class="mg-inst" id="mg-inst"></div>
+    <div id="mg-timer-wrap" style="text-align:center"></div>
     <div class="mg-area" id="mg-area"></div>
   </div>
 
@@ -807,8 +823,11 @@ const G = {
   ordersCorrect: 0, ordersMessed: 0,
   currentRound: 0, totalRounds: 12,
   isRunning: false, inMinigame: false,
-  andyChance: 0.28, patienceTimer: null,
+  andyChance: 0.35, patienceTimer: null,
   availableStation: null,
+  patienceDrainRate: 2.2,
+  isReaganCustomer: false,
+  honkEl: null,
 
   menu: [
     { id:'cs', name:'Chick-fil-A Sandwich', short:'CFA Sand', cat:'entree' },
@@ -840,40 +859,49 @@ const G = {
 
   npcOrders: {
     hudson: [
-      { greeting:"Justin! Shouldn't you be out running intervals? Whatever. Grilled sandwich, side salad, lemonade, and a fruit cup for Coach Martinez.", items:['gs','sa','lm','fs'] },
-      { greeting:"Cook! Your 800 split was embarrassing yesterday. Get me a CFA sandwich combo with mac and cheese, NOT fries. And an iced coffee. And don't mess it up like you mess up your kick.", items:['cs','mc','ic'] },
+      { greeting:"Justin! Shouldn't you be out running intervals? Whatever. Grilled sandwich, side salad, lemonade, and a fruit cup for Coach Martinez.", items:['gs','sa','lm','fs'], hudsonFlavor:true },
+      { greeting:"Cook! Your 800 split was embarrassing yesterday. Get me a CFA sandwich combo with mac and cheese, NOT fries. And an iced coffee. And don't mess it up like you mess up your kick.", items:['cs','mc','ic'], hudsonFlavor:true },
+      { greeting:"Cook! Stand up straight behind that register. Your posture is PATHETIC. CFA sandwich, fries, lemonade. And I want to see those shoulders BACK while you ring it up.", items:['cs','fr','lm'], hudsonFlavor:true },
     ],
     gentry: [
-      { greeting:"Yo Justin! Lemme get uhhhh... spicy deluxe, waffle fries, lemonade, and actually throw a cookie on there too.", items:['ss','fr','lm','ck'] },
-      { greeting:"Bro I need a 12-piece nuggets, mac and cheese, fries, and a milkshake. Practice was brutal.", items:['ng','mc','fr','ms'] },
+      { greeting:"Yo Justin! Lemme get uhhhh... spicy deluxe, waffle fries, lemonade, and actually throw a cookie on there too.", items:['ss','fr','lm','ck'], gentryFlavor:true },
+      { greeting:"Bro I need a 12-piece nuggets, mac and cheese, fries, and a milkshake. Practice was brutal.", items:['ng','mc','fr','ms'], gentryFlavor:true },
+      { greeting:"Aight so... nuggets, but like the 12-piece, then fries obviously, iced coffee with extra ice, a brownie, AND a cookie. Oh and a lemonade. Yeah that's it. Wait, add mac and cheese.", items:['ng','fr','ic','br','ck','lm','mc'], gentryFlavor:true },
     ],
     henry: [
-      { greeting:"Hey Justin! Usual - CFA sandwich, mac and cheese, milkshake, and a brownie. Actually make it two brownies, I'm splitting with someone.", items:['cs','mc','ms','br','br'] },
-      { greeting:"Justin! Strips, waffle fries, iced coffee, and an icedream cone. Hurry up I gotta go!", items:['st','fr','ic','cm'] },
+      { greeting:"Hey Justin! *shows phone* BRO LOOK AT THIS MEME. Okay okay sorry. Usual - CFA sandwich, mac and cheese, milkshake, and a brownie. Actually make it two brownies, I'm splitting with someone.", items:['cs','mc','ms','br','br'], henryFlavor:true },
+      { greeting:"Justin! *scrolling phone* Wait hold on this is so funny-- okay sorry. Strips, waffle fries, iced coffee, and an icedream cone. *shows another meme* LOOK AT THIS ONE", items:['st','fr','ic','cm'], henryFlavor:true },
     ],
     black: [
-      { greeting:"Justin, me and Carter are splitting a big order. Two 12-piece nuggets, two fries, a mac and cheese, two drinks, and two cookies.", items:['ng','ng','fr','fr','mc','dk','dk','ck','ck'] },
+      { greeting:"Justin, me and Carter are splitting a big order. Two 12-piece nuggets, two fries, a mac and cheese, two drinks, and two cookies.", items:['ng','ng','fr','fr','mc','dk','dk','ck','ck'], blackCarterFlavor:true },
+      { greeting:"Yo Justin. Carter wants a spicy deluxe but I think he should get grilled. Actually get both and we'll figure it out. And two fries, two drinks.", items:['ss','gs','fr','fr','dk','dk'], blackCarterFlavor:true },
     ],
     carter: [
       { greeting:"What's up Justin! Just a spicy deluxe, fries, lemonade, and a brownie.", items:['ss','fr','lm','br'] },
+      { greeting:"Yooo Justin! Me and Black can't decide. He wants nuggets, I want strips. Get both. Two fries, two lemonades, and two cookies.", items:['ng','st','fr','fr','lm','lm','ck','ck'], blackCarterFlavor:true },
     ],
     reagan: [
       { greeting:"Hey Justin... *smiles* Can I get a side salad, fruit cup, and lemonade? Oh and an icedream cone, I'm treating myself.", items:['sa','fs','lm','cm'] },
       { greeting:"Hi Justin! You look... flustered. I'll have a grilled sandwich, waffle fries, and a lemonade please.", items:['gs','fr','lm'] },
+      { greeting:"Hey! Justin! I brought some friends but they already ordered. Just a milkshake and a cookie for me. *smiles again*", items:['ms','ck'] },
     ],
     navaneeth: [
-      { greeting:"JUSTIN! BRO! I NEED FOOD RIGHT NOW!! Spicy deluxe, 12-piece nuggets, TWO fries, mac and cheese, milkshake, lemonade, a cookie AND a brownie!! I JUST RAN 10 MILES!!", items:['ss','ng','fr','fr','mc','ms','lm','ck','br'] },
-      { greeting:"YO JUSTIN!! CFA sandwich, strips, waffle fries, mac and cheese, drink, lemonade, icedream cone! DON'T FORGET THE ICEDREAM!!", items:['cs','st','fr','mc','dk','lm','cm'] },
+      { greeting:"JUSTIN! BRO! I NEED FOOD RIGHT NOW!! Spicy deluxe, 12-piece nuggets, TWO fries, mac and cheese, milkshake, lemonade, a cookie AND a brownie!! I JUST RAN 10 MILES!!", items:['ss','ng','fr','fr','mc','ms','lm','ck','br'], navFlavor:true },
+      { greeting:"YO JUSTIN!! CFA sandwich, strips, waffle fries, mac and cheese, drink, lemonade, icedream cone! DON'T FORGET THE ICEDREAM!!", items:['cs','st','fr','mc','dk','lm','cm'], navFlavor:true },
+      { greeting:"JUSTIN WAIT. CHANGE OF PLANS. Nuggets - NO WAIT - strips - ACTUALLY BOTH. Fries, mac and cheese, WAIT ADD ANOTHER FRIES. Milkshake AND lemonade AND a drink. Cookie. Brownie. ICEDREAM. GO GO GO!!", items:['ng','st','fr','fr','mc','ms','lm','dk','ck','br','cm'], navFlavor:true },
     ],
     walter: [{ greeting:"Hey man, sandwich combo and a brownie. And actually add a fruit cup.", items:['cs','fr','dk','br','fs'] }],
     ranel: [{ greeting:"What's good Justin, 12-piece nuggets, fries, lemonade, and two cookies.", items:['ng','fr','lm','ck','ck'] }],
     declan: [{ greeting:"Justin! Spicy deluxe, extra pickles, waffle fries, iced coffee, and an icedream!", items:['ss','fr','ic','cm'] }],
     katy: [
-      { greeting:"OH MY GOD JUSTIN HI!! Okay so milkshake, no wait lemonade, NO WAIT BOTH! And nuggets! And a cookie! And a brownie! And waffle fries! Actually get me a fruit cup too I need vitamins or whatever!", items:['ms','lm','ng','ck','br','fr','fs'] },
-      { greeting:"JUSTINNNN!! Salad because I'm being healthy but ALSO fries AND mac and cheese because like BALANCE right?? And an icedream cone! And an iced coffee!", items:['sa','fr','mc','cm','ic'] },
+      { greeting:"OH MY GOD JUSTIN HI!! So okay I have SO much to tell you. First of all, did you hear about— oh right, food. Okay so milkshake, no wait lemonade, NO WAIT BOTH! And nuggets! And a cookie! And a brownie! And waffle fries! Actually get me a fruit cup too I need vitamins or whatever! ANYWAY so as I was saying—", items:['ms','lm','ng','ck','br','fr','fs'], katyFlavor:true },
+      { greeting:"JUSTINNNN!! Okay so listen, I was telling Gentry about this thing and— oh wait I need to order. Salad because I'm being healthy but ALSO fries AND mac and cheese because like BALANCE right?? And an icedream cone! And an iced coffee! Okay ANYWAY so Gentry said—", items:['sa','fr','mc','cm','ic'], katyFlavor:true },
     ],
   },
 
+  // ==========================================
+  // LUKE ROASTS (base + situational)
+  // ==========================================
   lukeRoasts: [
     "Bro, you run a 4:20 mile but you can't run a register? Pick a struggle.",
     "Justin. JUSTIN. That is literally the opposite of what they ordered. Every single item is wrong.",
@@ -898,7 +926,40 @@ const G = {
     "Wow, you got ONE right. Don't celebrate too hard.",
     "I'm genuinely shocked. Write this date down, you did something correctly.",
   ],
+  lukeReaganRoasts: [
+    "Justin your face is literally red. At WORK. Pull yourself together.",
+    "Are you blushing right now? At WORK? In front of customers?? FOCUS.",
+    "Dude. You just stammered for 15 seconds. She's a CUSTOMER, Justin.",
+    "I can physically see your brain short-circuiting. This is embarrassing for both of us.",
+    "Justin, I need you to be a functional human being for the next 3 minutes. Can you do that?",
+  ],
+  lukeNavRoasts: [
+    "This is your worst nightmare isn't it.",
+    "Navaneeth's order is longer than your last race. Good luck.",
+    "I can already see the fear in your eyes. That's a LOT of items.",
+  ],
+  lukeSimpleFailRoasts: [
+    "That was TWO items. TWO. A caveman could do this.",
+    "The order was THREE things, Justin. My DOG could remember three things.",
+    "That was the simplest order we've had all day. And you STILL messed it up.",
+    "Even the customer is looking at you with pity. PITY, Justin.",
+  ],
+  lukePostAndyRoasts: [
+    "I'm running out of excuses for you with management, Justin.",
+    "Andy might be annoying but he's not always WRONG, is he?",
+    "I had to write an incident report because of that. Do you know how much I hate writing?",
+    "Corporate is going to love hearing about this one.",
+  ],
+  lukeSlowRoasts: [
+    "I've seen glaciers move faster than that, Justin.",
+    "Did you take a NAP in the middle of that order?",
+    "Their food was hot when they ordered it. Now it's a science experiment.",
+    "The customer aged visibly waiting for you.",
+  ],
 
+  // ==========================================
+  // ANDY ALLEGATIONS (expanded)
+  // ==========================================
   andyAllegations: [
     { claim:"Justin was spitting in the lemonade!", defenses:[
       { text:"That's insane Andy, I was TASTING it for quality control!", q:'good', e:0.7 },
@@ -940,6 +1001,36 @@ const G = {
       { text:"Luke you've been standing right here the whole time. Did you hear me say that? No? Exactly.", q:'good', e:0.9 },
       { text:"I mean... it IS kind of a funny name though...", q:'bad', e:-0.8 },
     ]},
+    { claim:"Justin was showing customers his mile time on his phone!", defenses:[
+      { text:"My phone has been in my locker since I clocked in. Check it.", q:'good', e:0.8 },
+      { text:"Why would I do that? That makes zero sense, Andy.", q:'good', e:0.7 },
+      { text:"It's a REALLY good mile time though...", q:'bad', e:-0.4 },
+    ]},
+    { claim:"Justin told a customer he could outrun their car!", defenses:[
+      { text:"Andy, that's physically impossible. I'm fast but I'm not insane.", q:'good', e:0.7 },
+      { text:"I was clearly joking and the customer laughed!", q:'good', e:0.6 },
+      { text:"I mean... depends on the car... in a school zone maybe...", q:'bad', e:-0.5 },
+    ]},
+    { claim:"Justin was doing high knees behind the counter during rush hour!", defenses:[
+      { text:"I was literally standing still the entire time. Ask anyone.", q:'good', e:0.7 },
+      { text:"Andy, how would you even see behind the counter? You're not staff.", q:'good', e:0.9 },
+      { text:"It was just a quick warm-up! My legs were stiff!", q:'bad', e:-0.4 },
+    ]},
+    { claim:"Justin gave a customer his number written on a napkin!", defenses:[
+      { text:"That NEVER happened. Andy is making things up again.", q:'good', e:0.7 },
+      { text:"Why would I write my number on a napkin like it's 2005?", q:'good', e:0.8 },
+      { text:"I... it was... that's not... *sweating profusely*", q:'bad', e:-0.6 },
+    ], lukeFollowup:"...was it Reagan's order?" },
+    { claim:"Justin was eating waffle fries and calling it 'carb loading'!", defenses:[
+      { text:"I haven't touched a single fry. Smell my breath if you want.", q:'good', e:0.7 },
+      { text:"Andy is literally eating our food right now. Look at his hands.", q:'good', e:0.9 },
+      { text:"Technically fries ARE carbs and I DO have a meet this weekend...", q:'bad', e:-0.5 },
+    ]},
+    { claim:"Justin told a kid that the cow mascot was real and lives in the freezer!", defenses:[
+      { text:"I would NEVER traumatize a child like that. Come on.", q:'good', e:0.8 },
+      { text:"Andy, the kid was laughing. It was obviously a joke.", q:'good', e:0.7 },
+      { text:"I mean... where DOES the cow costume go after events?", q:'bad', e:-0.4 },
+    ]},
   ],
 
   angryLines: [
@@ -963,12 +1054,150 @@ const G = {
     { text:"Uhh... do you want to speak to Luke? He's right there...", q:'neutral', e:-0.1 },
   ],
 
+  // ==========================================
+  // CHAOS EVENTS
+  // ==========================================
+  chaosEvents: [
+    {
+      name: 'tray_spill',
+      intro: "Justin trips over his own shoelace and sends a FULL TRAY of drinks flying across the floor!",
+      lukeReaction: "Justin. There are drinks EVERYWHERE. The floor is a lake. Customers are lifting their feet. Clean this up NOW.",
+      effect: function(cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 20);
+        G.toast("Spilled a tray of drinks! -20 patience", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'lemonade_machine',
+      intro: "The lemonade machine just DIED. It's making a terrible grinding noise and leaking everywhere.",
+      lukeReaction: "Great. Now you have to tell every customer who orders lemonade that we're out. This is going to go GREAT.",
+      effect: function(cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 15);
+        G.toast("Lemonade machine broke! Customers furious!", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'rush_hour',
+      intro: "RUSH HOUR just hit! The line is out the door and TWO customers are trying to order at the same time!",
+      lukeReaction: "Move FASTER, Justin! There are 30 people in line! I can't believe this is happening on YOUR shift!",
+      effect: function(cb) {
+        G.patienceDrainRate = 3.5;
+        G.toast("RUSH HOUR! Patience drains faster!", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'youre_welcome',
+      intro: "Justin just said 'you're welcome' to a customer instead of 'my pleasure'. Luke heard it. Everyone heard it.",
+      lukeReaction: "Did you just... did you just say 'YOU'RE WELCOME'?! At a CHICK-FIL-A?! That is a FIREABLE OFFENSE, Justin! Say it right! SAY IT!",
+      choices: [
+        { text: "My pleasure! MY PLEASURE! I'm sorry!", good: true },
+        { text: "What's the difference honestly?", good: false },
+        { text: "It just slipped out I swear!", good: true },
+      ],
+      effect: function(cb) {
+        G.showDialog('luke', G.chaosEvents[3].lukeReaction, G.chaosEvents[3].choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) {
+              G.toast("Luke is furious but lets it slide...", 'warn');
+            } else {
+              G.addStrike(0.5);
+              G.toast("Luke is LIVID. +0.5 strike!", 'bad');
+            }
+            cb();
+          }
+        })));
+        return true; // signals that effect handles its own dialog
+      }
+    },
+    {
+      name: 'zone_out',
+      intro: "Justin completely zones out thinking about his next cross country race. A customer has been waiting for 45 seconds staring at him.",
+      lukeReaction: "JUSTIN! Are you DAYDREAMING right now?! There is a CUSTOMER standing RIGHT THERE! What are you thinking about?!",
+      choices: [
+        { text: "Sorry! I was... calculating our inventory needs!", good: true },
+        { text: "I was thinking about my race strategy for Saturday...", good: false },
+        { text: "What? Oh! Sorry! I'm here! I'm focused!", good: true },
+      ],
+      effect: function(cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 15);
+        G.updateHUD();
+        G.showDialog('luke', G.chaosEvents[4].lukeReaction, G.chaosEvents[4].choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) {
+              G.toast("Close call. Stay focused!", 'warn');
+            } else {
+              G.addStrike(0.25);
+              G.toast("Luke shakes his head in disbelief.", 'bad');
+            }
+            cb();
+          }
+        })));
+        return true;
+      }
+    },
+    {
+      name: 'ipad_drop',
+      intro: "Justin drops the iPad outside! It's sliding across the asphalt while cars HONK and customers stare!",
+      lukeReaction: "That iPad costs $800, Justin. EIGHT HUNDRED DOLLARS. If there's a single crack I'm taking it out of your paycheck for the next YEAR.",
+      effect: function(cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 25);
+        G.toast("Dropped the iPad! Cars honking! -25 patience", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'fire_alarm',
+      intro: "The fryer just set off the FIRE ALARM! The entire restaurant is PANICKING! Customers are running for the exits!",
+      lukeReaction: "FALSE ALARM! EVERYONE CALM DOWN! Justin, go reset the alarm panel and then get back to work. We're losing customers by the SECOND!",
+      effect: function(cb) {
+        G.customerPatience = Math.max(0, G.customerPatience - 30);
+        G.toast("FIRE ALARM! Total chaos! -30 patience", 'chaos');
+        G.updateHUD();
+        setTimeout(cb, 600);
+      }
+    },
+    {
+      name: 'mom_calls',
+      intro: "Justin's phone starts RINGING in the middle of service. Loudly. It's his mom. Customers are staring.",
+      lukeReaction: "Is that... is that your PHONE?! During SERVICE?! Your MOM is calling you?! Tell her you're WORKING, Justin!",
+      choices: [
+        { text: "*silences phone* Sorry! Won't happen again!", good: true },
+        { text: "Hold on Luke, it might be important— Hi Mom...", good: false },
+        { text: "I thought it was on silent I SWEAR!", good: true },
+      ],
+      effect: function(cb) {
+        G.showDialog('luke', G.chaosEvents[7].lukeReaction, G.chaosEvents[7].choices.map(c => ({
+          text: c.text,
+          action: () => {
+            if (c.good) {
+              G.toast("Awkward... but crisis averted.", 'warn');
+            } else {
+              G.addStrike(0.5);
+              G.toast("Luke looks like he's about to explode.", 'bad');
+            }
+            cb();
+          }
+        })));
+        return true;
+      }
+    },
+  ],
+
   // --- INIT ---
   start() {
     this.score=0; this.strikes=0; this.customersServed=0;
     this.ordersCorrect=0; this.ordersMessed=0; this.currentRound=0;
     this.customerPatience=100; this.isRunning=true; this.inMinigame=false;
-    this.availableStation=null;
+    this.availableStation=null; this.patienceDrainRate=2.2; this.isReaganCustomer=false;
     Restaurant.justin = { x:0.5, y:0.45, tx:0.5, ty:0.45, frame:0, moving:false, targetStation:null };
     document.getElementById('title-screen').classList.remove('active');
     document.getElementById('fired-screen').classList.remove('active');
@@ -994,6 +1223,15 @@ const G = {
     pf.style.background = this.customerPatience > 50 ? 'var(--success)' : this.customerPatience > 25 ? 'var(--warn)' : 'var(--danger)';
   },
 
+  // --- TIMER DISPLAY ---
+  updateTimerDisplay() {
+    const wrap = document.getElementById('mg-timer-wrap');
+    if (!wrap) return;
+    const pct = this.customerPatience;
+    const cls = pct > 50 ? 'timer-ok' : pct > 25 ? 'timer-warn' : 'timer-crit';
+    wrap.innerHTML = `<span class="mg-timer ${cls}">${Math.ceil(pct)}% PATIENCE</span>`;
+  },
+
   // --- TOAST ---
   toast(msg, type='good') {
     const t = document.createElement('div');
@@ -1001,6 +1239,54 @@ const G = {
     t.textContent = msg;
     document.getElementById('game').appendChild(t);
     setTimeout(()=>t.remove(), 2500);
+  },
+
+  // --- WRONG ITEM FLASH ---
+  wrongFlash() {
+    const f = document.createElement('div');
+    f.className = 'mg-wrong-flash';
+    document.getElementById('game').appendChild(f);
+    setTimeout(()=>f.remove(), 400);
+  },
+
+  // --- SPEED BONUS ---
+  checkSpeedBonus() {
+    if (this.customerPatience > 70) {
+      this.score += 50;
+      this.toast('SPEED BONUS! +50', 'good');
+      return true;
+    } else if (this.customerPatience < 30) {
+      const roast = R(this.lukeSlowRoasts);
+      this.toast('Luke: "' + roast + '"', 'luke');
+      return false;
+    }
+    return null;
+  },
+
+  // --- HONK SYSTEM (Drive-through) ---
+  startHonking() {
+    this.stopHonking();
+    this._honkInterval = setInterval(() => {
+      if (this.customerPatience < 40) {
+        const overlay = document.getElementById('minigame-overlay');
+        if (overlay && overlay.classList.contains('visible')) {
+          let honk = overlay.querySelector('.honk-text');
+          if (!honk) {
+            honk = document.createElement('div');
+            honk.className = 'honk-text';
+            overlay.appendChild(honk);
+          }
+          honk.textContent = R(['HONK HONK!', 'BEEEEP!', '*HONKING*', 'HOOOONK!']);
+          clearTimeout(this._honkFade);
+          this._honkFade = setTimeout(() => { if(honk) honk.remove(); }, 1200);
+        }
+      }
+    }, 2500);
+  },
+  stopHonking() {
+    clearInterval(this._honkInterval);
+    const honks = document.querySelectorAll('.honk-text');
+    honks.forEach(h => h.remove());
   },
 
   // --- DIALOG ---
@@ -1068,6 +1354,7 @@ const G = {
 
   getFired(reason) {
     this.isRunning = false; this.inMinigame = false;
+    this.stopHonking();
     document.getElementById('hud').classList.remove('visible');
     document.getElementById('dialog').classList.remove('visible');
     document.getElementById('minigame-overlay').classList.remove('visible');
@@ -1107,14 +1394,66 @@ const G = {
     if (this.currentRound > this.totalRounds) { this.endShift(); return; }
     this.customerPatience = 100;
     this.inMinigame = false;
+    this.isReaganCustomer = false;
+    this.patienceDrainRate = 2.2;
     this.updateHUD();
 
-    // Random Andy event
-    if (this.currentRound > 2 && Math.random() < this.andyChance) {
-      this.andyEvent(() => this.assignStation());
+    // === SPECIAL ROUND EVENTS ===
+    if (this.currentRound === 3) {
+      this.toast('Luke: "Corporate is watching today. Don\'t embarrass me."', 'luke');
+    }
+    if (this.currentRound === 6) {
+      this.patienceDrainRate = 3.3;
+      this.toast('LUNCH RUSH! Patience drains 50% faster!', 'chaos');
+    }
+    if (this.currentRound === 12 && this.isRunning) {
+      this.toast('Luke: "I can\'t believe you made it. Genuinely shocked."', 'luke');
+    }
+
+    // === CHAOS EVENTS (random between rounds) ===
+    if (this.currentRound > 1 && Math.random() < 0.30) {
+      this.triggerChaos(() => this.afterChaos());
+      return;
+    }
+
+    this.afterChaos();
+  },
+
+  afterChaos() {
+    // Andy event check - round 9 gets double Andy
+    const andyRolls = this.currentRound === 9 ? 2 : 1;
+    let andyCount = 0;
+    for (let i = 0; i < andyRolls; i++) {
+      if (this.currentRound > 2 && Math.random() < this.andyChance) {
+        andyCount++;
+      }
+    }
+
+    if (andyCount > 0) {
+      const doAndy = (remaining, cb) => {
+        if (remaining <= 0) { cb(); return; }
+        if (remaining < andyCount) {
+          this.toast("Andy is BACK AGAIN?!", 'andy');
+        }
+        this.andyEvent(() => doAndy(remaining - 1, cb));
+      };
+      doAndy(andyCount, () => this.assignStation());
     } else {
       this.assignStation();
     }
+  },
+
+  triggerChaos(cb) {
+    const evt = R(this.chaosEvents);
+    this.toast('CHAOS EVENT!', 'chaos');
+    setTimeout(() => {
+      this.showDialog('justin', evt.intro, [], () => {
+        const handlesDialog = evt.effect(cb);
+        if (!handlesDialog) {
+          this.showDialog('luke', evt.lukeReaction, [], cb);
+        }
+      });
+    }, 600);
   },
 
   assignStation() {
@@ -1136,10 +1475,12 @@ const G = {
     // Patience drain
     clearInterval(this.patienceTimer);
     this.patienceTimer = setInterval(() => {
-      this.customerPatience = Math.max(0, this.customerPatience - 2.2);
+      this.customerPatience = Math.max(0, this.customerPatience - this.patienceDrainRate);
       this.updateHUD();
+      this.updateTimerDisplay();
       if (this.customerPatience <= 0) {
         clearInterval(this.patienceTimer);
+        this.stopHonking();
         this.failMG("Customer lost patience and left!");
       }
     }, 500);
@@ -1154,6 +1495,13 @@ const G = {
   },
 
   pickCustomer() {
+    // Round 11 guarantees Reagan
+    if (this.currentRound === 11) {
+      const orders = this.npcOrders['reagan'];
+      const order = orders[Math.floor(Math.random()*orders.length)];
+      return { key:'reagan', name:'Reagan', order };
+    }
+
     const keys = Object.keys(this.npcOrders);
     const k = keys[Math.floor(Math.random()*keys.length)];
     const orders = this.npcOrders[k];
@@ -1161,17 +1509,133 @@ const G = {
     return { key:k, name:this.chars[k]?.name||k, order };
   },
 
+  // --- REAGAN DYNAMICS ---
+  getReaganGreeting(cust) {
+    if (cust.key !== 'reagan') return cust.order.greeting;
+    this.isReaganCustomer = true;
+    return cust.order.greeting;
+  },
+
+  getReaganFlustered() {
+    return R([
+      "Uh... hi Reagan... what can I... you look— I MEAN what can I get you",
+      "Hey! Reagan! Hi! Welcome to— you already know where you are. What can I— yeah.",
+      "Oh! Reagan! Didn't expect— I mean of COURSE you can come here whenever— what would you like?",
+      "*voice cracks* Hey Reagan! What can I get for— *clears throat* sorry, what can I get you?",
+    ]);
+  },
+
+  reaganPostOrderDialog(cb) {
+    this.showDialog('justin', R([
+      "Did she just smile at me? Was that a real smile? FOCUS JUSTIN.",
+      "Okay. Be cool. She's just a customer. A really pretty customer. WHO I AM NOT THINKING ABOUT AT WORK.",
+      "My hands are shaking. Why are my hands shaking. It's a REGISTER, Justin. You've used it a thousand times.",
+      "She said 'thanks Justin' and my brain just... stopped. For like 3 full seconds.",
+    ]), [], () => {
+      this.showDialog('luke', R(this.lukeReaganRoasts), [], cb);
+    });
+  },
+
+  reaganFailDialog(cb) {
+    this.showDialog('justin', R([
+      "Oh no... oh no no no... not HER order...",
+      "I messed up REAGAN'S order. Of all the orders. REAGAN'S.",
+      "She's going to think I'm an idiot. I AM an idiot. But she doesn't need to KNOW that.",
+      "I'm going to think about this at 3 AM for the rest of my life.",
+    ]), [], () => {
+      this.showDialog('reagan', R([
+        "It's okay Justin, really! These things happen. *smiles reassuringly*",
+        "Don't worry about it! I know you're busy. It's totally fine!",
+        "Hey, no big deal! You're doing great. Seriously.",
+      ]), [], () => {
+        this.showDialog('luke', R([
+          "She's being nice about it which somehow makes this WORSE for you, doesn't it?",
+          "The look on your face right now... I almost feel bad for you. Almost.",
+          "Reagan handled that better than you handle literally anything.",
+        ]), [], cb);
+      });
+    });
+  },
+
+  // --- NPC FLAVOR DIALOGS ---
+  npcFlavorDialog(cust, cb) {
+    const order = cust.order;
+    // Navaneeth mid-order change
+    if (order.navFlavor && Math.random() < 0.5) {
+      this.showDialog('navaneeth', R([
+        "WAIT NO CHANGE THE FRIES TO MAC AND CHEESE WAIT NO KEEP THE FRIES AND ADD MAC AND CHEESE",
+        "ACTUALLY HOLD ON. Add strips. WAIT I ALREADY SAID THAT. Did I?? WHATEVER JUST ADD EVERYTHING.",
+        "YO WAIT. Is the milkshake machine working? IT BETTER BE. Actually give me TWO milkshakes. WAIT no, one milkshake one lemonade. FINAL ANSWER.",
+      ]), [], cb);
+      return true;
+    }
+    // Katy holds up the line
+    if (order.katyFlavor && Math.random() < 0.6) {
+      this.customerPatience = Math.max(0, this.customerPatience - 10);
+      this.updateHUD();
+      this.showDialog('katy', R([
+        "OH WAIT before you ring that up, did I tell you about what happened at practice?? So basically— actually never mind order first. OR ACTUALLY wait this is really quick—",
+        "Okay so I KNOW there's a line but this will only take a second— so you know how Gentry was saying— oh the people behind me look mad. FINE. Ring it up. But I'm telling you after!!",
+      ]), [], cb);
+      return true;
+    }
+    // Coach Hudson judges form
+    if (order.hudsonFlavor && Math.random() < 0.5) {
+      this.showDialog('hudson', R([
+        "Cook, your posture at that register is TERRIBLE. Shoulders BACK. Core ENGAGED. You ring up food like you run — sloppy.",
+        "Stand up straight, Cook! I can see your form breaking down from here. This is why your 5K time is stagnant.",
+        "Cook! What are you doing with your arms?? That's the same lazy motion I see at mile 3 when you give up.",
+      ]), [], cb);
+      return true;
+    }
+    // Black & Carter argue
+    if (order.blackCarterFlavor && Math.random() < 0.6) {
+      const arguer = cust.key === 'black' ? 'carter' : 'black';
+      this.showDialog(arguer, R([
+        "Nah nah nah, change mine to a spicy deluxe. Actually Justin, who do you think has better taste?? Don't answer that.",
+        "Justin tell him the nuggets are better than strips. TELL HIM. Actually just get both I don't care anymore.",
+        "This man has been arguing with me for 20 minutes about SAUCE. Justin just give us one of everything.",
+      ]), [], cb);
+      return true;
+    }
+    // Henry shows memes
+    if (order.henryFlavor && Math.random() < 0.5) {
+      this.customerPatience = Math.max(0, this.customerPatience - 8);
+      this.updateHUD();
+      this.showDialog('henry', R([
+        "*shoves phone in Justin's face* BRO YOU GOTTA SEE THIS. Wait let me find it. Hold on. It was so funny. Where did it— OH HERE. LOOK. *it's a picture of a chicken at a track meet* GET IT? BECAUSE YOU RUN AND WORK AT—",
+        "Justin. Justin. Look at this meme real quick. *shows phone* That's literally you at work. LITERALLY. Okay now take my order lol.",
+      ]), [], () => {
+        this.toast("Henry distracted you! -8 patience", 'warn');
+        cb();
+      });
+      return true;
+    }
+    // Gentry complex vibes
+    if (order.gentryFlavor && order.items.length > 5 && Math.random() < 0.4) {
+      this.showDialog('gentry', R([
+        "Yeah I know it's a lot. I'm a complex person, Justin. Don't judge me.",
+        "Before you give me that look — yes I need all of it. Practice was FOUR hours today.",
+      ]), [], cb);
+      return true;
+    }
+    return false;
+  },
+
   openMG(title, inst) {
     const o = document.getElementById('minigame-overlay');
     document.getElementById('mg-title').textContent = title;
     document.getElementById('mg-inst').textContent = inst;
     document.getElementById('mg-area').innerHTML = '';
+    document.getElementById('mg-timer-wrap').innerHTML = '';
     o.classList.add('visible');
     return document.getElementById('mg-area');
   },
 
   closeMG() {
     document.getElementById('minigame-overlay').classList.remove('visible');
+    document.getElementById('mg-timer-wrap').innerHTML = '';
+    this.stopHonking();
   },
 
   // ============================
@@ -1183,13 +1647,38 @@ const G = {
     let activeCat = 'entree';
     const cats = {entree:'Entrees',side:'Sides',bev:'Beverages',dessert:'Desserts'};
     const orderNum = Math.floor(Math.random()*900)+100;
+    const isReagan = cust.key === 'reagan';
 
-    this.showDialog(cust.key, cust.order.greeting, [
-      { text:"Welcome to Chick-fil-A! Go ahead.", action: () => render() },
-      { text:"My pleasure, what can I get you?", action: () => render() },
+    const greetingText = isReagan ? this.getReaganFlustered() : cust.order.greeting;
+
+    this.showDialog(cust.key, greetingText, [
+      { text: isReagan ? "Uh... welcome to... yeah. Go ahead." : "Welcome to Chick-fil-A! Go ahead.", action: () => {
+        if (isReagan) {
+          this.reaganPostOrderDialog(() => render());
+        } else {
+          // NPC flavor check
+          if (!this.npcFlavorDialog(cust, () => render())) {
+            render();
+          }
+        }
+      }},
+      { text: isReagan ? "*stammering* My... my pleasure... what can I..." : "My pleasure, what can I get you?", action: () => {
+        if (isReagan) {
+          this.reaganPostOrderDialog(() => render());
+        } else {
+          if (!this.npcFlavorDialog(cust, () => render())) {
+            render();
+          }
+        }
+      }},
     ]);
 
     const render = () => {
+      // Navaneeth special: show his reaction to the size
+      if (cust.key === 'navaneeth' && items.length > 7) {
+        this.toast(R(this.lukeNavRoasts), 'luke');
+      }
+
       const area = this.openMG('REGISTER', `Order #${orderNum} for ${cust.name}`);
       const wrap = document.createElement('div');
       wrap.className = 'reg-screen';
@@ -1244,14 +1733,24 @@ const G = {
         if (ok) {
           this.ordersCorrect++; this.score += 100+Math.round(this.customerPatience);
           this.toast('Order correct! +'+(100+Math.round(this.customerPatience)),'good');
-          this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+          this.checkSpeedBonus();
+          if (isReagan) {
+            this.showDialog('justin', "She ordered. I got it right. I'm basically a hero.", [], ()=>this.nextRound());
+          } else {
+            this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+          }
         } else {
-          this.ordersMessed++; this.toast('Wrong order sent!','bad');
-          // WRONG = customer blows up, then Luke destroys you, then strike
-          this.showDialog(cust.key, R(this.angryLines), this.angryChoices.map(c=>({text:c.text,action:()=>{
-            if(c.e>0){this.score+=Math.round(c.e*30);}else{this.addStrike(0.5);}
-            this.showDialog('luke',R(this.lukeRoasts),[],()=>{this.addStrike(0.5);this.nextRound();});
-          }})));
+          this.ordersMessed++;
+          if (isReagan) {
+            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
+          } else {
+            this.toast('Wrong order sent!','bad');
+            const roasts = items.length <= 3 ? this.lukeSimpleFailRoasts : this.lukeRoasts;
+            this.showDialog(cust.key, R(this.angryLines), this.angryChoices.map(c=>({text:c.text,action:()=>{
+              if(c.e>0){this.score+=Math.round(c.e*30);}else{this.addStrike(0.25);}
+              this.showDialog('luke',R(roasts),[],()=>{this.addStrike(0.75);this.nextRound();});
+            }})));
+          }
         }
         this.updateHUD();
       };
@@ -1267,9 +1766,14 @@ const G = {
     const correct = items.map(id=>this.menu.find(m=>m.id===id));
     const wrong = this.menu.filter(m=>!items.includes(m.id)).sort(()=>Math.random()-.5).slice(0,4);
     const all = [...correct,...wrong].sort(()=>Math.random()-.5);
+    const isReagan = cust.key === 'reagan';
 
-    this.showDialog('luke', `Justin! ${cust.name}'s order is up. Bag it correctly. Jacob already made it. Don't mess this up.`, [
-      { text:"On it!", action:()=>render() },
+    const introText = isReagan
+      ? `Justin! Reagan's order is up. Your hands are shaking. Bag it correctly. Don't you DARE mess this one up.`
+      : `Justin! ${cust.name}'s order is up. Bag it correctly. Jacob already made it. Don't mess this up.`;
+
+    this.showDialog('luke', introText, [
+      { text: isReagan ? "Oh no. Oh no oh no..." : "On it!", action:()=>render() },
     ]);
 
     const render = () => {
@@ -1285,8 +1789,21 @@ const G = {
         d.className = 'food-box';
         d.textContent = item.short;
         d.onclick = () => {
-          if(d.classList.contains('picked')){d.classList.remove('picked');picked=picked.filter(p=>p.idx!==idx);}
-          else{d.classList.add('picked');picked.push({id:item.id,idx});}
+          if(d.classList.contains('picked')){
+            d.classList.remove('picked');
+            picked=picked.filter(p=>p.idx!==idx);
+          } else {
+            // WRONG ITEM flash check
+            if (!items.includes(item.id)) {
+              d.classList.add('wrong-pick');
+              this.wrongFlash();
+              this.toast('WRONG ITEM!', 'bad');
+              setTimeout(() => d.classList.remove('wrong-pick'), 500);
+              return; // don't add it, just warn
+            }
+            d.classList.add('picked');
+            picked.push({id:item.id,idx});
+          }
           updBag();
         };
         conv.appendChild(d);
@@ -1305,10 +1822,21 @@ const G = {
         if(ok){
           this.ordersCorrect++; this.score+=120+Math.round(this.customerPatience);
           this.toast('Bagged perfectly! +'+(120+Math.round(this.customerPatience)),'good');
-          this.showDialog(cust.key, R(["Thanks! Perfect order!","That's everything, thanks!","Awesome, appreciate it!"]), [], ()=>this.nextRound());
+          this.checkSpeedBonus();
+          if (isReagan) {
+            this.showDialog('reagan', R(["Thanks Justin! *smiles*","Perfect, thank you! See you later!","You're the best, Justin!"]), [], () => {
+              this.showDialog('justin', "She said I'm the best. SHE SAID I'M THE BEST.", [], ()=>this.nextRound());
+            });
+          } else {
+            this.showDialog(cust.key, R(["Thanks! Perfect order!","That's everything, thanks!","Awesome, appreciate it!"]), [], ()=>this.nextRound());
+          }
         } else {
           this.ordersMessed++; this.toast('Wrong items in the bag!','bad');
-          this.showDialog('luke', R(this.lukeRoasts), [], ()=>{ this.addStrike(0.5); this.nextRound(); });
+          if (isReagan) {
+            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
+          } else {
+            this.showDialog('luke', R(this.lukeRoasts), [], ()=>{ this.addStrike(0.75); this.nextRound(); });
+          }
         }
         this.updateHUD();
       };
@@ -1322,14 +1850,19 @@ const G = {
     const spots = [];
     const nk = Object.keys(this.npcOrders);
     const correct = Math.floor(Math.random()*6);
+    const isReagan = cust.key === 'reagan';
     for(let i=0;i<6;i++){
       if(i===correct) spots.push({occ:true,name:cust.name,right:true,car:R(['Sedan','SUV','Truck','Van','Coupe'])});
       else if(Math.random()>.4){const k=nk[Math.floor(Math.random()*nk.length)];spots.push({occ:true,name:this.chars[k]?.name||'Customer',right:false,car:R(['Sedan','SUV','Truck','Hatch'])});}
       else spots.push({occ:false});
     }
 
-    this.showDialog('luke', `${cust.name} is waiting in the lot. Find their car and deliver. Don't give it to the wrong person... again.`, [
-      { text:"I'll find them!", action:()=>render() },
+    const introText = isReagan
+      ? `Reagan is waiting in the parking lot. Find her car. Your hands are sweating, Justin. Get it together.`
+      : `${cust.name} is waiting in the lot. Find their car and deliver. Don't give it to the wrong person... again.`;
+
+    this.showDialog('luke', introText, [
+      { text: isReagan ? "Reagan's out there?? I mean— yeah I'll find her." : "I'll find them!", action:()=>render() },
     ]);
 
     const render = () => {
@@ -1348,10 +1881,21 @@ const G = {
             if(sp.right){
               this.ordersCorrect++; this.score+=80+Math.round(this.customerPatience);
               this.toast('Delivered! +'+(80+Math.round(this.customerPatience)),'good');
-              this.showDialog(cust.key, R(["Thanks Justin!","Perfect, thanks!","That was fast!"]), [], ()=>this.nextRound());
+              this.checkSpeedBonus();
+              if (isReagan) {
+                this.showDialog('reagan', R(["Hey Justin! Thanks for bringing it out! *waves*","You found me! Thank you!","Justin! You're so sweet, thanks!"]), [], () => {
+                  this.showDialog('justin', "She waved at me. I'm going to pass out.", [], ()=>this.nextRound());
+                });
+              } else {
+                this.showDialog(cust.key, R(["Thanks Justin!","Perfect, thanks!","That was fast!"]), [], ()=>this.nextRound());
+              }
             } else {
               this.ordersMessed++; this.toast('Wrong car!','bad');
-              this.showDialog('luke', `You gave ${cust.name}'s food to ${sp.name}. HOW.`, [], ()=>{ this.addStrike(1); this.nextRound(); });
+              if (isReagan) {
+                this.reaganFailDialog(() => { this.addStrike(1.5); this.nextRound(); });
+              } else {
+                this.showDialog('luke', `You gave ${cust.name}'s food to ${sp.name}. HOW.`, [], ()=>{ this.addStrike(1.5); this.nextRound(); });
+              }
             }
             this.updateHUD();
           };
@@ -1372,17 +1916,23 @@ const G = {
     const items = cust.order.items;
     const weather = R(['94F - Hot out here','62F - Rainy','78F - Cloudy','101F - Scorching','55F - Windy']);
     const carNum = Math.floor(Math.random()*30)+1;
+    const isReagan = cust.key === 'reagan';
 
-    this.showDialog('luke', `Get outside with the iPad. Line of cars wrapped around. ${cust.name} is car #${carNum}. Take their order.`, [
-      { text:"Heading out!", action:()=>render() },
+    const introText = isReagan
+      ? `Wait... is that Reagan in the drive-through line? Get outside with the iPad. Car #${carNum}. Justin. BREATHE.`
+      : `Get outside with the iPad. Line of cars wrapped around. ${cust.name} is car #${carNum}. Take their order.`;
+
+    this.showDialog('luke', introText, [
+      { text: isReagan ? "Reagan drives through here??" : "Heading out!", action:()=>render() },
       { text:"Can't Jacob do it?", action:()=>{ this.toast("Luke: Jacob MAKES the food. GO.",'luke'); setTimeout(()=>render(),1200); }},
     ]);
 
     const render = () => {
+      const greetText = isReagan ? this.getReaganFlustered() + " ...through the car window. While holding an iPad. In the sun." : cust.order.greeting;
       const area = this.openMG('OUTSIDE iPAD ORDER', `Car #${carNum} - ${weather}`);
       const f = document.createElement('div');
       f.className = 'ipad-frame';
-      f.innerHTML = `<div class="ipad-inner"><div class="ipad-top"><h3>CFA Order System</h3><span class="car-tag">Car #${carNum}</span></div><div class="ipad-bubble">${cust.order.greeting}</div><div class="ipad-entered" id="ie">Tap items to add...</div><div class="ipad-grid" id="ig"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="ic">Clear</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="is">Send to Kitchen</button></div></div>`;
+      f.innerHTML = `<div class="ipad-inner"><div class="ipad-top"><h3>CFA Order System</h3><span class="car-tag">Car #${carNum}</span></div><div class="ipad-bubble">${greetText}</div><div class="ipad-entered" id="ie">Tap items to add...</div><div class="ipad-grid" id="ig"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="ic">Clear</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="is">Send to Kitchen</button></div></div>`;
       area.appendChild(f);
 
       const grid = document.getElementById('ig');
@@ -1408,10 +1958,22 @@ const G = {
         if(ok){
           this.ordersCorrect++; this.score+=110+Math.round(this.customerPatience);
           this.toast('Order sent to Jacob! +'+(110+Math.round(this.customerPatience)),'good');
-          this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+          this.checkSpeedBonus();
+          if (isReagan) {
+            this.showDialog('reagan', "Thanks Justin! Stay cool out here!", [], () => {
+              this.showDialog('justin', "She told me to stay cool. I am NOT cool. I am the opposite of cool right now.", [], ()=>this.nextRound());
+            });
+          } else {
+            this.showDialog('luke', R(this.lukeGood), [], ()=>this.nextRound());
+          }
         } else {
-          this.ordersMessed++; this.toast('Wrong order sent to kitchen!','bad');
-          this.showDialog('luke', R(["Jacob yelled at me because that order makes no sense.","The iPad order is all wrong!","Did the heat get to your brain?"]), [], ()=>{ this.addStrike(0.5); this.nextRound(); });
+          this.ordersMessed++;
+          if (isReagan) {
+            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
+          } else {
+            this.toast('Wrong order sent to kitchen!','bad');
+            this.showDialog('luke', R(["Jacob yelled at me because that order makes no sense.","The iPad order is all wrong!","Did the heat get to your brain?"]), [], ()=>{ this.addStrike(0.75); this.nextRound(); });
+          }
         }
         this.updateHUD();
       };
@@ -1427,16 +1989,25 @@ const G = {
     const correct = items.map(id=>this.menu.find(m=>m.id===id));
     const wrong = this.menu.filter(m=>!items.includes(m.id)).sort(()=>Math.random()-.5).slice(0,3);
     const tray = [...correct,...wrong].sort(()=>Math.random()-.5);
+    const isReagan = cust.key === 'reagan';
 
-    this.showDialog('luke', `Drive-through window! ${cust.name} pulling up. Hand them the RIGHT items. Do NOT give them someone else's food.`, [
-      { text:"Window time!", action:()=>render() },
+    const introText = isReagan
+      ? `Drive-through window! Reagan is pulling up. Do NOT make it weird, Justin.`
+      : `Drive-through window! ${cust.name} pulling up. Hand them the RIGHT items. Do NOT give them someone else's food.`;
+
+    this.showDialog('luke', introText, [
+      { text: isReagan ? "It's just a window. I can do this. Maybe." : "Window time!", action:()=>render() },
     ]);
 
     const render = () => {
+      this.startHonking();
       const area = this.openMG('DRIVE-THROUGH WINDOW', `Hand ${cust.name} their order`);
       const w = document.createElement('div');
       w.className = 'dt-wrap';
-      w.innerHTML = `<div class="dt-window"><div class="dt-car">${R(['[CAR]','[SUV]','[TRUCK]','[VAN]'])}</div><div class="dt-who">${cust.name}</div><div class="dt-says">"${R(["Mobile order for "+cust.name,"Picking up!","Hey, order ready?","What's up Justin!"])}"</div></div><div class="dt-counter"><div class="dt-ticket"><strong>Ticket:</strong> ${items.map(id=>this.menu.find(m=>m.id===id)?.short||id).join(', ')}</div><div class="dt-handed" id="dh"></div><div class="dt-tray" id="dtray"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="drst">Take Back</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="ddn">Close Window</button></div></div>`;
+      const sayText = isReagan
+        ? R(["Hi Justin! *waves from car*", "Hey! It's me!", "Justin! Fancy seeing you here *laughs*"])
+        : R(["Mobile order for "+cust.name,"Picking up!","Hey, order ready?","What's up Justin!"]);
+      w.innerHTML = `<div class="dt-window"><div class="dt-car">${R(['[CAR]','[SUV]','[TRUCK]','[VAN]'])}</div><div class="dt-who">${cust.name}</div><div class="dt-says">"${sayText}"</div></div><div class="dt-counter"><div class="dt-ticket"><strong>Ticket:</strong> ${items.map(id=>this.menu.find(m=>m.id===id)?.short||id).join(', ')}</div><div class="dt-handed" id="dh"></div><div class="dt-tray" id="dtray"></div><div class="reg-acts"><button class="btn btn-r" style="font-size:.75em" id="drst">Take Back</button><button class="btn" style="background:var(--success);color:#fff;font-size:.75em" id="ddn">Close Window</button></div></div>`;
       area.appendChild(w);
 
       const dtray = document.getElementById('dtray');
@@ -1456,19 +2027,31 @@ const G = {
       document.getElementById('ddn').onclick = () => {
         clearInterval(this.patienceTimer);
         this.closeMG();
+        this.stopHonking();
         const ok = [...items].sort().join() === handed.map(h=>h.id).sort().join();
         this.customersServed++;
         if(ok){
           this.ordersCorrect++; this.score+=90+Math.round(this.customerPatience);
           this.toast('Perfect handoff! +'+(90+Math.round(this.customerPatience)),'good');
-          this.showDialog(cust.key, R(["Thanks! Have a great day!","Perfect, everything's here!","Fast service, thanks!"]), [], ()=>this.nextRound());
+          this.checkSpeedBonus();
+          if (isReagan) {
+            this.showDialog('reagan', R(["Thanks Justin! *smiles and drives away*","You're a lifesaver! See you around!","Perfect! Bye Justin! *waves*"]), [], () => {
+              this.showDialog('justin', "I handed Reagan food through a window and our hands almost touched. I need to sit down.", [], ()=>this.nextRound());
+            });
+          } else {
+            this.showDialog(cust.key, R(["Thanks! Have a great day!","Perfect, everything's here!","Fast service, thanks!"]), [], ()=>this.nextRound());
+          }
         } else {
           this.ordersMessed++; this.toast('Wrong items!','bad');
-          this.showDialog(cust.key, R(["This isn't what I ordered??","I'm missing stuff!","Bro I can see my items right there on the counter."]),
-            this.angryChoices.map(c=>({text:c.text,action:()=>{
-              if(c.e>0){this.score+=Math.round(c.e*50);}else{this.addStrike(0.5);}
-              this.showDialog('luke',R(this.lukeRoasts),[],()=>this.nextRound());
-            }})));
+          if (isReagan) {
+            this.reaganFailDialog(() => { this.addStrike(0.75); this.nextRound(); });
+          } else {
+            this.showDialog(cust.key, R(["This isn't what I ordered??","I'm missing stuff!","Bro I can see my items right there on the counter."]),
+              this.angryChoices.map(c=>({text:c.text,action:()=>{
+                if(c.e>0){this.score+=Math.round(c.e*50);}else{this.addStrike(0.25);}
+                this.showDialog('luke',R(this.lukeRoasts),[],()=>{this.addStrike(0.75);this.nextRound();});
+              }})));
+          }
         }
         this.updateHUD();
       };
@@ -1481,18 +2064,28 @@ const G = {
     const a = R(this.andyAllegations);
     setTimeout(()=>{
       this.showDialog('andy', `Hey! Manager! ${a.claim}`, [], ()=>{
-        this.showDialog('luke', "Justin... Andy is saying stuff. Care to explain?",
+        // Special follow-up for napkin allegation
+        const followup = a.lukeFollowup
+          ? `Justin... Andy is saying stuff. Care to explain? Also... ${a.lukeFollowup}`
+          : "Justin... Andy is saying stuff. Care to explain?";
+        this.showDialog('luke', followup,
           a.defenses.map(d=>({
             text:d.text,
             action:()=>{
               if(d.e>0){
                 this.score+=Math.round(d.e*40);
                 this.toast('Defended yourself! Andy leaves.','good');
-                this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], cb);
+                this.showDialog('luke', R(["Yeah Andy, get out. Justin's fine.","You don't even work here, Andy!","Nice try Andy."]), [], () => {
+                  // Post-Andy Luke roast
+                  if (Math.random() < 0.5) {
+                    this.toast(R(this.lukePostAndyRoasts), 'luke');
+                  }
+                  cb();
+                });
               } else {
-                this.addStrike(0.5);
-                this.toast("That defense didn't help...",'bad');
-                this.showDialog('luke', R(["You're not helping your case here.","Just... don't say anything else."]), [], cb);
+                this.addStrike(0.75);
+                this.toast("That defense didn't help... +0.75 strike",'bad');
+                this.showDialog('luke', R(this.lukePostAndyRoasts), [], cb);
               }
             }
           }))
@@ -1506,7 +2099,7 @@ const G = {
     this.closeMG();
     this.customersServed++; this.ordersMessed++;
     this.toast(reason,'bad');
-    this.addStrike(1);
+    this.addStrike(1.5);
     if(this.isRunning) this.showDialog('luke', R(this.lukeRoasts), [], ()=>this.nextRound());
     this.updateHUD();
   },
@@ -1515,6 +2108,7 @@ const G = {
   endShift() {
     clearInterval(this.patienceTimer);
     this.isRunning = false; this.inMinigame = false;
+    this.stopHonking();
     document.getElementById('hud').classList.remove('visible');
     document.getElementById('dialog').classList.remove('visible');
     this.closeMG();
