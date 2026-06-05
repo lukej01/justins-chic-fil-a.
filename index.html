@@ -441,6 +441,8 @@ const Sprites = {
     levi:     { hair:'lots',  hairColor:'#C49A3C', skinColor:'#FDDCB5', eyeColor:'#5A3A1A', shirtColor:'#B8572A', pantsColor:'#336',    isApron:false, hat:false },
     stranger: { hair:'short', hairColor:'#333',    skinColor:'#D4AA78', eyeColor:'#444',    shirtColor:'#555',    pantsColor:'#333',    isApron:false, hat:false },
     hudsons_brother: { hair:'short', hairColor:'#999', skinColor:'#D4A06A', eyeColor:'#556B2F', shirtColor:'#0A4A72', pantsColor:'#334', isApron:false, hat:true },
+    ethan:    { hair:'short', hairColor:'#3A2A1A', skinColor:'#FDDCB5', eyeColor:'#4A6A8A', shirtColor:'#6B4A8A', pantsColor:'#334', isApron:false, hat:false },
+    ethan_gf: { hair:'long',  hairColor:'#8A5A2A', skinColor:'#FDDCB5', eyeColor:'#5A7A4A', shirtColor:'#F8A4B8', pantsColor:'#446', isApron:false, hat:false },
   },
 
   drawChar(canvasOrCtx, charKey, frame=0) {
@@ -1049,6 +1051,7 @@ const G = {
     katy:{ name:'Katy' }, nicolas:{ name:'Nicolas' }, caitlin:{ name:'Caitlin' },
     charles:{ name:'Charles Weiner' }, levi:{ name:'Levi Howard Weiner' },
     stranger:{ name:'???' }, hudsons_brother:{ name:"Coach Hudson's Bro" },
+    ethan:{ name:'Ethan Bridge' }, ethan_gf:{ name:"Ethan's Girlfriend" },
   },
 
   npcOrders: {
@@ -1118,6 +1121,11 @@ const G = {
     levi: [
       { greeting:"Justin. You know what I want. The Weiner special. Dad said you'd know. You DO know, right? RIGHT?? Come on. THE thing. Our thing.", items:['cs','xp','fr','lm','sc'], weinerflavor:true },
       { greeting:"It's me. Levi. Howard. Weiner. The WEINER SPECIAL. Classic. Legendary. Dad's order. Family recipe. You KNOW what it is. Stop acting like you don't.", items:['ss','fr','tea','bq','hm'], weinerflavor:true },
+    ],
+    ethan: [
+      { greeting:"Justin! Bro! This is my girlfriend — she just started, she's a freshman. I'll have a CFA sandwich and fries. She wants a lemonade and a cookie.", ethanItems:['cs','fr'], gfLine:"Oh! Can I also get a side salad? And extra pickles on his sandwich! You're so nice!", gfItems:['sa','xp'], items:['cs','fr','lm','ck','sa','xp'], ethanFlavor:true },
+      { greeting:"Yo Justin what up! Brought my girl again. She's been talking about this place since last week. Spicy deluxe for me, milkshake for her.", ethanItems:['ss','fr','ms'], gfLine:"Wait, can I change the milkshake to a lemonade? And can I get a fruit cup and a brownie? Ethan says you never mess up!", gfItems:['lm','fs','br'], items:['ss','fr','lm','fs','br'], ethanFlavor:true },
+      { greeting:"Justin! My girlfriend has been hyping you up at school nonstop. 12-piece nuggets, fries, strips, and a sweet tea for both of us.", ethanItems:['ng','fr','st','tea'], gfLine:"Oh and a honey mustard AND a ranch for dipping! Can I get a cookie too? Ethan always said you're the best here!", gfItems:['hm','rn','ck'], items:['ng','fr','st','tea','hm','rn','ck'], ethanFlavor:true },
     ],
   },
 
@@ -1582,7 +1590,7 @@ const G = {
     this.ordersCorrect=0; this.ordersMessed=0; this.currentRound=0;
     this.customerPatience=100; this.isRunning=true; this.inMinigame=false;
     this.availableStation=null; this.patienceDrainRate=0.85; this.isReaganCustomer=false;
-    this.andyRepelledCount=0;
+    this.andyRepelledCount=0; this.lastStation=null; this.lastCustomerKey=null;
     Restaurant.justin = { x:0.5, y:0.45, tx:0.5, ty:0.45, frame:0, moving:false, targetStation:null };
     document.getElementById('title-screen').classList.remove('active');
     document.getElementById('fired-screen').classList.remove('active');
@@ -1855,8 +1863,11 @@ const G = {
 
   assignStation() {
     const stations = ['register','bagging','curbside','ipad','drivethrough'];
-    this.availableStation = stations[Math.floor(Math.random()*stations.length)];
-    this.toast(`Luke: "Justin! Head to ${Restaurant.stations[this.availableStation].label}!"`, 'luke');
+    let pick, tries = 0;
+    do { pick = R(stations); tries++; } while (pick === this.lastStation && tries < 10);
+    this.lastStation = pick;
+    this.availableStation = pick;
+    this.toast(`Luke: "Justin! Head to ${Restaurant.stations[pick].label}!"`, 'luke');
   },
 
   arriveAtStation(station) {
@@ -1874,6 +1885,9 @@ const G = {
 
     // Levi Howard Weiner — "The Weiner Special" assembly game (handles its own timer)
     if (customer.key === 'levi') { this.mgWeinerSpecial(customer); return; }
+
+    // Ethan Bridge — double order (him + freshman GF), handles its own flow
+    if (customer.key === 'ethan') { this.mgEthanOrder(customer); return; }
 
     // Nicolas Bittner — super-speed legend: chill & patient, so the timer
     // crawls (which also means a fat patience bonus when you finish)
@@ -1913,9 +1927,11 @@ const G = {
     }
 
     const keys = Object.keys(this.npcOrders);
-    const k = keys[Math.floor(Math.random()*keys.length)];
+    let k, tries = 0;
+    do { k = R(keys); tries++; } while (k === this.lastCustomerKey && keys.length > 1 && tries < 15);
+    this.lastCustomerKey = k;
     const orders = this.npcOrders[k];
-    const order = orders[Math.floor(Math.random()*orders.length)];
+    const order = R(orders);
     return { key:k, name:this.chars[k]?.name||k, order };
   },
 
@@ -2725,8 +2741,8 @@ const G = {
 
   // Andy — secret room variant
   andySecretRoom(cb) {
-    this.showDialog('andy', "Hey. Manager. I need to use the secret room. You know which one. The one with the... bed.", [], () => {
-      this.showDialog('luke', "Justin... Andy claims there's a 'secret room.' Is there something back there I don't know about??", [
+    this.showDialog('andy', "Hey. Manager. I need to use the secret room. The one with Hannie's bed.", [], () => {
+      this.showDialog('luke', "Justin... Andy is asking about a 'secret room' with a bed. This is Hannie's bed apparently. Do I want to know??", [
         { text:"There IS no secret room. Andy, please leave.", action:()=>{
           this.score += 40;
           this.toast("Andy leaves, genuinely confused. +40 score.", 'good');
@@ -2742,7 +2758,8 @@ const G = {
           o.className = 'secret-room';
           o.innerHTML = `<div style="font-family:'Fredoka One',cursive;font-size:1.4em;color:#E51636;margin-bottom:16px">THE SECRET ROOM</div>
             <div class="secret-room-bed"></div>
-            <p style="margin-top:16px;font-size:.82em;opacity:.7;line-height:1.5">Andy is in the secret room.<br>With the bed.<br>Luke has not blinked in 45 seconds.</p>
+            <div style="font-family:'Fredoka One',cursive;font-size:.75em;color:#c8a8ff;margin-top:6px;letter-spacing:1px">HANNIE'S BED</div>
+            <p style="margin-top:12px;font-size:.82em;opacity:.7;line-height:1.5">Andy is in the secret room.<br>On Hannie's bed.<br>Luke has not blinked in 45 seconds.</p>
             <button class="btn btn-r" style="margin-top:18px;padding:12px 32px" id="sr-escape">Get Andy Out of There</button>`;
           document.getElementById('game').appendChild(o);
           SFX.fail();
@@ -2852,6 +2869,66 @@ const G = {
     const sl=document.createElement('div'); sl.className='glitch-scanline'; ov.appendChild(sl);
     g.appendChild(ov); g.classList.add('glitch-corrupt');
     setTimeout(()=>{ ov.remove(); g.classList.remove('glitch-corrupt'); }, duration);
+  },
+
+  // Ethan Bridge — double order with freshman GF
+  mgEthanOrder(cust) {
+    this.inMinigame = true;
+    const order = cust.order;
+
+    clearInterval(this.patienceTimer);
+    this.patienceTimer = setInterval(() => {
+      this.customerPatience = Math.max(0, this.customerPatience - this.patienceDrainRate);
+      this.updateHUD(); this.updateTimerDisplay();
+      if (this.customerPatience <= 0) { clearInterval(this.patienceTimer); this.failMG("Ethan and his girlfriend gave up waiting!"); }
+    }, 500);
+
+    // Step 1 — Ethan introduces himself + initial order
+    this.showDialog('ethan', order.greeting, [
+      { text:"Welcome! My pleasure, go ahead.", action:()=>gfStep() },
+    ]);
+
+    // Step 2 — GF swoops in with additions/changes
+    const gfStep = () => {
+      this.showDialog('ethan_gf', order.gfLine, [
+        { text:"Got it! Anything else?", action:()=>render() },
+      ]);
+    };
+
+    // Step 3 — Order pad with the combined final order
+    const render = () => {
+      const area = this.openMG('ETHAN + GF ORDER', "Don't mess this up — she will KNOW");
+      this._orderPad(area, {
+        items: order.items,
+        bubble: { charKey:'ethan', text: order.greeting },
+        sendLabel:'SEND ORDER',
+        onSend:(entered)=>{
+          clearInterval(this.patienceTimer);
+          this.closeMG();
+          const ok = [...order.items].sort().join() === [...entered].sort().join();
+          this.customersServed++;
+          if (ok) {
+            this.ordersCorrect++; this.score += 130 + Math.round(this.customerPatience);
+            SFX.success();
+            this.toast('Nailed the double order! +'+(130+Math.round(this.customerPatience)),'good');
+            this.checkSpeedBonus(); this.myPleasure(0.5);
+            this.showDialog('ethan', R([
+              "Bro you're the GOAT! She's obsessed with this place now.",
+              "She said the order was perfect! You're my guy Justin!",
+              "See? Told you Justin never messes up.",
+              "She literally wants to come back tomorrow. You did that.",
+            ]), [], ()=>this.nextRound());
+          } else {
+            this.ordersMessed++; SFX.fail();
+            this.showDialog('ethan_gf',"This isn't what I ordered... Ethan, I'm just saying.",[],()=>{
+              this.addStrike(0.5);
+              this.showDialog('ethan',"Bro... she's looking at me right now. I can't believe this. +0.5 strike, Justin.",[],()=>this.nextRound());
+            });
+          }
+          this.updateHUD();
+        }
+      });
+    };
   },
 
   // Levi Howard Weiner — Weiner Special assembly
@@ -2970,6 +3047,8 @@ const SFX = {
     levi:     ['square',   490, 70,  0.09],
     stranger: ['sine',     420, 50,  0.07],
     hudsons_brother: ['square', 290, 25, 0.10],
+    ethan:    ['square',   480, 65,  0.08],
+    ethan_gf: ['sine',     720, 90,  0.08],
     gentry:   ['triangle', 460, 60,  0.08],
     henry:    ['square',   500, 80,  0.08],
     black:    ['triangle', 420, 50,  0.08],
