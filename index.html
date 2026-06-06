@@ -1694,6 +1694,7 @@ const G = {
     document.getElementById('dlg-name').textContent = name;
     const textEl = document.getElementById('dlg-text');
     textEl.textContent = '';
+    if (this._typerId) { clearTimeout(this._typerId); this._typerId = null; }
     let i = 0;
     const tp = () => {
       if (i < text.length) {
@@ -1701,7 +1702,9 @@ const G = {
         // chirp every 2 non-space characters
         if (text[i] !== ' ' && i % 2 === 0) SFX.voice(charKey);
         i++;
-        setTimeout(tp, 16);
+        this._typerId = setTimeout(tp, 16);
+      } else {
+        this._typerId = null;
       }
     };
     tp();
@@ -2870,7 +2873,7 @@ const G = {
         this.showDialog('luke',"I have NEVER in my ENTIRE CAREER written an incident report this specific. This is unprecedented. +0.75 strike. Deal with your FRIENDS, Justin.",[],()=>cb());
       }
     };
-    document.getElementById('gc-stop').onclick=o.onclick=()=>{ if(!stopped){ stopped=true; finish(true); }};
+    document.getElementById('gc-stop').onclick=o.onclick=()=>{ if(!stopped) finish(true); };
     const ticker=setInterval(()=>{ elapsed++; const r=SECS-elapsed; if(timerEl) timerEl.textContent=r>0?r:'0'; if(elapsed>=SECS&&!stopped) finish(false); },1000);
   },
 
